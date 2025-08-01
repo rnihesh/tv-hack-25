@@ -1,288 +1,294 @@
-const { validationResult } = require("express-validator");
-const Company = require("../models/Company");
-const { ChatbotChain } = require("../services/langchain/contextualChains");
-const { businessLogger, aiLogger } = require("../utils/logger");
+const { validationResult } = require('express-validator');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+const Company = require('../models/Company');
+const AIContext = require('../models/AIContext');
+const config = require('../config/env-config');
+const { logger, aiLogger } = require('../utils/logger');
 
-// Credit costs for chatbot operations
-const CREDIT_COSTS = {
-  chatbot_response: 1,
-  chatbot_training: 5,
-  conversation_analysis: 2,
-};
+// Initialize Gemini AI
+const genAI = new GoogleGenerativeAI(config.geminiApiKey);
 
-// @desc    Generate chatbot response with context
-// @route   POST /api/chatbot/respond
-// @access  Private
-const generateResponse = async (req, res) => {
+/**
+ * Process chatbot message with company context
+ */
+const processMessage = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
         success: false,
-        message: "Validation failed",
-        errors: errors.array(),
+        errors: errors.array()
       });
     }
 
-    const { userMessage, conversationId, customerInfo, intent } = req.body;
-    const company = req.companyData; // From middleware
+    const { message, sessionId } = req.body;
+    const companyId = req.company.id;
 
-    // Check and deduct credits
-    const requiredCredits = CREDIT_COSTS.chatbot_response;
-    if (!company.hasCredits(requiredCredits)) {
-      return res.status(403).json({
+    // Check if company has sufficient credits
+    const company = await Company.findById(companyId);
+    if (!company) {
+      return res.status(404).json({
         success: false,
-        message: "Insufficient credits",
-        requiredCredits,
-        currentCredits: company.credits.currentCredits,
+        message: 'Company not found'
       });
     }
 
-    // Initialize the chatbot chain with context
-    const chatbotChain = new ChatbotChain(company._id);
-
-    // Generate contextual response
-    const result = await chatbotChain.generateResponse({
-      userMessage,
-      conversationId: conversationId || `conv_${Date.now()}`,
-      customerInfo,
-      intent,
-    });
-
-    // Deduct credits and update usage
-    await company.deductCredits(
-      requiredCredits,
-      "chatbot_response",
-      "Chatbot response generation"
-    );
-    company.usage.chatbotResponses = (company.usage.chatbotResponses || 0) + 1;
-    await company.save();
-
-    // Log business activity
-    businessLogger.contentGeneration(company.email, "chatbot_response", true, {
-      intent: result.detectedIntent,
-      model: result.modelUsed,
-      creditsUsed: requiredCredits,
-    });
-
-    res.status(200).json({
-      success: true,
-      message: "Response generated successfully",
-      data: {
-        response: result.response,
-        conversationId: result.conversationId,
-        detectedIntent: result.detectedIntent,
-        suggestedActions: result.suggestedActions,
-        contextInsights: result.contextInsights,
-        metadata: {
-          tokensUsed: result.metrics.tokenUsage.total,
-          processingTime: result.metrics.duration,
-          contextSources: result.contextUsed,
-          confidence: result.confidence,
-        },
-        creditsUsed: requiredCredits,
-        remainingCredits: company.credits.currentCredits,
-      },
-    });
-  } catch (error) {
-    businessLogger.contentGeneration(
-      req.company?.email || "unknown",
-      "chatbot_response",
-      false,
-      { error: error.message }
-    );
-
-    console.error("Chatbot response error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Error generating chatbot response",
-      error:
-        process.env.NODE_ENV === "development"
-          ? error.message
-          : "Internal server error",
-    });
-  }
-};
-
-// @desc    Train chatbot with business-specific context
-// @route   POST /api/chatbot/train
-// @access  Private
-const trainChatbot = async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
+    // Check credits for chatbot usage
+    if (!company.hasCredits(1)) {
+      return res.status(402).json({
         success: false,
-        message: "Validation failed",
-        errors: errors.array(),
+        message: 'Insufficient credits for chatbot service',
+        creditsRequired: 1,
+        currentCredits: company.credits.currentCredits
       });
     }
 
-    const { trainingData, businessInfo, faqData, productInfo } = req.body;
-    const company = req.companyData;
+    aiLogger.info('Processing chatbot message', {
+      companyId,
+      sessionId,
+      messageLength: message.length
+    });
 
-    // Check and deduct credits
-    const requiredCredits = CREDIT_COSTS.chatbot_training;
-    if (!company.hasCredits(requiredCredits)) {
-      return res.status(403).json({
-        success: false,
-        message: "Insufficient credits",
-        requiredCredits,
-        currentCredits: company.credits.currentCredits,
+    // Get or create AI context for this session
+    let aiContext = await AIContext.findOne({
+      companyId,
+      contextType: 'chatbot',
+      sessionId
+    });
+
+    if (!aiContext) {
+      aiContext = new AIContext({
+        companyId,
+        contextType: 'chatbot',
+        sessionId,
+        conversationHistory: [],
+        businessContext: {
+          extractedPreferences: {},
+          communicationPatterns: {}
+        }
       });
     }
 
-    // Initialize the chatbot chain with context
-    const chatbotChain = new ChatbotChain(company._id);
+    // Build context-aware prompt
+    const businessInfo = company.businessDescription || 'A business';
+    const targetAudience = company.targetAudience || 'customers';
+    const personality = company.aiContextProfile?.businessPersonality || 'helpful and professional';
+    const brandVoice = company.aiContextProfile?.brandVoice || 'professional';
 
-    // Train chatbot with business context
-    const result = await chatbotChain.trainWithBusinessContext({
-      trainingData,
-      businessInfo,
-      faqData,
-      productInfo,
-    });
+    // Get recent conversation history
+    const recentHistory = aiContext.conversationHistory
+      .slice(-10) // Last 10 messages for context
+      .map(msg => `${msg.role}: ${msg.content}`)
+      .join('\n');
 
-    // Deduct credits and update usage
-    await company.deductCredits(
-      requiredCredits,
-      "chatbot_training",
-      "Chatbot training"
-    );
-    company.usage.chatbotTrainingSessions =
-      (company.usage.chatbotTrainingSessions || 0) + 1;
-    await company.save();
+    const contextualPrompt = `You are an AI business assistant for "${company.companyName || 'this company'}".
 
-    // Log business activity
-    businessLogger.contentGeneration(company.email, "chatbot_training", true, {
-      trainingDataSize: trainingData?.length || 0,
-      model: result.modelUsed,
-      creditsUsed: requiredCredits,
-    });
+BUSINESS CONTEXT:
+- Business Description: ${businessInfo}
+- Target Audience: ${targetAudience}
+- Communication Style: ${personality}
+- Brand Voice: ${brandVoice}
+- Services/Products: ${company.aiContextProfile?.productServices?.join(', ') || 'various services'}
 
-    res.status(200).json({
-      success: true,
-      message: "Chatbot training completed successfully",
-      data: {
-        trainingResults: result.trainingResults,
-        improvedCapabilities: result.improvedCapabilities,
-        contextUpdates: result.contextUpdates,
-        metadata: {
-          tokensUsed: result.metrics.tokenUsage.total,
-          processingTime: result.metrics.duration,
-          documentsProcessed: result.documentsProcessed,
-        },
-        creditsUsed: requiredCredits,
-        remainingCredits: company.credits.currentCredits,
-      },
-    });
-  } catch (error) {
-    businessLogger.contentGeneration(
-      req.company?.email || "unknown",
-      "chatbot_training",
-      false,
-      { error: error.message }
-    );
+RECENT CONVERSATION:
+${recentHistory}
 
-    console.error("Chatbot training error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Error training chatbot",
-      error:
-        process.env.NODE_ENV === "development"
-          ? error.message
-          : "Internal server error",
-    });
-  }
-};
+INSTRUCTIONS:
+- Act as a helpful customer service representative for this specific business
+- Use the business context to provide relevant, accurate responses
+- Maintain a ${brandVoice} tone that matches the company's communication style
+- Reference the company's services and target audience when appropriate
+- Be helpful, friendly, and professional
+- If you don't know specific details, suggest contacting the business directly
+- Keep responses concise but informative (max 200 words)
 
-// @desc    Analyze conversation patterns
-// @route   POST /api/chatbot/analyze
-// @access  Private
-const analyzeConversations = async (req, res) => {
-  try {
-    const { timeRange, conversationIds, analysisType } = req.body;
-    const company = req.companyData;
+User Message: ${message}
 
-    // Check and deduct credits
-    const requiredCredits = CREDIT_COSTS.conversation_analysis;
-    if (!company.hasCredits(requiredCredits)) {
-      return res.status(403).json({
-        success: false,
-        message: "Insufficient credits",
-        requiredCredits,
-        currentCredits: company.credits.currentCredits,
-      });
-    }
+Response:`;
 
-    // Initialize the chatbot chain with context
-    const chatbotChain = new ChatbotChain(company._id);
+    // Call Gemini API
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    
+    const result = await model.generateContent(contextualPrompt);
+    const response = result.response;
+    const responseText = response.text();
 
-    // Analyze conversation patterns
-    const result = await chatbotChain.analyzeConversations({
-      timeRange,
-      conversationIds,
-      analysisType: analysisType || "comprehensive",
-    });
-
-    // Deduct credits and update usage
-    await company.deductCredits(
-      requiredCredits,
-      "conversation_analysis",
-      "Conversation analysis"
-    );
-
-    // Log business activity
-    businessLogger.contentGeneration(
-      company.email,
-      "conversation_analysis",
-      true,
+    // Save conversation to context
+    aiContext.conversationHistory.push(
       {
-        analysisType,
-        conversationsAnalyzed: result.conversationsAnalyzed,
-        creditsUsed: requiredCredits,
+        role: 'user',
+        content: message,
+        timestamp: new Date(),
+        metadata: {
+          sessionId
+        }
+      },
+      {
+        role: 'assistant',
+        content: responseText,
+        timestamp: new Date(),
+        metadata: {
+          model: 'gemini-2.5-flash',
+          sessionId
+        }
       }
     );
 
-    res.status(200).json({
-      success: true,
-      message: "Conversation analysis completed successfully",
-      data: {
-        insights: result.insights,
-        patterns: result.patterns,
-        recommendations: result.recommendations,
-        performanceMetrics: result.performanceMetrics,
-        metadata: {
-          conversationsAnalyzed: result.conversationsAnalyzed,
-          timeRange: result.timeRange,
-          processingTime: result.metrics.duration,
-        },
-        creditsUsed: requiredCredits,
-        remainingCredits: company.credits.currentCredits,
-      },
-    });
-  } catch (error) {
-    businessLogger.contentGeneration(
-      req.company?.email || "unknown",
-      "conversation_analysis",
-      false,
-      { error: error.message }
-    );
+    // Update business context with conversation patterns
+    if (!aiContext.businessContext.communicationPatterns) {
+      aiContext.businessContext.communicationPatterns = {};
+    }
+    
+    // Track common query types
+    const queryType = categorizeQuery(message);
+    if (queryType) {
+      aiContext.businessContext.communicationPatterns[queryType] = 
+        (aiContext.businessContext.communicationPatterns[queryType] || 0) + 1;
+    }
 
-    console.error("Conversation analysis error:", error);
+    await aiContext.save();
+
+    // Deduct credits after successful generation
+    await company.deductCredits('chatbot', 1, 'Chatbot message processing');
+
+    // Update usage tracking
+    company.usage.chatbotQueries += 1;
+    await company.save();
+
+    aiLogger.info('Chatbot response generated successfully', {
+      companyId,
+      sessionId,
+      responseLength: responseText.length
+    });
+
+    res.json({
+      success: true,
+      data: {
+        response: responseText,
+        sessionId,
+        creditsRemaining: company.credits.currentCredits - 1
+      }
+    });
+
+  } catch (error) {
+    logger.error('Chatbot processing failed:', {
+      error: error.message,
+      stack: error.stack,
+      companyId: req.company?.id
+    });
+
     res.status(500).json({
       success: false,
-      message: "Error analyzing conversations",
-      error:
-        process.env.NODE_ENV === "development"
-          ? error.message
-          : "Internal server error",
+      message: 'Failed to process chatbot message',
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+    });
+  }
+};
+
+// Helper function to categorize user queries
+const categorizeQuery = (message) => {
+  const lowercaseMessage = message.toLowerCase();
+  
+  if (lowercaseMessage.includes('price') || lowercaseMessage.includes('cost') || lowercaseMessage.includes('pricing')) {
+    return 'pricing_inquiry';
+  } else if (lowercaseMessage.includes('service') || lowercaseMessage.includes('product')) {
+    return 'service_inquiry';
+  } else if (lowercaseMessage.includes('contact') || lowercaseMessage.includes('reach') || lowercaseMessage.includes('phone')) {
+    return 'contact_inquiry';
+  } else if (lowercaseMessage.includes('about') || lowercaseMessage.includes('company') || lowercaseMessage.includes('business')) {
+    return 'about_inquiry';
+  } else if (lowercaseMessage.includes('help') || lowercaseMessage.includes('support')) {
+    return 'support_request';
+  }
+  
+  return 'general_inquiry';
+};
+
+/**
+ * Get chatbot conversation history
+ */
+const getConversationHistory = async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const companyId = req.company.id;
+
+    // Get conversation context from AI Context
+    const aiContext = await AIContext.findOne({
+      companyId,
+      contextType: 'chatbot',
+      sessionId
+    });
+
+    const history = aiContext ? aiContext.conversationHistory : [];
+
+    res.json({
+      success: true,
+      data: {
+        sessionId,
+        history
+      }
+    });
+
+  } catch (error) {
+    logger.error('Failed to get conversation history:', {
+      error: error.message,
+      companyId: req.company?.id,
+      sessionId: req.params.sessionId
+    });
+
+    res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve conversation history'
+    });
+  }
+};
+
+/**
+ * Clear chatbot conversation history
+ */
+const clearConversationHistory = async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const companyId = req.company.id;
+
+    // Clear session context in AIContext
+    await AIContext.findOneAndUpdate(
+      {
+        companyId,
+        contextType: 'chatbot',
+        sessionId
+      },
+      {
+        $set: { conversationHistory: [] }
+      }
+    );
+
+    logger.info('Conversation history cleared', {
+      companyId,
+      sessionId
+    });
+
+    res.json({
+      success: true,
+      message: 'Conversation history cleared successfully'
+    });
+
+  } catch (error) {
+    logger.error('Failed to clear conversation history:', {
+      error: error.message,
+      companyId: req.company?.id,
+      sessionId: req.params.sessionId
+    });
+
+    res.status(500).json({
+      success: false,
+      message: 'Failed to clear conversation history'
     });
   }
 };
 
 module.exports = {
-  generateResponse,
-  trainChatbot,
-  analyzeConversations,
+  processMessage,
+  getConversationHistory,
+  clearConversationHistory
 };
