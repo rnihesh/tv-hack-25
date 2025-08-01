@@ -9,6 +9,7 @@ const AppNavigation = () => {
     { path: '/dashboard', label: 'Dashboard', icon: '🏠' },
     { path: '/website-generator', label: 'Website Generator', icon: '🌐' },
     { path: '/image-generator', label: 'Image Generator', icon: '🎨' },
+    { path: '/chatbot', label: 'AI Assistant', icon: '🤖' },
   ];
 
   return (

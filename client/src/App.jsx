@@ -5,7 +5,9 @@ import AuthWrapper from './components/auth/AuthWrapper'
 import Dashboard from './components/Dashboard'
 import WebsiteGenerator from './website-generator/WebsiteGenerator'
 import ImageGenerator from './aiImageGenerator/ImageGenerator'
-// import ChatInterface from './chatbot/ChatInterface'
+import ChatbotPage from './chatbot/ChatbotPage'
+import ChatInterface from './chatbot/ChatInterface'
+import ThemeToggle from './utils/ThemeToggle'
 // import MailingDashboard from './mailer/MailingDashboard'
 
 // Protected Route Component
@@ -85,14 +87,14 @@ function AppContent() {
         } 
       />
       
-      {/* <Route 
+      <Route 
         path="/chatbot" 
         element={
           <ProtectedRoute>
-            <ChatInterface />
+            <ChatbotPage />
           </ProtectedRoute>
         } 
-      /> */}
+      />
 
       {/* <Route 
         path="/mailer" 
@@ -117,6 +119,8 @@ function App() {
     <AuthProvider>
       <Router>
         <AppContent />
+        <ThemeToggle />
+        <ChatInterface />
       </Router>
     </AuthProvider>
   );

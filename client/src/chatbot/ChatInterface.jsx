@@ -1,92 +1,107 @@
-import { useState, useRef, useEffect } from 'react';
-import { chatbotAPI } from '../utils/mailapi';
+import { useState, useEffect, useRef } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
 const ChatInterface = () => {
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      sender: 'bot',
-      message: 'Hello! I\'m your AI assistant. How can I help you today?',
-      timestamp: new Date(Date.now() - 300000),
-      intent: 'greeting'
-    }
-  ]);
+  const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [sessionId, setSessionId] = useState('');
+  const [isMinimized, setIsMinimized] = useState(true);
   const messagesEndRef = useRef(null);
-  const [conversationId] = useState(`conv_${Date.now()}`);
+  const { token } = useAuth();
+
+  // Generate session ID on component mount
+  useEffect(() => {
+    const newSessionId = `chatbot_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+    setSessionId(newSessionId);
+    
+    // Add welcome message
+    setMessages([{
+      id: 1,
+      text: "Hello! I'm your AI business assistant. How can I help you today?",
+      isBot: true,
+      timestamp: new Date()
+    }]);
+  }, []);
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const handleSendMessage = async () => {
+  const sendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
 
     const userMessage = {
       id: Date.now(),
-      sender: 'user',
-      message: inputMessage.trim(),
+      text: inputMessage,
+      isBot: false,
       timestamp: new Date()
     };
 
     setMessages(prev => [...prev, userMessage]);
     setInputMessage('');
     setIsLoading(true);
-    setIsTyping(true);
 
     try {
-      const response = await chatbotAPI.generateResponse({
-        userMessage: inputMessage.trim(),
-        conversationId,
-        intent: 'general'
+      const response = await fetch('/api/chatbot/message', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          message: inputMessage,
+          sessionId: sessionId
+        })
       });
 
-      // Simulate typing delay for better UX
-      setTimeout(() => {
+      const data = await response.json();
+
+      if (data.success) {
         const botMessage = {
           id: Date.now() + 1,
-          sender: 'bot',
-          message: response.response,
-          timestamp: new Date(),
-          intent: response.detectedIntent,
-          confidence: response.confidence
+          text: data.data.response,
+          isBot: true,
+          timestamp: new Date()
         };
-
         setMessages(prev => [...prev, botMessage]);
-        setIsTyping(false);
-        setIsLoading(false);
-      }, 1500);
-
+      } else {
+        throw new Error(data.message || 'Failed to get response');
+      }
     } catch (error) {
       console.error('Chat error:', error);
-      setTimeout(() => {
-        const errorMessage = {
-          id: Date.now() + 1,
-          sender: 'bot',
-          message: 'I apologize, but I\'m having trouble processing your request right now. Please try again later.',
-          timestamp: new Date(),
-          intent: 'error',
-          isError: true
-        };
-
-        setMessages(prev => [...prev, errorMessage]);
-        setIsTyping(false);
-        setIsLoading(false);
-      }, 1000);
+      const errorMessage = {
+        id: Date.now() + 1,
+        text: "I'm sorry, I encountered an error. Please try again.",
+        isBot: true,
+        timestamp: new Date(),
+        isError: true
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSendMessage();
+      sendMessage();
     }
+  };
+
+  const clearChat = () => {
+    setMessages([{
+      id: 1,
+      text: "Hello! I'm your AI business assistant. How can I help you today?",
+      isBot: true,
+      timestamp: new Date()
+    }]);
   };
 
   const formatTime = (timestamp) => {
@@ -96,183 +111,122 @@ const ChatInterface = () => {
     });
   };
 
-  const clearConversation = () => {
-    setMessages([
-      {
-        id: 1,
-        sender: 'bot',
-        message: 'Conversation cleared. How can I help you today?',
-        timestamp: new Date(),
-        intent: 'greeting'
-      }
-    ]);
-  };
+  if (isMinimized) {
+    return (
+      <div className="fixed bottom-4 right-4 z-50">
+        <button
+          onClick={() => setIsMinimized(false)}
+          className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white p-4 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          </svg>
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-      {/* Chat Interface */}
-      <div className="lg:col-span-3">
-        <div className="card h-[600px] flex flex-col">
-          {/* Chat Header */}
-          <div className="p-4 border-b border-theme">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-brand-100 rounded-full flex items-center justify-center">
-                  <span className="text-brand-600 font-semibold">AI</span>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-theme-primary">Customer Support Assistant</h3>
-                  <div className="flex items-center space-x-2 text-sm">
-                    <div className="w-2 h-2 bg-accent-success rounded-full"></div>
-                    <span className="text-theme-secondary">Online</span>
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center space-x-2">
-                <button 
-                  onClick={clearConversation}
-                  className="btn-secondary px-3 py-1 text-sm rounded-lg focus-ring"
-                >
-                  Clear Chat
-                </button>
-              </div>
-            </div>
+    <div className="fixed bottom-4 right-4 w-96 h-[32rem] bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 flex flex-col z-50 overflow-hidden">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 rounded-t-2xl flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+          <div>
+            <h3 className="font-semibold">AI Assistant</h3>
+            <p className="text-sm opacity-90">Always here to help</p>
           </div>
-
-          {/* Messages Area */}
-          <div className="flex-1 p-4 overflow-y-auto space-y-4">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
-                <div
-                  className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                    message.sender === 'user'
-                      ? 'bg-brand-600 text-white'
-                      : message.isError
-                      ? 'bg-accent-error-light text-accent-error border border-accent-error'
-                      : 'bg-theme-secondary text-theme-primary border border-theme'
-                  }`}
-                >
-                  <p className="text-sm">{message.message}</p>
-                  <div className="flex items-center justify-between mt-1">
-                    <span className={`text-xs ${
-                      message.sender === 'user' 
-                        ? 'text-brand-100' 
-                        : 'text-theme-tertiary'
-                    }`}>
-                      {formatTime(message.timestamp)}
-                    </span>
-                    {message.confidence && (
-                      <span className="text-xs text-theme-tertiary ml-2">
-                        {Math.round(message.confidence * 100)}%
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-            
-            {/* Typing Indicator */}
-            {isTyping && (
-              <div className="flex justify-start">
-                <div className="bg-theme-secondary text-theme-primary border border-theme px-4 py-2 rounded-lg">
-                  <div className="flex space-x-1">
-                    <div className="w-2 h-2 bg-theme-tertiary rounded-full animate-pulse"></div>
-                    <div className="w-2 h-2 bg-theme-tertiary rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
-                    <div className="w-2 h-2 bg-theme-tertiary rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
-                  </div>
-                </div>
-              </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
-
-          {/* Message Input */}
-          <div className="p-4 border-t border-theme">
-            <div className="flex space-x-2">
-              <textarea
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Type your message..."
-                className="flex-1 p-3 border border-theme rounded-lg bg-theme-secondary text-theme-primary placeholder-theme-tertiary focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent resize-none"
-                rows={1}
-                disabled={isLoading}
-              />
-              <button
-                onClick={handleSendMessage}
-                disabled={!inputMessage.trim() || isLoading}
-                className="btn-primary px-4 py-3 rounded-lg focus-ring disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLoading ? (
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                ) : (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                  </svg>
-                )}
-              </button>
-            </div>
-          </div>
+        </div>
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={clearChat}
+            className="p-1 hover:bg-white/20 rounded-full transition-colors"
+            title="Clear chat"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+          <button
+            onClick={() => setIsMinimized(true)}
+            className="p-1 hover:bg-white/20 rounded-full transition-colors"
+            title="Minimize"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+            </svg>
+          </button>
         </div>
       </div>
 
-      {/* Chat Info Panel */}
-      <div className="space-y-6">
-        {/* Conversation Stats */}
-        <div className="card p-4">
-          <h3 className="font-semibold text-theme-primary mb-3">Session Info</h3>
-          <div className="space-y-3">
-            <div className="flex justify-between">
-              <span className="text-theme-secondary text-sm">Messages</span>
-              <span className="font-medium text-theme-primary">{messages.length}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-theme-secondary text-sm">Duration</span>
-              <span className="font-medium text-theme-primary">
-                {Math.floor((Date.now() - messages[0]?.timestamp) / 60000)}m
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-theme-secondary text-sm">Status</span>
-              <span className="text-accent-success text-sm font-medium">Active</span>
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 dark:bg-gray-900/50">
+        {messages.map((message) => (
+          <div
+            key={message.id}
+            className={`flex ${message.isBot ? 'justify-start' : 'justify-end'}`}
+          >
+            <div
+              className={`max-w-[80%] rounded-2xl px-4 py-2 ${
+                message.isBot
+                  ? message.isError
+                    ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200'
+                    : 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 shadow-sm'
+                  : 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-sm'
+              }`}
+            >
+              <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
+              <p className={`text-xs mt-1 ${
+                message.isBot 
+                  ? 'text-gray-500 dark:text-gray-400' 
+                  : 'text-blue-100'
+              }`}>
+                {formatTime(message.timestamp)}
+              </p>
             </div>
           </div>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="card p-4">
-          <h3 className="font-semibold text-theme-primary mb-3">Quick Actions</h3>
-          <div className="space-y-2">
-            <button className="w-full btn-secondary text-sm py-2 rounded-lg focus-ring">
-              Export Conversation
-            </button>
-            <button className="w-full btn-secondary text-sm py-2 rounded-lg focus-ring">
-              Escalate to Human
-            </button>
-            <button className="w-full btn-secondary text-sm py-2 rounded-lg focus-ring">
-              Save as FAQ
-            </button>
-          </div>
-        </div>
-
-        {/* Recent Intents */}
-        <div className="card p-4">
-          <h3 className="font-semibold text-theme-primary mb-3">Detected Intents</h3>
-          <div className="space-y-2">
-            {messages
-              .filter(m => m.sender === 'user' && m.intent)
-              .slice(-5)
-              .map((message, index) => (
-                <div key={index} className="flex items-center justify-between text-sm">
-                  <span className="text-theme-secondary truncate">{message.intent}</span>
-                  <span className="text-brand-600 font-medium">
-                    {message.confidence ? `${Math.round(message.confidence * 100)}%` : '-'}
-                  </span>
+        ))}
+        
+        {isLoading && (
+          <div className="flex justify-start">
+            <div className="bg-white dark:bg-gray-700 rounded-2xl px-4 py-2 shadow-sm">
+              <div className="flex items-center space-x-2">
+                <div className="flex space-x-1">
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
                 </div>
-              ))}
+                <span className="text-xs text-gray-500 dark:text-gray-400">AI is thinking...</span>
+              </div>
+            </div>
+          </div>
+        )}
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Input */}
+      <div className="p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex items-center space-x-2">
+          <div className="flex-1 relative">
+            <textarea
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Type your message..."
+              className="w-full p-3 pr-12 border border-gray-300 dark:border-gray-600 rounded-xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
+              rows="1"
+              style={{ minHeight: '44px', maxHeight: '100px' }}
+              disabled={isLoading}
+            />
+            <button
+              onClick={sendMessage}
+              disabled={!inputMessage.trim() || isLoading}
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 text-white rounded-lg transition-all duration-200 disabled:cursor-not-allowed"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              </svg>
+            </button>
           </div>
         </div>
       </div>
