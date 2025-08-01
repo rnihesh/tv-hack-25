@@ -1,6 +1,6 @@
 // Central model exports for the AI Business Toolkit
-const Company = require("./User");
-const AIContext = require("./Business");
+const Company = require("./Company");
+const AIContext = require("./AIContext");
 const WebsiteTemplate = require("./Website");
 const EmailCampaign = require("./Marketing");
 const GeneratedContent = require("./Media");

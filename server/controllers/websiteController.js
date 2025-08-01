@@ -1,13 +1,9 @@
 const { validationResult } = require("express-validator");
 const Company = require("../models/Company");
-const { GeneratedContent } = require("../models/GeneratedContent");
-const { WebsiteTemplate } = require("../models/Website");
+const WebsiteTemplate = require("../models/Website");
 const { VectorStore } = require("../models/VectorStore");
 const { modelManager } = require("../services/langchain/models");
-const {
-  WebsiteGenerationChain,
-} = require("../services/langchain/contextualChains");
-const { businessLogger, aiLogger } = require("../utils/logger");
+const { logger, businessLogger, aiLogger } = require("../utils/logger");
 
 // Credit costs for different operations
 const CREDIT_COSTS = {
