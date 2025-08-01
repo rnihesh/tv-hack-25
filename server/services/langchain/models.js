@@ -176,13 +176,13 @@ try {
         throw new Error("No models available");
       }
 
-      // Task-specific model preferences - temporarily prefer Ollama for debugging
+      // Task-specific model preferences - use Gemini 2.5 Flash for website generation
       const taskPreferences = {
         "email_generation": ["ollama-llama3", "gemini-2.5-flash"],
-        "website_generation": ["ollama-llama3", "gemini-2.5-flash"],
+        "website_generation": ["gemini-2.5-flash", "ollama-llama3"],
         "chatbot": ["ollama-llama3", "gemini-2.5-flash"],
-        "image_generation": ["ollama-llama3", "gemini-2.5-flash"],
-        "general": ["ollama-llama3", "gemini-2.5-flash"]
+        "image_generation": ["gemini-2.5-flash", "ollama-llama3"],
+        "general": ["gemini-2.5-flash", "ollama-llama3"]
       };
 
       const preferences = taskPreferences[taskType] || taskPreferences["general"];
