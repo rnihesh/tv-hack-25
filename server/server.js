@@ -36,6 +36,7 @@ const { httpLogger, logger } = require("./utils/logger");
 // Route imports
 const authRoutes = require("./routes/authRoutes");
 const websiteRoutes = require("./routes/websiteRoutes");
+const emailRoutes = require("./routes/emailRoutes");
 const marketingRoutes = require("./routes/marketingRoutes");
 const mediaRoutes = require("./routes/mediaRoutes");
 const chatbotRoutes = require("./routes/chatbotRoutes");
@@ -133,6 +134,7 @@ app.get("/api/status", (req, res) => {
 // API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/websites", websiteRoutes);
+app.use("/api/email", emailRoutes);
 app.use("/api/marketing", marketingRoutes);
 app.use("/api/media", mediaRoutes);
 app.use("/api/chatbot", chatbotRoutes);
