@@ -36,9 +36,15 @@ class WebsiteAPI {
 
   // Generate new website
   async generateWebsite(formData) {
+    // Transform frontend form data to backend expected format
+    const payload = {
+      companyId: 'dummy-company-123', // This will be replaced with real auth later
+      requirements: formData.requirements || formData.prompt || 'Create a modern, responsive website'
+    };
+    
     return this.request('/generate', {
       method: 'POST',
-      body: JSON.stringify(formData),
+      body: JSON.stringify(payload),
     });
   }
 
