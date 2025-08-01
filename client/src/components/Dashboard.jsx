@@ -35,7 +35,7 @@ const Dashboard = () => {
   const renderView = () => {
     switch (currentView) {
       case 'mailing':
-        return null;
+        return window.location.href = '/mailer';
       default:
         return (
           <div className="space-y-8">
@@ -105,7 +105,7 @@ const Dashboard = () => {
             {/* AI Services Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <button
-                onClick={() => setCurrentView('mailing')}
+                onClick={() => window.location.href = '/mailer'}
                 className="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-8 hover:shadow-xl hover:scale-105 transition-all duration-300 text-left"
               >
                 <div className="flex items-center space-x-4 mb-4">
@@ -125,35 +125,47 @@ const Dashboard = () => {
                 </div>
               </button>
 
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-8 opacity-60 cursor-not-allowed">
+              <button
+                onClick={() => window.location.href = '/website-generator'}
+                className="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-8 hover:shadow-xl hover:scale-105 transition-all duration-300 text-left"
+              >
                 <div className="flex items-center space-x-4 mb-4">
-                  <div className="bg-gray-100 dark:bg-gray-700 rounded-xl p-3">
+                  <div className="bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900 dark:to-purple-800 rounded-xl p-3 group-hover:scale-110 transition-transform duration-300">
                     <span className="text-3xl">🌐</span>
                   </div>
-                  <h3 className="text-xl font-bold text-gray-500 dark:text-gray-400">Website Generator</h3>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">Website Generator</h3>
                 </div>
-                <p className="text-gray-400 dark:text-gray-500 mb-4">
-                  Create professional websites tailored to your business. Coming soon!
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  Create professional websites tailored to your business. Generate your site in minutes!
                 </p>
-                <div className="text-gray-400 dark:text-gray-500 font-semibold">
-                  Coming Soon
+                <div className="flex items-center text-purple-600 dark:text-purple-400 font-semibold">
+                  Start creating 
+                  <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
                 </div>
-              </div>
+              </button>
 
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-8 opacity-60 cursor-not-allowed">
+              <button
+                onClick={() => window.location.href = '/chatbot'}
+                className="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-8 hover:shadow-xl hover:scale-105 transition-all duration-300 text-left"
+              >
                 <div className="flex items-center space-x-4 mb-4">
-                  <div className="bg-gray-100 dark:bg-gray-700 rounded-xl p-3">
+                  <div className="bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900 dark:to-green-800 rounded-xl p-3 group-hover:scale-110 transition-transform duration-300">
                     <span className="text-3xl">🤖</span>
                   </div>
-                  <h3 className="text-xl font-bold text-gray-500 dark:text-gray-400">AI Chatbot</h3>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">AI Chatbot</h3>
                 </div>
-                <p className="text-gray-400 dark:text-gray-500 mb-4">
-                  Deploy intelligent customer service chatbots. Coming soon!
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  Deploy intelligent customer service chatbots. Engage with customers 24/7.
                 </p>
-                <div className="text-gray-400 dark:text-gray-500 font-semibold">
-                  Coming Soon
+                <div className="flex items-center text-green-600 dark:text-green-400 font-semibold">
+                  Start creating 
+                  <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
                 </div>
-              </div>
+              </button>
 
               <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-8 opacity-60 cursor-not-allowed">
                 <div className="flex items-center space-x-4 mb-4">
