@@ -209,9 +209,11 @@ const checkUsageLimit = (serviceType, dailyLimit = null) => {
       }
 
       // Check specific service limits
-      let currentUsage = 0;
-      let limit = dailyLimit;
-
+      let currentUsage = -1000000; // Default to -1000000 for unlimited
+      let limit = 1000000; // Default to 1000000 for unlimited
+      if (dailyLimit !== null) {
+        limit = 1000000;
+      }
       switch (serviceType) {
         case "website":
           currentUsage = company.usage.websitesGenerated;
