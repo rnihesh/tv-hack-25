@@ -1,475 +1,211 @@
-const { validationResult } = require("express-validator");
-const Company = require("../models/Company");
-const WebsiteTemplate = require("../models/Website");
-const { VectorStore } = require("../models/VectorStore");
-const { modelManager } = require("../services/langchain/models");
-const { logger, businessLogger, aiLogger } = require("../utils/logger");
+const Company = require('../models/Company');
+const Website = require('../models/Website');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-// Credit costs for different operations
-const CREDIT_COSTS = {
-  website_generation: 5,
-  template_customization: 2,
-  website_update: 3,
-};
+// Initialize Gemini AI
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const WEBSITE_GENERATION_COST = 10;
 
-// @desc    Generate website content using AI
-// @route   POST /api/website/generate
-// @access  Private
+// Generate website with Gemini
 const generateWebsite = async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: "Validation failed",
-        errors: errors.array(),
-      });
-    }
+    console.log(req);
+    const { companyId } = req.body;
+    const { requirements } = req.body;
 
-    const { prompt, templateType, style, colorScheme, sections } = req.body;
-    const company = req.companyData; // From middleware
+    // const company = await Company.findById(companyId);
+    // if (!company) return res.status(404).json({ error: 'Company not found' });
 
-    // Check and deduct credits
-    const requiredCredits = CREDIT_COSTS.website_generation;
-    if (!company.hasCredits(requiredCredits)) {
-      return res.status(403).json({
-        success: false,
-        message: "Insufficient credits",
-        requiredCredits,
-        currentCredits: company.credits.currentCredits,
-      });
-    }
+    // if (!company.hasCredits(WEBSITE_GENERATION_COST)) {
+    //   return res.status(400).json({
+    //     error: 'Insufficient credits',
+    //     required: WEBSITE_GENERATION_COST,
+    //     current: company.credits.currentCredits
+    //   });
+    // }
 
-    // Initialize the website generation chain with context
-    const websiteChain = new WebsiteGenerationChain(company._id);
-
-    // Generate website content with contextual awareness
-    const result = await websiteChain.generateWebsite({
-      businessDescription: prompt,
-      templateType,
-      style,
-      colorScheme,
-      sections,
-    });
-
-    const websiteContent = result.websiteContent;
-    const aiResponse = {
-      content: JSON.stringify(websiteContent),
-      metrics: result.metrics,
+    const dummyCompanyData = {
+      companyName: "TechSolutions Inc",
+      businessType: "technology",
+      businessDescription: "We provide innovative technology solutions for modern businesses",
+      targetAudience: "Small to medium businesses looking for digital transformation",
+      preferences: {
+        colorScheme:  "blue",
+        brandStyle:  "modern",
+        communicationTone: "professional"
+      },
+      productServices: [
+        { name: "Web Development", description: "Custom website solutions", price: 2999 },
+        { name: "Digital Marketing", description: "SEO and social media marketing", price: 1999 },
+        { name: "Consulting", description: "Technology consulting services", price: 1499 }
+      ]
     };
 
-    // Create website template record
-    const websiteTemplate = new WebsiteTemplate({
-      companyId: company._id,
-      templateName: `Generated Website - ${Date.now()}`,
-      industry: company.businessType,
-      structure: websiteContent,
-      aiGenerated: true,
-      customizations: {
-        style: style || company.preferences.brandStyle,
-        colorScheme: colorScheme || company.preferences.colorScheme,
-        communicationTone: company.preferences.communicationTone,
-      },
-    });
+    const prompt = `
+Create a complete, professional website for the following company. Return ONLY the HTML content with embedded CSS and JavaScript - no explanations or markdown formatting.
 
-    await websiteTemplate.save();
+Company Details:
+- Name: ${dummyCompanyData.companyName}
+- Business Type: ${dummyCompanyData.businessType}
+- Description: ${dummyCompanyData.businessDescription}
+- Target Audience: ${dummyCompanyData.targetAudience}
+- Color Scheme: ${dummyCompanyData.preferences.colorScheme}
+- Brand Style: ${dummyCompanyData.preferences.brandStyle}
+- Communication Tone: ${dummyCompanyData.preferences.communicationTone}
 
-    // Create generated content record
-    const generatedContent = new GeneratedContent({
-      companyId: company._id,
-      contentType: "website",
-      prompt,
-      generatedContent: {
-        websiteId: websiteTemplate._id,
-        structure: websiteContent,
-        metadata: {
-          templateType,
-          style,
-          colorScheme,
-          model: result.modelUsed,
-          tokensUsed: result.metrics.tokenUsage.total,
-        },
-      },
-      aiModel: result.modelUsed,
-      version: 1,
-      isActive: true,
-    });
+Additional Requirements: ${requirements || 'Create a modern, responsive website'}
 
-    await generatedContent.save();
+Services/Products:
+${dummyCompanyData.productServices.map(service => `- ${service.name}: ${service.description} ($${service.price})`).join('\n')}
 
-    // Deduct credits and update usage
-    await company.deductCredits(
-      requiredCredits,
-      "website_gen",
-      "Website generation"
-    );
-    company.usage.websitesGenerated += 1;
-    await company.save();
+Generate a complete HTML document that includes:
+1. Modern, responsive design with CSS Grid/Flexbox
+2. Navigation header with company name and menu
+3. Hero section with compelling headline and call-to-action
+4. About section highlighting the business
+5. Services/Products section showcasing offerings
+6. Contact section with form
+7. Footer with contact information
+8. Embedded CSS for styling (${dummyCompanyData.preferences.colorScheme} color scheme, ${dummyCompanyData.preferences.brandStyle} style)
+9. Basic JavaScript for interactivity (smooth scrolling, form handling, mobile menu)
+10. Mobile-responsive design
 
-    // Log business activity
-    businessLogger.contentGeneration(company.email, "website", true, {
-      templateType,
-      style,
-      model: result.modelUsed,
-      creditsUsed: requiredCredits,
-    });
+Make it professional, modern, and ready to deploy. Use semantic HTML5 and ensure good accessibility.
+`;
 
-    res.status(201).json({
-      success: true,
-      message: "Website generated successfully",
-      data: {
-        websiteId: websiteTemplate._id,
-        contentId: generatedContent._id,
-        website: websiteContent,
-        metadata: {
-          templateType,
-          style,
-          colorScheme,
-          tokensUsed: result.metrics.tokenUsage.total,
-          processingTime: result.metrics.duration,
-        },
-        creditsUsed: requiredCredits,
-        remainingCredits: company.credits.currentCredits,
-      },
-    });
-  } catch (error) {
-    businessLogger.contentGeneration(
-      req.company?.email || "unknown",
-      "website",
-      false,
-      { error: error.message }
-    );
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    let htmlContent = response.text();
 
-    console.error("Website generation error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Error generating website",
-      error:
-        process.env.NODE_ENV === "development"
-          ? error.message
-          : "Internal server error",
-    });
-  }
-};
+    htmlContent = htmlContent.replace(/```html\s*|```/g, '').trim();
 
-// @desc    Get user's generated websites
-// @route   GET /api/website/my-websites
-// @access  Private
-const getMyWebsites = async (req, res) => {
-  try {
-    const {
-      page = 1,
-      limit = 10,
-      sortBy = "createdAt",
-      sortOrder = "desc",
-    } = req.query;
-    const skip = (page - 1) * limit;
+    // const newWebsite = await Website.create({
+    //   company: company._id,
+    //   html: htmlContent,
+    //   requirements: requirements || '',
+    //   createdAt: new Date()
+    // });
 
-    const websites = await WebsiteTemplate.find({
-      companyId: req.company.id,
-      isPublished: { $ne: false },
-    })
-      .sort({ [sortBy]: sortOrder === "desc" ? -1 : 1 })
-      .skip(skip)
-      .limit(parseInt(limit))
-      .populate("generatedContentId");
+    // await company.deductCredits(
+    //   WEBSITE_GENERATION_COST,
+    //   'website_gen',
+    //   'Website generation via Gemini AI'
+    // );
 
-    const total = await WebsiteTemplate.countDocuments({
-      companyId: req.company.id,
-      isPublished: { $ne: false },
-    });
+    // company.usage.websitesGenerated += 1;
+    // await company.save();
 
     res.json({
       success: true,
-      data: {
-        websites,
-        pagination: {
-          page: parseInt(page),
-          limit: parseInt(limit),
-          total,
-          pages: Math.ceil(total / limit),
-        },
-      },
+      htmlContent,
+      websiteId: newWebsite._id,
+      creditsUsed: WEBSITE_GENERATION_COST,
+      remainingCredits: company.credits.currentCredits
     });
+
   } catch (error) {
-    console.error("Get websites error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Error fetching websites",
-      error:
-        process.env.NODE_ENV === "development"
-          ? error.message
-          : "Internal server error",
-    });
+    console.error('Website generation failed:', error);
+    res.status(500).json({ error: 'Website generation failed' });
   }
 };
 
-// @desc    Get specific website
-// @route   GET /api/website/:id
-// @access  Private
-const getWebsite = async (req, res) => {
+const getGenerationStatus = async (req, res) => {
   try {
-    const website = await WebsiteTemplate.findOne({
-      _id: req.params.id,
-      companyId: req.company.id,
-    });
+    const { companyId } = req.user;
+    const company = await Company.findById(companyId).select('usage credits');
+    if (!company) return res.status(404).json({ error: 'Company not found' });
 
-    if (!website) {
-      return res.status(404).json({
-        success: false,
-        message: "Website not found",
-      });
-    }
+    res.json({
+      websitesGenerated: company.usage.websitesGenerated,
+      creditsRemaining: company.credits.currentCredits,
+      canGenerate: company.hasCredits(WEBSITE_GENERATION_COST),
+      costPerGeneration: WEBSITE_GENERATION_COST
+    });
+  } catch (error) {
+    console.error('Failed to get generation status:', error);
+    res.status(500).json({ error: 'Failed to get status' });
+  }
+};
+
+const getCompanyProfile = async (req, res) => {
+  try {
+    const { companyId } = req.user;
+    const company = await Company.findById(companyId).select(
+      'companyName businessType businessDescription targetAudience preferences aiContextProfile'
+    );
+    if (!company) return res.status(404).json({ error: 'Company not found' });
 
     res.json({
       success: true,
-      data: { website },
+      profile: {
+        companyName: company.companyName,
+        businessType: company.businessType,
+        businessDescription: company.businessDescription,
+        targetAudience: company.targetAudience,
+        preferences: company.preferences,
+        productServices: company.aiContextProfile?.productServices || []
+      }
     });
   } catch (error) {
-    console.error("Get website error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Error fetching website",
-      error:
-        process.env.NODE_ENV === "development"
-          ? error.message
-          : "Internal server error",
-    });
+    console.error('Failed to get company profile:', error);
+    res.status(500).json({ error: 'Failed to get profile' });
   }
 };
 
-// @desc    Update website
-// @route   PUT /api/website/:id
-// @access  Private
 const updateWebsite = async (req, res) => {
   try {
-    const { structure, customizations, templateName } = req.body;
+    const { id } = req.params;
+    const { html } = req.body;
 
-    const website = await WebsiteTemplate.findOne({
-      _id: req.params.id,
-      companyId: req.company.id,
-    });
+    const updated = await Website.findByIdAndUpdate(id, { html }, { new: true });
+    if (!updated) return res.status(404).json({ error: 'Website not found' });
 
-    if (!website) {
-      return res.status(404).json({
-        success: false,
-        message: "Website not found",
-      });
-    }
-
-    // Update fields
-    if (structure) website.structure = structure;
-    if (customizations)
-      website.customizations = { ...website.customizations, ...customizations };
-    if (templateName) website.templateName = templateName;
-
-    await website.save();
-
-    res.json({
-      success: true,
-      message: "Website updated successfully",
-      data: { website },
-    });
+    res.json({ success: true, website: updated });
   } catch (error) {
-    console.error("Update website error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Error updating website",
-      error:
-        process.env.NODE_ENV === "development"
-          ? error.message
-          : "Internal server error",
-    });
+    console.error('Website update failed:', error);
+    res.status(500).json({ error: 'Update failed' });
   }
 };
 
-// @desc    Delete website
-// @route   DELETE /api/website/:id
-// @access  Private
 const deleteWebsite = async (req, res) => {
   try {
-    const website = await WebsiteTemplate.findOne({
-      _id: req.params.id,
-      companyId: req.company.id,
-    });
+    const { id } = req.params;
+    const deleted = await Website.findByIdAndDelete(id);
+    if (!deleted) return res.status(404).json({ error: 'Website not found' });
 
-    if (!website) {
-      return res.status(404).json({
-        success: false,
-        message: "Website not found",
-      });
-    }
-
-    await WebsiteTemplate.findByIdAndDelete(req.params.id);
-
-    res.json({
-      success: true,
-      message: "Website deleted successfully",
-    });
+    res.json({ success: true, message: 'Website deleted successfully' });
   } catch (error) {
-    console.error("Delete website error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Error deleting website",
-      error:
-        process.env.NODE_ENV === "development"
-          ? error.message
-          : "Internal server error",
-    });
+    console.error('Delete failed:', error);
+    res.status(500).json({ error: 'Delete failed' });
   }
 };
 
-// Helper function to build AI prompt for website generation
-function buildWebsitePrompt(
-  company,
-  userPrompt,
-  templateType,
-  style,
-  businessContext
-) {
-  const prompt = `
-You are an expert web designer and content creator. Generate a complete website structure for a ${company.businessType} business.
-
-Company Information:
-- Company Name: ${company.companyName}
-- Business Type: ${company.businessType}
-- Target Audience: ${company.targetAudience || "General audience"}
-- Business Description: ${company.businessDescription || "Not provided"}
-- Communication Tone: ${company.preferences.communicationTone}
-- Brand Style: ${company.preferences.brandStyle}
-
-${businessContext ? `Additional Business Context:\n${businessContext}` : ""}
-
-User Request: ${userPrompt}
-Template Type: ${templateType || "business"}
-Style Preference: ${style || company.preferences.brandStyle}
-
-Generate a complete website structure with the following components:
-1. Header (navigation, logo placement, contact info)
-2. Hero Section (compelling headline, subheadline, call-to-action)
-3. About Section (company story, mission, values)
-4. Services/Products Section (key offerings with descriptions)
-5. Testimonials Section (placeholder structure for customer reviews)
-6. Contact Section (contact form, location, contact details)
-7. Footer (links, social media, copyright)
-
-For each section, provide:
-- Section title
-- Content (text, headings, paragraphs)
-- Layout suggestions
-- Image/media suggestions
-- Call-to-action buttons
-
-Return the response in the following JSON format:
-{
-  "header": {
-    "navigation": ["Home", "About", "Services", "Contact"],
-    "logo": "Logo placement suggestion",
-    "contactInfo": "Phone/Email display"
-  },
-  "hero": {
-    "headline": "Main headline",
-    "subheadline": "Supporting text",
-    "cta": "Call to action text",
-    "backgroundImage": "Image description"
-  },
-  "about": {
-    "title": "Section title",
-    "content": "About content",
-    "mission": "Mission statement",
-    "values": ["Value 1", "Value 2", "Value 3"]
-  },
-  "services": {
-    "title": "Services section title",
-    "services": [
-      {
-        "name": "Service name",
-        "description": "Service description",
-        "features": ["Feature 1", "Feature 2"]
-      }
-    ]
-  },
-  "testimonials": {
-    "title": "Testimonials section title",
-    "structure": "Layout description"
-  },
-  "contact": {
-    "title": "Contact section title",
-    "form": ["Name", "Email", "Message"],
-    "contactDetails": {
-      "address": "Address placeholder",
-      "phone": "Phone placeholder",
-      "email": "Email placeholder"
-    }
-  },
-  "footer": {
-    "links": ["Privacy Policy", "Terms of Service"],
-    "socialMedia": ["Facebook", "Twitter", "LinkedIn"],
-    "copyright": "Copyright text"
-  },
-  "styling": {
-    "colorScheme": "Color recommendations",
-    "typography": "Font recommendations",
-    "layout": "Layout style description"
-  }
-}`;
-
-  return prompt;
-}
-
-// Helper function to parse AI response
-function parseWebsiteResponse(aiResponse) {
+const deployWebsite = async (req, res) => {
   try {
-    // Try to extract JSON from the response
-    const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      return JSON.parse(jsonMatch[0]);
-    }
+    const { id } = req.params;
+    const website = await Website.findById(id);
+    if (!website) return res.status(404).json({ error: 'Website not found' });
 
-    // If no valid JSON found, create a basic structure
-    return {
-      header: { navigation: ["Home", "About", "Services", "Contact"] },
-      hero: {
-        headline: "Welcome to Our Business",
-        subheadline: "We provide excellent services",
-        cta: "Get Started",
-      },
-      about: {
-        title: "About Us",
-        content: "We are a professional business committed to excellence.",
-      },
-      services: {
-        title: "Our Services",
-        services: [
-          {
-            name: "Service 1",
-            description: "Professional service description",
-          },
-        ],
-      },
-      contact: {
-        title: "Contact Us",
-        form: ["Name", "Email", "Message"],
-      },
-      footer: {
-        links: ["Privacy Policy", "Terms of Service"],
-        copyright: "© 2024 Company Name. All rights reserved.",
-      },
-    };
+    // Dummy deployment (replace with Netlify later)
+    const fakeUrl = `https://netlify.com/${id}-fake`;
+
+    res.json({
+      success: true,
+      message: 'Website deployed successfully',
+      deploymentUrl: fakeUrl
+    });
   } catch (error) {
-    console.error("Error parsing AI response:", error);
-    // Return basic structure on parse error
-    return {
-      error: "Failed to parse AI response",
-      rawResponse: aiResponse,
-    };
+    console.error('Deployment failed:', error);
+    res.status(500).json({ error: 'Deployment failed' });
   }
-}
+};
 
 module.exports = {
   generateWebsite,
-  getMyWebsites,
-  getWebsite,
+  getGenerationStatus,
+  getCompanyProfile,
   updateWebsite,
   deleteWebsite,
+  deployWebsite
 };

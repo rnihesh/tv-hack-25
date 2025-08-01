@@ -45,6 +45,9 @@ module.exports = {
   chromaUrl: process.env.CHROMA_URL || "http://localhost:8000",
   vectorStorePath: process.env.VECTOR_STORE_PATH || "./vector_stores/",
 
+  // Netlify Configuration
+  netlifyToken: process.env.NETLIFY_TOKEN,
+
   // Rate Limiting
   rateLimitWindowMs:
     parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutes

@@ -1,55 +1,31 @@
 const express = require("express");
 const {
   generateWebsite,
-  getMyWebsites,
-  getWebsite,
+  getGenerationStatus,
+  getCompanyProfile,
   updateWebsite,
   deleteWebsite,
+  deployWebsite
 } = require("../controllers/websiteController");
-
-const {
-  protect,
-  checkCredits,
-  checkUsageLimit,
-} = require("../middlewares/authMiddleware");
-const {
-  websiteGenerationValidation,
-  mongoIdValidation,
-  paginationValidation,
-} = require("../middlewares/validator");
 
 const router = express.Router();
 
-// @route   POST /api/website/generate
-// @desc    Generate website content using AI
-// @access  Private
-router.post(
-  "/generate",
-  protect,
-  checkCredits(5), // 5 credits required for website generation
-  checkUsageLimit("website"),
-  websiteGenerationValidation,
-  generateWebsite
-);
+// POST /api/websites/generate — generate HTML using AI
+router.post("/generate", generateWebsite);
 
-// @route   GET /api/website/my-websites
-// @desc    Get user's generated websites
-// @access  Private
-router.get("/my-websites", protect, paginationValidation, getMyWebsites);
+// GET /api/websites/status — get usage and credits
+router.get("/status", getGenerationStatus);
 
-// @route   GET /api/website/:id
-// @desc    Get specific website
-// @access  Private
-router.get("/:id", protect, mongoIdValidation, getWebsite);
+// GET /api/websites/profile — get company profile
+router.get("/profile", getCompanyProfile);
 
-// @route   PUT /api/website/:id
-// @desc    Update website
-// @access  Private
-router.put("/:id", protect, mongoIdValidation, updateWebsite);
+// PUT /api/websites/:id — update website HTML
+router.put("/:id", updateWebsite);
 
-// @route   DELETE /api/website/:id
-// @desc    Delete website
-// @access  Private
-router.delete("/:id", protect, mongoIdValidation, deleteWebsite);
+// DELETE /api/websites/:id — delete website
+router.delete("/:id", deleteWebsite);
+
+// POST /api/websites/:id/deploy — deploy website
+router.post("/:id/deploy", deployWebsite);
 
 module.exports = router;
