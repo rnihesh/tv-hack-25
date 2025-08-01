@@ -1,13 +1,14 @@
-import axios from 'axios';
+import axios from "axios";
 
 // Base URL for your backend API
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
 // Create axios instance with default config
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
@@ -15,7 +16,7 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     // Add auth token if available
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem("authToken");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -35,7 +36,7 @@ api.interceptors.response.use(
     // Handle common errors
     if (error.response?.status === 401) {
       // Handle unauthorized - redirect to login or refresh token
-      localStorage.removeItem('authToken');
+      localStorage.removeItem("authToken");
       // window.location.href = '/login';
     }
     return Promise.reject(error);
@@ -46,25 +47,25 @@ api.interceptors.response.use(
 export const emailAPI = {
   // Enhance email message using AI
   enhanceMessage: async (data) => {
-    const response = await api.post('/email/enhance', data);
+    const response = await api.post("/email/enhance", data);
     return response.data;
   },
 
   // Send email immediately
   sendEmail: async (data) => {
-    const response = await api.post('/email/send', data);
+    const response = await api.post("/email/send", data);
     return response.data;
   },
 
   // Schedule email for later
   scheduleEmail: async (data) => {
-    const response = await api.post('/email/schedule', data);
+    const response = await api.post("/email/schedule", data);
     return response.data;
   },
 
   // Get email templates
   getTemplates: async () => {
-    const response = await api.get('/email/templates');
+    const response = await api.get("/email/templates");
     return response.data;
   },
 
@@ -73,19 +74,77 @@ export const emailAPI = {
     const response = await api.get(`/email/analytics/${campaignId}`);
     return response.data;
   },
+
+  // Get company's email list
+  getEmails: async () => {
+    const response = await api.get("/email/emails");
+    return response.data;
+  },
+
+  // Add emails to company's list
+  addEmails: async (data, isFile = false) => {
+    const config = isFile
+      ? {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      : {};
+
+    const response = await api.post("/email/emails", data, config);
+    return response.data;
+  },
+
+  // Update/replace company's email list
+  updateEmails: async (data, isFile = false) => {
+    const config = isFile
+      ? {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      : {};
+
+    const response = await api.put("/email/emails", data, config);
+    return response.data;
+  },
+
+  // Send verification email
+  sendVerificationEmail: async (data) => {
+    const response = await api.post("/email/send-verification", data);
+    return response.data;
+  },
+
+  // Test email configuration
+  testEmailConfig: async () => {
+    const response = await api.post("/email/test");
+    return response.data;
+  },
+
+  // Generate marketing email with AI
+  generateEmail: async (data) => {
+    const response = await api.post("/email/generate", data);
+    return response.data;
+  },
+
+  // Generate email campaign sequence
+  generateEmailCampaign: async (data) => {
+    const response = await api.post("/email/campaign", data);
+    return response.data;
+  },
 };
 
 // Customer API functions
 export const customerAPI = {
   // Get all customers
   getCustomers: async () => {
-    const response = await api.get('/customers');
+    const response = await api.get("/customers");
     return response.data;
   },
 
   // Get customer segments
   getSegments: async () => {
-    const response = await api.get('/customers/segments');
+    const response = await api.get("/customers/segments");
     return response.data;
   },
 
@@ -100,9 +159,9 @@ export const customerAPI = {
 export const authAPI = {
   // Login user
   login: async (credentials) => {
-    const response = await api.post('/auth/login', credentials);
+    const response = await api.post("/auth/login", credentials);
     if (response.data.success && response.data.data?.token) {
-      localStorage.setItem('authToken', response.data.data.token);
+      localStorage.setItem("authToken", response.data.data.token);
     }
     return response.data;
   },
@@ -110,83 +169,85 @@ export const authAPI = {
   // Register new company
   register: async (userData) => {
     try {
-      const response = await api.post('/auth/register', userData);
+      const response = await api.post("/auth/register", userData);
       if (response.data.success && response.data.data?.token) {
-        localStorage.setItem('authToken', response.data.data.token);
+        localStorage.setItem("authToken", response.data.data.token);
       }
       return response.data;
     } catch (error) {
-      return { success: false, message: error.response?.data?.message || 'Registration failed' };
-      
+      return {
+        success: false,
+        message: error.response?.data?.message || "Registration failed",
+      };
     }
   },
 
   // Logout user
   logout: async () => {
     try {
-      await api.post('/auth/logout');
+      await api.post("/auth/logout");
     } catch (error) {
       // Even if logout fails on server, clear local storage
-      console.warn('Logout request failed, but clearing local auth data');
+      console.warn("Logout request failed, but clearing local auth data");
     }
-    localStorage.removeItem('authToken');
-    window.location.href = '/login';
+    localStorage.removeItem("authToken");
+    window.location.href = "/login";
   },
 
   // Get current user profile
   getProfile: async () => {
-    const response = await api.get('/auth/profile');
+    const response = await api.get("/auth/profile");
     return response.data;
   },
 
   // Update user profile
   updateProfile: async (profileData) => {
-    const response = await api.put('/auth/profile', profileData);
+    const response = await api.put("/auth/profile", profileData);
     return response.data;
   },
 
   // Get user credits
   getCredits: async () => {
-    const response = await api.get('/auth/credits');
+    const response = await api.get("/auth/credits");
     return response.data;
   },
 
   // Change password
   changePassword: async (passwordData) => {
-    const response = await api.put('/auth/change-password', passwordData);
+    const response = await api.put("/auth/change-password", passwordData);
     return response.data;
   },
 
   // Check if user is authenticated
   isAuthenticated: () => {
-    return !!localStorage.getItem('authToken');
+    return !!localStorage.getItem("authToken");
   },
 
   // Get stored token
   getToken: () => {
-    return localStorage.getItem('authToken');
+    return localStorage.getItem("authToken");
   },
 };
 
 // Company API functions (for future use)
 export const companyAPI = {
   getProfile: async () => {
-    const response = await api.get('/company/profile');
+    const response = await api.get("/company/profile");
     return response.data;
   },
 
   updateProfile: async (data) => {
-    const response = await api.put('/company/profile', data);
+    const response = await api.put("/company/profile", data);
     return response.data;
   },
 
   getCredits: async () => {
-    const response = await api.get('/company/credits');
+    const response = await api.get("/company/credits");
     return response.data;
   },
 
   getUsage: async () => {
-    const response = await api.get('/company/usage');
+    const response = await api.get("/company/usage");
     return response.data;
   },
 };

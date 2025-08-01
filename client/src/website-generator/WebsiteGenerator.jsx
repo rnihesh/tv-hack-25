@@ -18,8 +18,8 @@ const WebsiteGenerator = () => {
     type: "success",
   });
   const [pagination, setPagination] = useState({
-    page: 1,
-    limit: 10,
+    page: 2,
+    limit: 100,
     total: 0,
     pages: 0,
   });

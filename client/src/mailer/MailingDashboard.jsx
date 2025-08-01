@@ -1,24 +1,24 @@
-import { useState } from 'react';
-import EmailComposer from './EmailComposer';
-import EmailPreview from './EmailPreview';
-import CustomerList from './CustomerList';
-import SendConfirmation from './SendConfirmation';
+import { useState } from "react";
+import EmailComposer from "./EmailComposer";
+import EmailPreview from "./EmailPreview";
+import CustomerList from "./CustomerList";
+import SendConfirmation from "./SendConfirmation";
 
 const MailingDashboard = () => {
-  const [currentStep, setCurrentStep] = useState('compose');
+  const [currentStep, setCurrentStep] = useState("compose");
   const [emailData, setEmailData] = useState({
-    description: '',
-    enhancedMessage: '',
-    subject: '',
-    selectedCustomers: []
+    description: "",
+    enhancedMessage: "",
+    subject: "",
+    selectedCustomers: [], // Keep same name for compatibility with existing components
   });
   const [isLoading, setIsLoading] = useState(false);
 
   const steps = [
-    { id: 'compose', label: 'Compose', icon: '✏️' },
-    { id: 'preview', label: 'Preview', icon: '👁️' },
-    { id: 'customers', label: 'Recipients', icon: '👥' },
-    { id: 'send', label: 'Send', icon: '🚀' }
+    { id: "compose", label: "Compose", icon: "✏️" },
+    { id: "preview", label: "Preview", icon: "👁️" },
+    { id: "customers", label: "Recipients", icon: "�" },
+    { id: "send", label: "Send", icon: "🚀" },
   ];
 
   const handleStepChange = (stepId) => {
@@ -26,7 +26,7 @@ const MailingDashboard = () => {
   };
 
   const handleEmailDataUpdate = (newData) => {
-    setEmailData(prev => ({ ...prev, ...newData }));
+    setEmailData((prev) => ({ ...prev, ...newData }));
   };
 
   return (
@@ -37,7 +37,10 @@ const MailingDashboard = () => {
           <h1 className="text-3xl heading-primary text-theme-primary mb-2">
             Email Marketing Campaign
           </h1>
-          <p className="text-theme-secondary">Create and send personalized emails to your customers with AI-powered content generation</p>
+          <p className="text-theme-secondary">
+            Create and send personalized emails to your customers with
+            AI-powered content generation
+          </p>
         </div>
 
         {/* Step Navigation */}
@@ -48,9 +51,7 @@ const MailingDashboard = () => {
                 <button
                   onClick={() => handleStepChange(step.id)}
                   className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 focus-ring ${
-                    currentStep === step.id
-                      ? 'btn-primary'
-                      : 'btn-secondary'
+                    currentStep === step.id ? "btn-primary" : "btn-secondary"
                   }`}
                 >
                   <span className="text-lg">{step.icon}</span>
@@ -66,46 +67,46 @@ const MailingDashboard = () => {
 
         {/* Main Content */}
         <div className="card-elevated transition-colors duration-200">
-          {currentStep === 'compose' && (
+          {currentStep === "compose" && (
             <EmailComposer
               emailData={emailData}
               onDataUpdate={handleEmailDataUpdate}
-              onNext={() => handleStepChange('preview')}
+              onNext={() => handleStepChange("preview")}
               isLoading={isLoading}
               setIsLoading={setIsLoading}
             />
           )}
-          
-          {currentStep === 'preview' && (
+
+          {currentStep === "preview" && (
             <EmailPreview
               emailData={emailData}
-              onBack={() => handleStepChange('compose')}
-              onNext={() => handleStepChange('customers')}
-              onEdit={() => handleStepChange('compose')}
+              onBack={() => handleStepChange("compose")}
+              onNext={() => handleStepChange("customers")}
+              onEdit={() => handleStepChange("compose")}
             />
           )}
-          
-          {currentStep === 'customers' && (
+
+          {currentStep === "customers" && (
             <CustomerList
               emailData={emailData}
               onDataUpdate={handleEmailDataUpdate}
-              onBack={() => handleStepChange('preview')}
-              onNext={() => handleStepChange('send')}
+              onBack={() => handleStepChange("preview")}
+              onNext={() => handleStepChange("send")}
             />
           )}
-          
-          {currentStep === 'send' && (
+
+          {currentStep === "send" && (
             <SendConfirmation
               emailData={emailData}
-              onBack={() => handleStepChange('customers')}
+              onBack={() => handleStepChange("customers")}
               onSent={() => {
                 // Reset to compose for new campaign
-                setCurrentStep('compose');
+                setCurrentStep("compose");
                 setEmailData({
-                  description: '',
-                  enhancedMessage: '',
-                  subject: '',
-                  selectedCustomers: []
+                  description: "",
+                  enhancedMessage: "",
+                  subject: "",
+                  selectedCustomers: [],
                 });
               }}
             />
