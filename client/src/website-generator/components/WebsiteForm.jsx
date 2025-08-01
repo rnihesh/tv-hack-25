@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 const WebsiteForm = ({ onSubmit, loading, userCredits }) => {
   const [formData, setFormData] = useState({
     prompt: '',
+    requirements: '',
     templateType: 'business',
     style: 'modern',
     colorScheme: 'blue',
@@ -106,6 +107,7 @@ const WebsiteForm = ({ onSubmit, loading, userCredits }) => {
   const handleReset = () => {
     setFormData({
       prompt: '',
+      requirements: '',
       templateType: 'business',
       style: 'modern',
       colorScheme: 'blue',
@@ -159,6 +161,28 @@ const WebsiteForm = ({ onSubmit, loading, userCredits }) => {
           )}
           <div className="mt-1 text-xs text-gray-500 text-right">
             {formData.prompt.length}/1000 characters
+          </div>
+        </div>
+
+        {/* Additional Requirements */}
+        <div>
+          <label htmlFor="requirements" className="block text-sm font-medium text-gray-700 mb-2">
+            Additional Requirements
+            <span className="block text-xs text-gray-500 font-normal">
+              Any specific features, design elements, or functionality you want included
+            </span>
+          </label>
+          <textarea
+            id="requirements"
+            name="requirements"
+            value={formData.requirements}
+            onChange={handleInputChange}
+            placeholder="e.g., Include a contact form, customer testimonials section, photo gallery, or specific color preferences"
+            rows="3"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          <div className="mt-1 text-xs text-gray-500 text-right">
+            {formData.requirements.length}/500 characters
           </div>
         </div>
 

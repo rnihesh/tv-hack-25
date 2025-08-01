@@ -58,12 +58,27 @@ const WebsiteGenerator = () => {
       const response = await api.generateWebsite(formData);
       
       if (response.success) {
-        const message = response.data.deployment 
-          ? 'Website generated and deployed successfully!' 
-          : 'Website generated successfully!';
-        showToast(message, 'success');
-        setSelectedWebsite(response.data);
+        // Create a website object with the generated HTML content
+        const websiteData = {
+          _id: `generated-${Date.now()}`,
+          templateName: formData.prompt || 'Generated Website',
+          htmlContent: response.htmlContent,
+          industry: formData.industry || 'General',
+          aiGenerated: true,
+          createdAt: new Date().toISOString(),
+          customizations: {
+            style: formData.style || 'modern',
+            colorScheme: formData.colorScheme || 'blue'
+          },
+          requirements: formData.requirements || '',
+          isDeployed: false,
+          deploymentUrl: null
+        };
+        
+        showToast('Website generated successfully!', 'success');
+        setSelectedWebsite(websiteData);
         setActiveTab('preview');
+        
         // Refresh websites list if we're on manage tab
         if (activeTab === 'manage') {
           loadWebsites();
@@ -251,6 +266,7 @@ const WebsiteGenerator = () => {
             <WebsiteViewer
               website={selectedWebsite}
               onUpdate={handleUpdateWebsite}
+              onDeploy={handleDeployWebsite}
               loading={loading}
             />
           )}
