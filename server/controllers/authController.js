@@ -4,7 +4,7 @@ const { validationResult } = require("express-validator");
 const Company = require("../models/Company");
 const { VectorStore } = require("../models/VectorStore");
 const config = require("../config/env-config");
-const logger = require("../utils/logger");
+const { logger, businessLogger } = require("../utils/logger");
 
 // Generate JWT Token
 const generateToken = (id) => {
@@ -97,7 +97,7 @@ const registerCompany = async (req, res) => {
 
     logger.info(`New company registered: ${company.email}`);
   } catch (error) {
-    logger.error("Registration error:", error);
+    logger.error("Registration error", { error: error.message, stack: error.stack });
     res.status(500).json({
       success: false,
       message: "Server error during registration",
