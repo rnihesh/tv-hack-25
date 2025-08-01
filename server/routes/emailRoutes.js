@@ -4,10 +4,9 @@ const {
   generateEmail,
   generateEmailCampaign,
 } = require("../controllers/emailController");
-const { authMiddleware } = require("../middlewares/authMiddleware");
+const { protect } = require("../middlewares/authMiddleware");
 const {
-  validateEmailGeneration,
-  validateEmailCampaign,
+  emailGenerationValidation,
 } = require("../middlewares/validator");
 
 const router = express.Router();
@@ -99,7 +98,7 @@ const emailCampaignValidation = [
 // @access  Private
 router.post(
   "/generate",
-  authMiddleware,
+  protect,
   emailGenerationValidation,
   generateEmail
 );
@@ -109,8 +108,8 @@ router.post(
 // @access  Private
 router.post(
   "/campaign",
-  authMiddleware,
-  emailCampaignValidation,
+  protect,
+  emailGenerationValidation,
   generateEmailCampaign
 );
 

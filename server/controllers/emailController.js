@@ -1,6 +1,6 @@
 const { validationResult } = require("express-validator");
 const Company = require("../models/Company");
-const { GeneratedContent } = require("../models/GeneratedContent");
+const GeneratedContent = require("../models/Media");
 const {
   EmailMarketingChain,
 } = require("../services/langchain/contextualChains");

@@ -18,6 +18,7 @@ const marketingRoutes = require("./routes/marketingRoutes");
 const mediaRoutes = require("./routes/mediaRoutes");
 const chatbotRoutes = require("./routes/chatbotRoutes");
 const feedbackRoutes = require("./routes/feedbackRoutes");
+const emailRoutes = require("./routes/emailRoutes");
 
 const app = express();
 
@@ -114,16 +115,6 @@ app.get("/health", (req, res) => {
 
 // API status endpoint
 app.get("/api/status", (req, res) => {
-  res.json({
-    success: true,
-    message: "AI Digital Toolkit API is running",
-    version: "1.0.0",
-    timestamp: new Date().toISOString(),
-  });
-});
-
-// API status endpoint
-app.get("/api/status", (req, res) => {
   res.status(200).json({
     message: "AI Business Toolkit API is running",
     version: "1.0.0",
@@ -150,6 +141,7 @@ app.use("/api/marketing", marketingRoutes);
 app.use("/api/media", mediaRoutes);
 app.use("/api/chatbot", chatbotRoutes);
 app.use("/api/feedback", feedbackRoutes);
+app.use("/api/email", emailRoutes);
 
 // Stripe webhook endpoint (before JSON parsing middleware)
 app.post(
