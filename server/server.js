@@ -66,44 +66,21 @@ app.use(
 );
 
 // CORS Configuration
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin (mobile apps, postman, etc.)
-      if (!origin) return callback(null, true);
-
-      const allowedOrigins = [
-        config.corsOrigin,
-        "http://localhost:3000",
-        "http://localhost:5173",
-        "https://localhost:5173",
-      ];
-
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-
-      callback(new Error("Not allowed by CORS"));
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-  })
-);
-
+app.use(cors());
+app.set("trust proxy", true);
 // Rate Limiting
-const limiter = rateLimit({
-  windowMs: config.rateLimitWindowMs || 15 * 60 * 1000, // 15 minutes
-  max: config.rateLimitMax || 100, // 100 requests per window
-  message: {
-    success: false,
-    error: "Too many requests from this IP, please try again later.",
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
+// const limiter = rateLimit({
+//   windowMs: config.rateLimitWindowMs || 15 * 60 * 1000, // 15 minutes
+//   max: config.rateLimitMax || 100, // 100 requests per window
+//   message: {
+//     success: false,
+//     error: "Too many requests from this IP, please try again later.",
+//   },
+//   standardHeaders: true,
+//   legacyHeaders: false,
+// });
 
-app.use("/api/", limiter);
+// app.use("/api/", limiter);
 
 // Body parsing middleware
 app.use(
