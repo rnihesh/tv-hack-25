@@ -1,8 +1,7 @@
 // Test script to simulate website generation
 const testWebsiteGeneration = async () => {
   const formData = {
-    prompt:
-      "We are a modern coffee shop that serves artisanal coffee and pastries",
+    prompt: "Create a website for my business based on my company information",
     templateType: "business",
     style: "modern",
     colorScheme: "blue",

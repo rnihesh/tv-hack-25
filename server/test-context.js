@@ -10,8 +10,17 @@ async function testContext() {
     await mongoose.connect(config.mongoUri);
     console.log("✅ Connected to MongoDB");
 
-    // Find a test company (the one from the logs)
-    const testCompanyId = "688cc1359378d060eb3d18dd";
+    // Find a test company (get any company from database)
+    const testCompany = await Company.findOne();
+    if (!testCompany) {
+      console.log("❌ No companies found in database");
+      return;
+    }
+
+    const testCompanyId = testCompany._id.toString();
+    console.log(
+      `\n🔍 Testing with company: ${testCompany.name} (${testCompany.businessType})`
+    );
 
     console.log("\n🔍 Testing context storage and retrieval...");
 
@@ -19,12 +28,15 @@ async function testContext() {
     await vectorContextService.initialize();
     console.log("✅ Vector context service initialized");
 
-    // Test adding documents to context
+    // Test adding documents to context using actual company data
     console.log("\n📝 Adding test documents to context...");
 
     await vectorContextService.addDocumentToContext(
       testCompanyId,
-      "We are a modern coffee shop that serves artisanal coffee and pastries",
+      `We are ${testCompany.name}, a ${testCompany.businessType}. ${
+        testCompany.description ||
+        "We provide quality services to our customers."
+      }`,
       {
         source: "test_business_info",
         type: "business_description",
@@ -35,7 +47,7 @@ async function testContext() {
 
     await vectorContextService.addDocumentToContext(
       testCompanyId,
-      "Our target customers are young professionals who appreciate quality coffee",
+      `Our business type is ${testCompany.businessType} and we focus on providing excellent customer service`,
       {
         source: "test_business_info",
         type: "target_audience",
@@ -51,7 +63,7 @@ async function testContext() {
 
     const searchResults = await vectorContextService.searchContext(
       testCompanyId,
-      "coffee shop business",
+      `${testCompany.businessType} business information`,
       { limit: 5 }
     );
 
