@@ -14,6 +14,11 @@ const CREDIT_COSTS = {
 // Generate website with AI
 exports.generateWebsite = async (req, res) => {
   try {
+    console.log('=== Website Generation Request ===');
+    console.log('Request body:', req.body);
+    console.log('Company data:', req.companyData ? 'Present' : 'Missing');
+    console.log('CREDIT_COSTS:', CREDIT_COSTS);
+    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
@@ -25,6 +30,17 @@ exports.generateWebsite = async (req, res) => {
 
     const { prompt, templateType = "business", style, colorScheme, sections } = req.body;
     const company = req.companyData;
+
+    if (!company) {
+      console.error('Company data is missing from request');
+      return res.status(401).json({
+        success: false,
+        message: "Company data not found",
+      });
+    }
+
+    console.log('Company ID:', company._id);
+    console.log('Generation prompt:', prompt);
 
     // Generate website using AI
     const websiteChain = new WebsiteGenerationChain();
@@ -66,7 +82,11 @@ exports.generateWebsite = async (req, res) => {
     await newWebsite.save();
 
     // Deduct credits and update usage
-    const requiredCredits = CREDIT_COSTS.website_generation;
+    if (!CREDIT_COSTS) {
+      console.error('CREDIT_COSTS is undefined!');
+      throw new Error('CREDIT_COSTS configuration is missing');
+    }
+    const requiredCredits = CREDIT_COSTS.website_generation || 5; // fallback to 5 credits
     await company.deductCredits(
       requiredCredits,
       "website_gen",

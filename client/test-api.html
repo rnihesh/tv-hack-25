@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>API Test</title>
+  </head>
+  <body>
+    <h1>API Test</h1>
+    <button onclick="testWebsiteGeneration()">Test Website Generation</button>
+    <div id="result"></div>
+
+    <script>
+      async function testWebsiteGeneration() {
+        const payload = {
+          prompt: "Create a simple business website for a technology company",
+          templateType: "business",
+          style: "modern",
+          colorScheme: "blue",
+          sections: [],
+        };
+
+        try {
+          const response = await fetch(
+            "http://localhost:3000/api/websites/generate",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer dummy-jwt-token-for-testing",
+              },
+              body: JSON.stringify(payload),
+            }
+          );
+
+          const result = await response.json();
+          document.getElementById("result").innerHTML =
+            "<pre>" + JSON.stringify(result, null, 2) + "</pre>";
+          console.log("API Response:", result);
+        } catch (error) {
+          console.error("API Error:", error);
+          document.getElementById("result").innerHTML =
+            "Error: " + error.message;
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -1,30 +1,39 @@
-import React, { useState, useEffect } from 'react';
-import { api } from './api';
-import WebsiteForm from './components/WebsiteForm';
-import WebsiteList from './components/WebsiteList';
-import WebsiteViewer from './components/WebsiteViewer';
-import LoadingSpinner from './components/LoadingSpinner';
-import Toast from './components/Toast';
+import React, { useState, useEffect } from "react";
+import { api } from "./api";
+import WebsiteForm from "./components/WebsiteForm";
+import WebsiteList from "./components/WebsiteList";
+import WebsiteViewer from "./components/WebsiteViewer";
+import LoadingSpinner from "./components/LoadingSpinner";
+import Toast from "./components/Toast";
 
 const WebsiteGenerator = () => {
-  const [activeTab, setActiveTab] = useState('generate');
+  const [activeTab, setActiveTab] = useState("generate");
   const [websites, setWebsites] = useState([]);
   const [selectedWebsite, setSelectedWebsite] = useState(null);
   const [loading, setLoading] = useState(false);
   const [deployingWebsites, setDeployingWebsites] = useState(new Set());
-  const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
-  const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0, pages: 0 });
+  const [toast, setToast] = useState({
+    show: false,
+    message: "",
+    type: "success",
+  });
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    pages: 0,
+  });
 
   // Dummy user for testing (will be replaced with auth later)
   const dummyUser = {
-    id: 'dummy-user-123',
-    companyName: 'Demo Company',
-    businessType: 'Technology',
-    credits: 100
+    id: "dummy-user-123",
+    companyName: "Demo Company",
+    businessType: "Technology",
+    credits: 9999975,
   };
 
   useEffect(() => {
-    if (activeTab === 'manage') {
+    if (activeTab === "manage") {
       loadWebsites();
     }
   }, [activeTab, pagination.page]);
@@ -34,19 +43,19 @@ const WebsiteGenerator = () => {
       setLoading(true);
       const response = await api.getMyWebsites({
         page: pagination.page,
-        limit: pagination.limit
+        limit: pagination.limit,
       });
-      
+
       if (response.success) {
         setWebsites(response.data.websites);
-        setPagination(prev => ({
+        setPagination((prev) => ({
           ...prev,
-          ...response.data.pagination
+          ...response.data.pagination,
         }));
       }
     } catch (error) {
-      showToast('Failed to load websites', 'error');
-      console.error('Load websites error:', error);
+      showToast("Failed to load websites", "error");
+      console.error("Load websites error:", error);
     } finally {
       setLoading(false);
     }
@@ -56,38 +65,39 @@ const WebsiteGenerator = () => {
     try {
       setLoading(true);
       const response = await api.generateWebsite(formData);
-      
+
       if (response.success) {
         // Create a website object with the generated HTML content
         const websiteData = {
-          _id: `generated-${Date.now()}`,
-          templateName: formData.prompt || 'Generated Website',
-          htmlContent: response.htmlContent,
-          industry: formData.industry || 'General',
+          _id: response.data.websiteId || `generated-${Date.now()}`,
+          templateName: formData.prompt || "Generated Website",
+          htmlContent: response.data.htmlContent,
+          industry: formData.industry || "General",
           aiGenerated: true,
           createdAt: new Date().toISOString(),
           customizations: {
-            style: formData.style || 'modern',
-            colorScheme: formData.colorScheme || 'blue'
+            style: formData.style || "modern",
+            colorScheme: formData.colorScheme || "blue",
           },
-          requirements: formData.requirements || '',
+          requirements: formData.requirements || "",
           isDeployed: false,
-          deploymentUrl: null
+          deploymentUrl: null,
         };
-        
-        showToast('Website generated successfully!', 'success');
+
+        showToast("Website generated successfully!", "success");
         setSelectedWebsite(websiteData);
-        setActiveTab('preview');
-        
+        setActiveTab("preview");
+
         // Refresh websites list if we're on manage tab
-        if (activeTab === 'manage') {
+        if (activeTab === "manage") {
           loadWebsites();
         }
       }
     } catch (error) {
-      const message = error.response?.data?.message || 'Failed to generate website';
-      showToast(message, 'error');
-      console.error('Generate website error:', error);
+      const message =
+        error.response?.data?.message || "Failed to generate website";
+      showToast(message, "error");
+      console.error("Generate website error:", error);
     } finally {
       setLoading(false);
     }
@@ -97,16 +107,17 @@ const WebsiteGenerator = () => {
     try {
       setLoading(true);
       const response = await api.updateWebsite(websiteId, updateData);
-      
+
       if (response.success) {
-        showToast('Website updated successfully!', 'success');
+        showToast("Website updated successfully!", "success");
         setSelectedWebsite(response.data.website);
         loadWebsites(); // Refresh the list
       }
     } catch (error) {
-      const message = error.response?.data?.message || 'Failed to update website';
-      showToast(message, 'error');
-      console.error('Update website error:', error);
+      const message =
+        error.response?.data?.message || "Failed to update website";
+      showToast(message, "error");
+      console.error("Update website error:", error);
     } finally {
       setLoading(false);
     }
@@ -114,19 +125,20 @@ const WebsiteGenerator = () => {
 
   const handleDeployWebsite = async (websiteId, siteName) => {
     try {
-      setDeployingWebsites(prev => new Set([...prev, websiteId]));
+      setDeployingWebsites((prev) => new Set([...prev, websiteId]));
       const response = await api.deployWebsite(websiteId, { siteName });
-      
+
       if (response.success) {
-        showToast('Website deployed successfully!', 'success');
+        showToast("Website deployed successfully!", "success");
         loadWebsites(); // Refresh the list to show deployment status
       }
     } catch (error) {
-      const message = error.response?.data?.message || 'Failed to deploy website';
-      showToast(message, 'error');
-      console.error('Deploy website error:', error);
+      const message =
+        error.response?.data?.message || "Failed to deploy website";
+      showToast(message, "error");
+      console.error("Deploy website error:", error);
     } finally {
-      setDeployingWebsites(prev => {
+      setDeployingWebsites((prev) => {
         const newSet = new Set(prev);
         newSet.delete(websiteId);
         return newSet;
@@ -135,25 +147,28 @@ const WebsiteGenerator = () => {
   };
 
   const handleDeleteWebsite = async (websiteId) => {
-    if (!window.confirm('Are you sure you want to delete this website?')) {
+    if (!window.confirm("Are you sure you want to delete this website?")) {
       return;
     }
 
     try {
       setLoading(true);
       const response = await api.deleteWebsite(websiteId);
-      
+
       if (response.success) {
-        showToast('Website deleted successfully!', 'success');
-        setWebsites(prev => prev.filter(website => website._id !== websiteId));
+        showToast("Website deleted successfully!", "success");
+        setWebsites((prev) =>
+          prev.filter((website) => website._id !== websiteId)
+        );
         if (selectedWebsite?._id === websiteId) {
           setSelectedWebsite(null);
         }
       }
     } catch (error) {
-      const message = error.response?.data?.message || 'Failed to delete website';
-      showToast(message, 'error');
-      console.error('Delete website error:', error);
+      const message =
+        error.response?.data?.message || "Failed to delete website";
+      showToast(message, "error");
+      console.error("Delete website error:", error);
     } finally {
       setLoading(false);
     }
@@ -163,27 +178,30 @@ const WebsiteGenerator = () => {
     try {
       setLoading(true);
       const response = await api.getWebsite(websiteId);
-      
+
       if (response.success) {
         setSelectedWebsite(response.data.website);
-        setActiveTab('preview');
+        setActiveTab("preview");
       }
     } catch (error) {
-      const message = error.response?.data?.message || 'Failed to load website';
-      showToast(message, 'error');
-      console.error('View website error:', error);
+      const message = error.response?.data?.message || "Failed to load website";
+      showToast(message, "error");
+      console.error("View website error:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const showToast = (message, type = 'success') => {
+  const showToast = (message, type = "success") => {
     setToast({ show: true, message, type });
-    setTimeout(() => setToast({ show: false, message: '', type: 'success' }), 3000);
+    setTimeout(
+      () => setToast({ show: false, message: "", type: "success" }),
+      3000
+    );
   };
 
   const handlePageChange = (newPage) => {
-    setPagination(prev => ({ ...prev, page: newPage }));
+    setPagination((prev) => ({ ...prev, page: newPage }));
   };
 
   return (
@@ -192,7 +210,9 @@ const WebsiteGenerator = () => {
         {/* Header */}
         <header className="text-center mb-8 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl p-8 shadow-lg">
           <h1 className="text-4xl font-bold mb-2">AI Website Generator</h1>
-          <p className="text-xl opacity-90 mb-4">Generate professional websites with AI assistance</p>
+          <p className="text-xl opacity-90 mb-4">
+            Generate professional websites with AI assistance
+          </p>
           <div className="flex justify-center gap-8 text-sm">
             <span className="bg-white bg-opacity-20 px-3 py-1 rounded-full">
               Company: {dummyUser.companyName}
@@ -205,34 +225,34 @@ const WebsiteGenerator = () => {
 
         {/* Tab Navigation */}
         <nav className="flex bg-white rounded-lg p-1 mb-8 shadow-md">
-          <button 
+          <button
             className={`flex-1 py-3 px-6 rounded-md font-medium transition-all ${
-              activeTab === 'generate' 
-                ? 'bg-blue-500 text-white shadow-md' 
-                : 'text-gray-600 hover:bg-gray-50'
+              activeTab === "generate"
+                ? "bg-blue-500 text-white shadow-md"
+                : "text-gray-600 hover:bg-gray-50"
             }`}
-            onClick={() => setActiveTab('generate')}
+            onClick={() => setActiveTab("generate")}
           >
             Generate Website
           </button>
-          <button 
+          <button
             className={`flex-1 py-3 px-6 rounded-md font-medium transition-all ${
-              activeTab === 'manage' 
-                ? 'bg-blue-500 text-white shadow-md' 
-                : 'text-gray-600 hover:bg-gray-50'
+              activeTab === "manage"
+                ? "bg-blue-500 text-white shadow-md"
+                : "text-gray-600 hover:bg-gray-50"
             }`}
-            onClick={() => setActiveTab('manage')}
+            onClick={() => setActiveTab("manage")}
           >
             My Websites
           </button>
           {selectedWebsite && (
-            <button 
+            <button
               className={`flex-1 py-3 px-6 rounded-md font-medium transition-all ${
-                activeTab === 'preview' 
-                  ? 'bg-blue-500 text-white shadow-md' 
-                  : 'text-gray-600 hover:bg-gray-50'
+                activeTab === "preview"
+                  ? "bg-blue-500 text-white shadow-md"
+                  : "text-gray-600 hover:bg-gray-50"
               }`}
-              onClick={() => setActiveTab('preview')}
+              onClick={() => setActiveTab("preview")}
             >
               Preview
             </button>
@@ -242,16 +262,16 @@ const WebsiteGenerator = () => {
         {/* Main Content */}
         <main className="bg-white rounded-xl shadow-lg p-8 relative">
           {loading && <LoadingSpinner />}
-          
-          {activeTab === 'generate' && (
-            <WebsiteForm 
+
+          {activeTab === "generate" && (
+            <WebsiteForm
               onSubmit={handleGenerateWebsite}
               loading={loading}
               userCredits={dummyUser.credits}
             />
           )}
 
-          {activeTab === 'manage' && (
+          {activeTab === "manage" && (
             <WebsiteList
               websites={websites}
               loading={loading}
@@ -262,7 +282,7 @@ const WebsiteGenerator = () => {
             />
           )}
 
-          {activeTab === 'preview' && selectedWebsite && (
+          {activeTab === "preview" && selectedWebsite && (
             <WebsiteViewer
               website={selectedWebsite}
               onUpdate={handleUpdateWebsite}
@@ -274,10 +294,12 @@ const WebsiteGenerator = () => {
 
         {/* Toast */}
         {toast.show && (
-          <Toast 
-            message={toast.message} 
+          <Toast
+            message={toast.message}
             type={toast.type}
-            onClose={() => setToast({ show: false, message: '', type: 'success' })}
+            onClose={() =>
+              setToast({ show: false, message: "", type: "success" })
+            }
           />
         )}
       </div>
