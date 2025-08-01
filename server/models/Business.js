@@ -6,13 +6,13 @@ const AIContextSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Company",
       required: true,
-      index: true,
+      
     },
     contextType: {
       type: String,
       enum: ["chatbot", "email", "website", "image_gen", "general"],
       required: true,
-      index: true,
+      
     },
     conversationHistory: [
       {
@@ -59,7 +59,7 @@ const AIContextSchema = new mongoose.Schema(
     ],
     sessionId: {
       type: String,
-      index: true,
+      
     },
     isActive: {
       type: Boolean,

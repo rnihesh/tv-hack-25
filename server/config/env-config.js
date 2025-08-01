@@ -1,4 +1,16 @@
-require("dotenv").config();
+const path = require("path");
+const fs = require("fs");
+
+// Load environment variables from .env file
+require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
+
+// If you need to look in parent directory too (as in test-db.js)
+if (!process.env.DBURL && !process.env.MONGO_URI) {
+  const parentEnvPath = path.join(__dirname, "..", "..", ".env");
+  if (fs.existsSync(parentEnvPath)) {
+    require("dotenv").config({ path: parentEnvPath });
+  }
+}
 
 module.exports = {
   // Server Configuration
@@ -7,7 +19,7 @@ module.exports = {
 
   // Database Configuration
   mongoUri:
-    process.env.DBURL || "mongodb://localhost:27017/ai-business-toolkit",
+    process.env.DBURL || process.env.MONGO_URI || "mongodb://localhost:27017/ai-business-toolkit",
 
   // JWT Configuration
   jwtSecret:

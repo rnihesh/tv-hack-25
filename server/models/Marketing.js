@@ -6,7 +6,7 @@ const EmailCampaignSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Company",
       required: true,
-      index: true,
+      
     },
     campaignName: {
       type: String,
@@ -63,7 +63,7 @@ const EmailCampaignSchema = new mongoose.Schema(
       type: String,
       enum: ["draft", "scheduled", "sending", "sent", "failed", "paused"],
       default: "draft",
-      index: true,
+      
     },
     analytics: {
       sent: {

@@ -297,7 +297,6 @@ const companySchema = new mongoose.Schema(
 );
 
 // Indexes
-companySchema.index({ email: 1 });
 companySchema.index({ "subscription.status": 1 });
 companySchema.index({ businessType: 1 });
 companySchema.index({ createdAt: 1 });

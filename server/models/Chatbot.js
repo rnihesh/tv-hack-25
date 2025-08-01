@@ -7,7 +7,7 @@ const ChatbotConfigSchema = new mongoose.Schema(
       ref: "Company",
       required: true,
       unique: true,
-      index: true,
+      
     },
     botName: {
       type: String,
@@ -205,7 +205,6 @@ const ChatbotConfigSchema = new mongoose.Schema(
 );
 
 // Indexes
-ChatbotConfigSchema.index({ companyId: 1 });
 ChatbotConfigSchema.index({ isActive: 1 });
 
 // Methods

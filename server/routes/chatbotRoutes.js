@@ -1,6 +1,16 @@
 const express = require("express");
 const { body } = require("express-validator");
-const { protect } = require("../middlewares/authMiddleware");
+const {
+  protect,
+  checkCredits,
+  checkUsageLimit,
+} = require("../middlewares/authMiddleware");
+
+const {
+  generateResponse,
+  trainChatbot,
+  analyzeConversations,
+} = require("../controllers/chatbotController");
 
 const router = express.Router();
 
@@ -76,7 +86,8 @@ const conversationAnalysisValidation = [
 // @access  Private
 router.post(
   "/respond",
-  authMiddleware,
+  protect, // Use protect instead of authMiddleware
+  checkCredits(1), // Assuming 1 credit required for response
   chatbotResponseValidation,
   generateResponse
 );
@@ -84,14 +95,21 @@ router.post(
 // @route   POST /api/chatbot/train
 // @desc    Train chatbot with business-specific context
 // @access  Private
-router.post("/train", authMiddleware, chatbotTrainingValidation, trainChatbot);
+router.post(
+  "/train",
+  protect, // Use protect instead of authMiddleware
+  checkCredits(5), // Assuming 5 credits required for training
+  chatbotTrainingValidation,
+  trainChatbot
+);
 
 // @route   POST /api/chatbot/analyze
 // @desc    Analyze conversation patterns and insights
 // @access  Private
 router.post(
   "/analyze",
-  authMiddleware,
+  protect, // Use protect instead of authMiddleware
+  checkCredits(2), // Assuming 2 credits required for analysis
   conversationAnalysisValidation,
   analyzeConversations
 );

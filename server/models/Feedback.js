@@ -7,7 +7,7 @@ const FeedbackSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Company",
       required: true,
-      index: true,
+      
     },
     source: {
       type: String,
@@ -21,7 +21,7 @@ const FeedbackSchema = new mongoose.Schema(
         "direct",
       ],
       required: true,
-      index: true,
+      
     },
     content: {
       originalText: {
@@ -39,7 +39,7 @@ const FeedbackSchema = new mongoose.Schema(
       overall: {
         type: String,
         enum: ["positive", "negative", "neutral"],
-        index: true,
+        
       },
       score: {
         type: Number,
@@ -149,7 +149,7 @@ const FeedbackSchema = new mongoose.Schema(
         type: String,
         enum: ["pending", "processing", "completed", "failed"],
         default: "pending",
-        index: true,
+        
       },
       aiModel: String,
       processingTime: Number,
@@ -194,7 +194,7 @@ const FeedbackAnalyticsSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Company",
       required: true,
-      index: true,
+      
     },
     period: {
       type: String,

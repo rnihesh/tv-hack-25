@@ -6,7 +6,7 @@ const WebsiteTemplateSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Company",
       required: true,
-      index: true,
+      
     },
     templateName: {
       type: String,
@@ -175,7 +175,6 @@ const WebsiteTemplateSchema = new mongoose.Schema(
 WebsiteTemplateSchema.index({ companyId: 1 });
 WebsiteTemplateSchema.index({ industry: 1 });
 WebsiteTemplateSchema.index({ isPublished: 1 });
-WebsiteTemplateSchema.index({ publishedUrl: 1 });
 
 // Pre-save middleware to generate published URL
 WebsiteTemplateSchema.pre("save", function (next) {
