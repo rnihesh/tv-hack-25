@@ -30,6 +30,11 @@ module.exports = {
   geminiApiKey: process.env.GEMINI_API_KEY,
   ollamaUrl: process.env.OLLAMA_URL || "http://localhost:11434",
 
+  // Cloudinary Configuration
+  cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
+  cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
+  cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET,
+
   // Email Configuration
   gmailAddress: process.env.GMAIL_ADDRESS,
   googleClientId: process.env.GOOGLE_CLIENT_ID,

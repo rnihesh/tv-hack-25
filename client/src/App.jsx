@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext'
 import AuthWrapper from './components/auth/AuthWrapper'
 import Dashboard from './components/Dashboard'
 import WebsiteGenerator from './website-generator/WebsiteGenerator'
+import ImageGenerator from './aiImageGenerator/ImageGenerator'
 // import ChatInterface from './chatbot/ChatInterface'
 // import MailingDashboard from './mailer/MailingDashboard'
 
@@ -71,6 +72,15 @@ function AppContent() {
         element={
           <ProtectedRoute>
             <WebsiteGenerator />
+          </ProtectedRoute>
+        } 
+      />
+      
+      <Route 
+        path="/image-generator" 
+        element={
+          <ProtectedRoute>
+            <ImageGenerator />
           </ProtectedRoute>
         } 
       />
