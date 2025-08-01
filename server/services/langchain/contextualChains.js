@@ -73,9 +73,18 @@ Response:`);
         throw new Error("No AI models are currently available. Please check your model configuration.");
       }
 
-      // Get the best model for this task
-      selectedModel =
-        modelName || modelManager.getBestModelForTask(this.contextType);
+      // Get the best working model for this task (with health checking)
+      if (modelName) {
+        selectedModel = modelName;
+      } else {
+        try {
+          // Use the enhanced method that tests model health
+          selectedModel = await modelManager.getBestWorkingModelForTask(this.contextType);
+        } catch (error) {
+          // Fallback to the basic selection if health checking fails
+          selectedModel = modelManager.getBestModelForTask(this.contextType);
+        }
+      }
 
       // Create contextual prompt
       const contextualPrompt = await this.createContextualPrompt(
@@ -85,12 +94,20 @@ Response:`);
         sessionId
       );
 
-      // Invoke the model
+      // Invoke the model with automatic fallback
       const response = await modelManager.invokeWithMetrics(
         selectedModel,
         contextualPrompt,
         modelOptions
       );
+
+      // Log if fallback was used
+      if (response.fallbackUsed) {
+        aiLogger.info(`Fallback used: ${response.originalModelRequested} -> ${response.modelUsed}`);
+      }
+      if (response.emergencyFallbackUsed) {
+        aiLogger.warn(`Emergency fallback used: ${response.originalModelRequested} -> ${response.modelUsed}`);
+      }
 
       // Update context with this interaction
       if (saveContext && sessionId) {
@@ -101,7 +118,9 @@ Response:`);
           userQuery,
           response.content,
           {
-            model: selectedModel,
+            model: response.modelUsed,
+            originalModel: response.originalModelRequested,
+            fallbackUsed: response.fallbackUsed || false,
             tokenCount: response.metrics.tokenUsage.total,
             processingTime: response.metrics.duration,
           }
@@ -112,7 +131,9 @@ Response:`);
         content: response.content,
         metrics: response.metrics,
         contextUsed: contextualPrompt.length > basePrompt.length,
-        modelUsed: selectedModel,
+        modelUsed: response.modelUsed,
+        fallbackUsed: response.fallbackUsed || false,
+        emergencyFallbackUsed: response.emergencyFallbackUsed || false,
       };
     } catch (error) {
       aiLogger.error("contextual_chain", selectedModel, error, {
@@ -173,6 +194,9 @@ class WebsiteGenerationChain extends ContextAwareChain {
       ...invokeOptions
     } = options;
 
+    // Create a unique session ID for this website generation
+    const sessionId = `website_gen_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+
     const websitePrompt = `Generate a complete, professional website based on the following requirements:
 
 User Requirements: ${prompt}
@@ -212,8 +236,27 @@ Create a complete, professional HTML website that:
 
 Generate clean, semantic HTML5 with embedded CSS and JavaScript. Make it production-ready.`;
 
+    // Store the website generation request in context first
+    try {
+      await vectorContextService.addDocumentToContext(companyId, prompt, {
+        source: "website_generation_request",
+        templateType,
+        style,
+        colorScheme,
+        sections: sections.join(", "),
+        timestamp: new Date().toISOString(),
+        importance: 8,
+      });
+      
+      logger.info(`Stored website generation request in context for company ${companyId}`);
+    } catch (contextError) {
+      logger.warn(`Failed to store context, but continuing with generation: ${contextError.message}`);
+    }
+
     const result = await this.invoke(companyId, websitePrompt, {
       basePrompt,
+      sessionId, // Pass the session ID to enable context saving
+      saveContext: true, // Explicitly enable context saving
       ...invokeOptions,
     });
 
@@ -230,12 +273,35 @@ Generate clean, semantic HTML5 with embedded CSS and JavaScript. Make it product
       }
     }
 
+    // Store the successful website generation in context for future reference
+    try {
+      const generationSummary = `Successfully generated a ${templateType} website with ${style} style and ${colorScheme} color scheme. Website includes sections: ${sections.join(", ")}. Generated HTML is ${htmlContent.length} characters long.`;
+      
+      await vectorContextService.addDocumentToContext(companyId, generationSummary, {
+        source: "website_generation_result",
+        templateType,
+        style,
+        colorScheme,
+        sections: sections.join(", "),
+        htmlLength: htmlContent.length,
+        modelUsed: result.modelUsed,
+        timestamp: new Date().toISOString(),
+        importance: 9,
+        sessionId, // Include session ID for tracking
+      });
+      
+      logger.info(`Stored website generation result in context for company ${companyId}`);
+    } catch (contextError) {
+      logger.warn(`Failed to store generation result in context: ${contextError.message}`);
+    }
+
     return {
       content: htmlContent,
       modelUsed: result.modelUsed || "ollama-llama3",
       metrics: result.metrics || { tokenUsage: { total: 0 }, duration: 0 },
       contextUsed: result.contextUsed || false,
       contextInsights: "Website generated with company context",
+      sessionId, // Return session ID for tracking
     };
   }
 }

@@ -109,7 +109,7 @@ function App() {
         <AppContent />
       </Router>
     </AuthProvider>
-  )
+  );
 }
 
-export default App
+export default App;

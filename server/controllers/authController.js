@@ -74,6 +74,18 @@ const registerCompany = async (req, res) => {
     // Create vector store for the company
     try {
       await VectorStore.createForCompany(company._id, company.businessType);
+      
+      // Seed initial context with company information
+      const { vectorContextService } = require("../services/langchain/vectorContext");
+      await vectorContextService.seedCompanyContext(company._id, {
+        companyName,
+        businessType,
+        businessDescription,
+        targetAudience,
+        preferences
+      });
+      
+      logger.info(`Seeded initial context for company: ${company._id}`);
     } catch (vectorError) {
       logger.error("Failed to create vector store for company:", vectorError);
       // Don't fail registration if vector store creation fails

@@ -10,7 +10,7 @@ const aiContextSchema = new mongoose.Schema(
     },
     contextType: {
       type: String,
-      enum: ["chatbot", "email", "website", "image_gen", "general"],
+      enum: ["chatbot", "email", "email_generation", "website", "website_generation", "image_gen", "image_generation", "general"],
       required: true,
       
     },

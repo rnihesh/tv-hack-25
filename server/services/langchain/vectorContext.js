@@ -2,7 +2,6 @@ const { OllamaEmbeddings } = require("@langchain/community/embeddings/ollama");
 const { GoogleGenerativeAIEmbeddings } = require("@langchain/google-genai");
 const { Document } = require("@langchain/core/documents");
 const { VectorStore } = require("../../models/VectorStore");
-const { AIContext } = require("../../models/AIContext");
 const config = require("../../config/env-config");
 const { logger, aiLogger } = require("../../utils/logger");
 const { memoryVectorStore } = require("./memoryVectorStore");
@@ -15,22 +14,59 @@ class VectorContextService {
 
   async initialize() {
     try {
-      // Initialize embeddings - prefer Ollama for local, fallback to Google
+      // Initialize embeddings with fallback logic
+      let embeddingsInitialized = false;
+      
+      // Try Ollama first if URL is configured
       if (config.ollamaUrl) {
-        this.embeddings = new OllamaEmbeddings({
-          baseUrl: config.ollamaUrl,
-          model: "mxbai-embed-large", // Good embedding model
-        });
-        logger.info("Vector service initialized with Ollama embeddings");
-      } else if (config.geminiApiKey) {
-        this.embeddings = new GoogleGenerativeAIEmbeddings({
-          apiKey: config.geminiApiKey,
-          model: "embedding-001",
-        });
-        logger.info("Vector service initialized with Google embeddings");
-      } else {
+        try {
+          // Test Ollama connectivity first
+          const fetch = require("node-fetch");
+          const response = await fetch(`${config.ollamaUrl}/api/tags`, {
+            method: "GET",
+            timeout: 3000,
+          });
+          
+          if (response.ok) {
+            this.embeddings = new OllamaEmbeddings({
+              baseUrl: config.ollamaUrl,
+              model: "mxbai-embed-large", // Good embedding model
+            });
+            
+            // Test with a simple embedding
+            await this.embeddings.embedQuery("test");
+            
+            logger.info("Vector service initialized with Ollama embeddings");
+            embeddingsInitialized = true;
+          } else {
+            logger.warn(`Ollama responded with status ${response.status}, falling back to Google`);
+          }
+        } catch (ollamaError) {
+          logger.warn(`Ollama not accessible (${ollamaError.message}), falling back to Google embeddings`);
+        }
+      }
+      
+      // Fallback to Google if Ollama failed or not configured
+      if (!embeddingsInitialized && config.geminiApiKey) {
+        try {
+          this.embeddings = new GoogleGenerativeAIEmbeddings({
+            apiKey: config.geminiApiKey,
+            model: "text-embedding-004", // Updated to latest model
+          });
+          
+          // Test with a simple embedding
+          await this.embeddings.embedQuery("test");
+          
+          logger.info("Vector service initialized with Google embeddings (fallback)");
+          embeddingsInitialized = true;
+        } catch (geminiError) {
+          logger.error(`Google embeddings also failed: ${geminiError.message}`);
+        }
+      }
+      
+      if (!embeddingsInitialized) {
         throw new Error(
-          "No embedding service available. Configure OLLAMA_URL or GEMINI_API_KEY"
+          "No embedding service available. Both Ollama and Google embeddings failed to initialize."
         );
       }
 
@@ -58,8 +94,30 @@ class VectorContextService {
         await this.initialize();
       }
       
-      // Generate embedding for document
-      const embedding = await this.embeddings.embedQuery(document);
+      if (!this.embeddings) {
+        logger.warn("No embeddings service available, skipping vector storage");
+        return { id: `fallback_${Date.now()}` };
+      }
+      
+      // Generate embedding for document with error handling
+      let embedding;
+      try {
+        embedding = await this.embeddings.embedQuery(document);
+      } catch (embeddingError) {
+        logger.error(`Failed to generate embedding: ${embeddingError.message}`);
+        // Re-initialize embeddings and try once more
+        try {
+          await this.initialize();
+          if (this.embeddings) {
+            embedding = await this.embeddings.embedQuery(document);
+          } else {
+            throw new Error("No embeddings service available after re-initialization");
+          }
+        } catch (retryError) {
+          logger.error(`Failed to generate embedding on retry: ${retryError.message}`);
+          return { id: `fallback_${Date.now()}` };
+        }
+      }
       
       // Generate unique ID
       const id = `doc_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
@@ -100,8 +158,30 @@ class VectorContextService {
         await this.initialize();
       }
       
-      // Generate query embedding
-      const queryEmbedding = await this.embeddings.embedQuery(query);
+      if (!this.embeddings) {
+        logger.warn("No embeddings service available, returning empty search results");
+        return [];
+      }
+      
+      // Generate query embedding with error handling
+      let queryEmbedding;
+      try {
+        queryEmbedding = await this.embeddings.embedQuery(query);
+      } catch (embeddingError) {
+        logger.error(`Failed to generate query embedding: ${embeddingError.message}`);
+        // Try to re-initialize and retry once
+        try {
+          await this.initialize();
+          if (this.embeddings) {
+            queryEmbedding = await this.embeddings.embedQuery(query);
+          } else {
+            throw new Error("No embeddings service available after re-initialization");
+          }
+        } catch (retryError) {
+          logger.error(`Failed to generate query embedding on retry: ${retryError.message}`);
+          return []; // Return empty results on failure
+        }
+      }
       
       // Search in memory store
       const results = await memoryVectorStore.queryCollection(
@@ -131,8 +211,8 @@ class VectorContextService {
     sessionId = null
   ) {
     try {
-      // Get vector context
-      const vectorResults = await this.searchContext(companyId, "", {
+      // Get vector context - search with a general business query instead of empty string
+      const vectorResults = await this.searchContext(companyId, "business information company profile services", {
         filter: { source: "business_info" },
         limit: 3,
       });
@@ -140,6 +220,7 @@ class VectorContextService {
       // Get AI conversation context
       let aiContext = null;
       if (sessionId) {
+        const AIContext = require("../../models/AIContext");
         aiContext = await AIContext.findOrCreateContext(
           companyId,
           contextType,
@@ -183,6 +264,7 @@ class VectorContextService {
   ) {
     try {
       // Update AI context
+      const AIContext = require("../../models/AIContext");
       const aiContext = await AIContext.findOrCreateContext(
         companyId,
         contextType,
@@ -317,7 +399,35 @@ class VectorContextService {
 
   async seedCompanyContext(companyId, initialData) {
     try {
+      if (!this.initialized) {
+        await this.initialize();
+      }
+
       const documents = [];
+
+      // Add company name and basic info
+      if (initialData.companyName) {
+        documents.push({
+          content: `Company Name: ${initialData.companyName}`,
+          metadata: {
+            source: "business_info",
+            type: "company_name",
+            importance: 10,
+          },
+        });
+      }
+
+      // Add business type
+      if (initialData.businessType) {
+        documents.push({
+          content: `Business Type: ${initialData.businessType}`,
+          metadata: {
+            source: "business_info",
+            type: "business_type",
+            importance: 9,
+          },
+        });
+      }
 
       // Add company basic info
       if (initialData.businessDescription) {
@@ -327,6 +437,33 @@ class VectorContextService {
             source: "business_info",
             type: "company_description",
             importance: 9,
+          },
+        });
+      }
+
+      // Add target audience info
+      if (initialData.targetAudience) {
+        documents.push({
+          content: `Target Audience: ${initialData.targetAudience}`,
+          metadata: {
+            source: "business_info",
+            type: "target_audience",
+            importance: 8,
+          },
+        });
+      }
+
+      // Add preferences info
+      if (initialData.preferences) {
+        const preferencesText = Object.entries(initialData.preferences)
+          .map(([key, value]) => `${key}: ${value}`)
+          .join(", ");
+        documents.push({
+          content: `Company Preferences: ${preferencesText}`,
+          metadata: {
+            source: "business_info",
+            type: "preferences",
+            importance: 7,
           },
         });
       }
@@ -464,6 +601,7 @@ Communication Tone: ${company.preferences?.communicationTone || "professional"}`
 
       // Delete MongoDB records
       await VectorStore.deleteOne({ companyId });
+      const AIContext = require("../../models/AIContext");
       await AIContext.deleteMany({ companyId });
 
       logger.info(`Deleted all context for company ${companyId}`);

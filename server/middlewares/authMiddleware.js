@@ -24,6 +24,28 @@ const protect = async (req, res, next) => {
       });
     }
 
+    // Development bypass for dummy token
+    if (token === 'dummy-jwt-token-for-testing' && process.env.NODE_ENV === 'development') {
+      // Find the first active company for testing
+      const company = await Company.findOne({ isActive: true });
+      
+      if (!company) {
+        return res.status(401).json({
+          success: false,
+          message: "No test company found for development",
+        });
+      }
+
+      req.company = {
+        id: company._id,
+        email: company.email,
+        companyName: company.companyName,
+        subscription: company.subscription,
+      };
+
+      return next();
+    }
+
     // Verify token
     const decoded = jwt.verify(token, config.jwtSecret);
 
