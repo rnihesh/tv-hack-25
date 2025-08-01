@@ -4,6 +4,9 @@ const { GeneratedContent } = require("../models/GeneratedContent");
 const { WebsiteTemplate } = require("../models/Website");
 const { VectorStore } = require("../models/VectorStore");
 const { modelManager } = require("../services/langchain/models");
+const {
+  WebsiteGenerationChain,
+} = require("../services/langchain/contextualChains");
 const { businessLogger, aiLogger } = require("../utils/logger");
 
 // Credit costs for different operations
@@ -41,48 +44,23 @@ const generateWebsite = async (req, res) => {
       });
     }
 
-    // Get company's vector store for context
-    const vectorStore = await VectorStore.findByCompany(company._id);
-    let businessContext = "";
+    // Initialize the website generation chain with context
+    const websiteChain = new WebsiteGenerationChain(company._id);
 
-    if (vectorStore) {
-      // Get relevant business context
-      const contextDocs = vectorStore.searchDocuments({
-        source: "business_info",
-        importance: 7,
-      });
-      businessContext = contextDocs
-        .slice(0, 3)
-        .map((doc) => doc.content)
-        .join("\n");
-    }
-
-    // Build AI prompt for website generation
-    const aiPrompt = buildWebsitePrompt(
-      company,
-      prompt,
+    // Generate website content with contextual awareness
+    const result = await websiteChain.generateWebsite({
+      businessDescription: prompt,
       templateType,
       style,
-      businessContext
-    );
+      colorScheme,
+      sections,
+    });
 
-    // Get the best model for website generation
-    const modelName =
-      company.aiContextProfile?.contextualPreferences?.preferredAIModel ||
-      modelManager.getBestModelForTask("website_generation");
-
-    // Generate website content
-    const aiResponse = await modelManager.invokeWithMetrics(
-      modelName,
-      aiPrompt,
-      {
-        temperature: 0.7,
-        maxTokens: 4000,
-      }
-    );
-
-    // Parse AI response to extract website structure
-    const websiteContent = parseWebsiteResponse(aiResponse.content);
+    const websiteContent = result.websiteContent;
+    const aiResponse = {
+      content: JSON.stringify(websiteContent),
+      metrics: result.metrics,
+    };
 
     // Create website template record
     const websiteTemplate = new WebsiteTemplate({
@@ -112,11 +90,11 @@ const generateWebsite = async (req, res) => {
           templateType,
           style,
           colorScheme,
-          model: modelName,
-          tokensUsed: aiResponse.metrics.tokenUsage.total,
+          model: result.modelUsed,
+          tokensUsed: result.metrics.tokenUsage.total,
         },
       },
-      aiModel: modelName,
+      aiModel: result.modelUsed,
       version: 1,
       isActive: true,
     });
@@ -136,7 +114,7 @@ const generateWebsite = async (req, res) => {
     businessLogger.contentGeneration(company.email, "website", true, {
       templateType,
       style,
-      model: modelName,
+      model: result.modelUsed,
       creditsUsed: requiredCredits,
     });
 
@@ -151,8 +129,8 @@ const generateWebsite = async (req, res) => {
           templateType,
           style,
           colorScheme,
-          tokensUsed: aiResponse.metrics.tokenUsage.total,
-          processingTime: aiResponse.metrics.duration,
+          tokensUsed: result.metrics.tokenUsage.total,
+          processingTime: result.metrics.duration,
         },
         creditsUsed: requiredCredits,
         remainingCredits: company.credits.currentCredits,
