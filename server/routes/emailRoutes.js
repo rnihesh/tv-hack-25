@@ -14,8 +14,6 @@ const {
 
 const router = express.Router();
 
-<<<<<<< Updated upstream
-=======
 // Test route (no auth required for testing)
 router.get("/test", (req, res) => {
   res.json({
@@ -188,7 +186,6 @@ router.post(
   scheduleEmail
 );
 
->>>>>>> Stashed changes
 // @route   POST /api/email/generate
 // @desc    Generate marketing email with AI and context
 // @access  Private
