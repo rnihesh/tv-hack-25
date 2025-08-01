@@ -8,7 +8,7 @@ const VectorStoreSchema = new mongoose.Schema(
       ref: "Company",
       required: true,
       unique: true,
-      index: true,
+      
     },
     collectionName: {
       type: String,
@@ -155,7 +155,7 @@ const VectorStoreSchema = new mongoose.Schema(
         "maintenance",
       ],
       default: "initializing",
-      index: true,
+      
     },
     indexMetrics: {
       totalDocuments: {
@@ -218,12 +218,12 @@ const DocumentChunkSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "VectorStore",
       required: true,
-      index: true,
+      
     },
     parentDocumentId: {
       type: String,
       required: true,
-      index: true,
+      
     },
     chunkId: {
       type: String,
@@ -282,7 +282,7 @@ const SearchHistorySchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Company",
       required: true,
-      index: true,
+      
     },
     vectorStoreId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -338,14 +338,11 @@ const SearchHistorySchema = new mongoose.Schema(
 );
 
 // Indexes
-VectorStoreSchema.index({ companyId: 1 });
-VectorStoreSchema.index({ collectionName: 1 });
 VectorStoreSchema.index({ indexStatus: 1 });
 VectorStoreSchema.index({ "documents.source": 1 });
 VectorStoreSchema.index({ "documents.category": 1 });
 
 DocumentChunkSchema.index({ vectorStoreId: 1, parentDocumentId: 1 });
-DocumentChunkSchema.index({ chunkId: 1 });
 DocumentChunkSchema.index({ "metadata.category": 1 });
 
 SearchHistorySchema.index({ companyId: 1, createdAt: -1 });

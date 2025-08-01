@@ -6,7 +6,7 @@ const GeneratedContentSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Company",
       required: true,
-      index: true,
+      
     },
     contentType: {
       type: String,
@@ -20,7 +20,7 @@ const GeneratedContentSchema = new mongoose.Schema(
         "social_media",
       ],
       required: true,
-      index: true,
+      
     },
     prompt: {
       type: String,

@@ -319,7 +319,6 @@ const CompanySchema = new mongoose.Schema(
 );
 
 // Indexes for better performance
-CompanySchema.index({ email: 1 });
 CompanySchema.index({ "subscription.plan": 1 });
 CompanySchema.index({ "aiContextProfile.vectorCollectionId": 1 });
 CompanySchema.index({ createdAt: -1 });

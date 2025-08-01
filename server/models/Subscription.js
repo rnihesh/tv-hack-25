@@ -139,7 +139,7 @@ const PaymentSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Company",
       required: true,
-      index: true,
+      
     },
     paymentIntentId: {
       type: String,
@@ -170,7 +170,7 @@ const PaymentSchema = new mongoose.Schema(
         "refunded",
       ],
       default: "pending",
-      index: true,
+      
     },
     paymentMethod: {
       type: String,
@@ -294,7 +294,7 @@ const CreditTransactionSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Company",
       required: true,
-      index: true,
+      
     },
     transactionType: {
       type: String,
@@ -308,7 +308,7 @@ const CreditTransactionSchema = new mongoose.Schema(
         "daily_reset",
       ],
       required: true,
-      index: true,
+      
     },
     service: {
       type: String,
@@ -391,12 +391,12 @@ const AIServiceAnalyticsSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Company",
       required: true,
-      index: true,
+      
     },
     date: {
       type: Date,
       required: true,
-      index: true,
+      
     },
     services: {
       websiteGeneration: {
@@ -465,12 +465,10 @@ const AIServiceAnalyticsSchema = new mongoose.Schema(
 );
 
 // Indexes
-SubscriptionPlanSchema.index({ planName: 1 });
 SubscriptionPlanSchema.index({ isActive: 1 });
 SubscriptionPlanSchema.index({ order: 1 });
 
 PaymentSchema.index({ companyId: 1, status: 1 });
-PaymentSchema.index({ paymentIntentId: 1 });
 PaymentSchema.index({ subscriptionId: 1 });
 PaymentSchema.index({ createdAt: -1 });
 

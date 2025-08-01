@@ -1,3 +1,25 @@
+// TEMPORARY: Force development mode for debugging
+if (process.env.DEBUG_SERVER === 'true') {
+  console.log("⚠️ RUNNING IN DEBUG MODE - BYPASSING SERVICE CHECKS");
+  process.env.NODE_ENV = 'development';
+  process.env.ALLOW_NO_DB = 'true';
+  process.env.ALLOW_NO_CHROMA = 'true';
+  process.env.ALLOW_NO_SERVICES = 'true';
+}
+
+// Move existing error handlers to the top
+process.on('uncaughtException', (err) => {
+  console.error('CRITICAL - Uncaught Exception:');
+  console.error(err);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('CRITICAL - Unhandled Promise Rejection:');
+  console.error(reason);
+  process.exit(1);
+});
+
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
@@ -21,9 +43,6 @@ const feedbackRoutes = require("./routes/feedbackRoutes");
 const emailRoutes = require("./routes/emailRoutes");
 
 const app = express();
-
-// Connect to MongoDB
-connectDB();
 
 // Trust proxy (for rate limiting behind reverse proxy)
 app.set("trust proxy", 1);
@@ -211,19 +230,174 @@ process.on("uncaughtException", (err) => {
   process.exit(1);
 });
 
-const PORT = config.port;
+// Enhanced error handling for startup
+const startServer = async () => {
+  try {
+    console.log("🔍 Starting server initialization...");
 
-app.listen(PORT, () => {
-  console.log(`
+    // Connect to MongoDB with enhanced error handling
+    try {
+      console.log("🔍 Step 1: Attempting database connection...");
+      logger.info('Attempting database connection...');
+      await connectDB();
+      console.log("🔍 Database connection successful");
+      logger.info('MongoDB connected successfully');
+    } catch (dbError) {
+      // Direct console output for critical errors
+      console.error('MongoDB Connection Error:', dbError.message);
+      console.error(dbError.stack);
+      
+      logger.error('MongoDB Connection Error:', {
+        message: dbError.message,
+        stack: dbError.stack,
+        code: dbError.code,
+        name: dbError.name
+      });
+      
+      // Only continue without DB in development with flag
+      if (process.env.NODE_ENV === 'development' && process.env.ALLOW_NO_DB === 'true') {
+        logger.warn('Starting server without MongoDB connection (ALLOW_NO_DB=true)');
+      } else {
+        logger.error('Server startup failed due to database connection error');
+        process.exit(1);
+      }
+    }
+
+    // Check other required services
+    try {
+      console.log("🔍 Step 2: Checking required services...");
+      await checkRequiredServices();
+    } catch (serviceError) {
+      console.error("Service check failed:", serviceError.message);
+      if (process.env.NODE_ENV === 'development' && process.env.ALLOW_NO_SERVICES === 'true') {
+        console.warn("Continuing despite service check failure (ALLOW_NO_SERVICES=true)");
+      } else {
+        throw serviceError;
+      }
+    }
+
+    console.log("🔍 Step 3: Setting up HTTP server...");
+    const PORT = config.port;
+
+    console.log("🔍 Step 4: Starting HTTP server on port", PORT);
+    const server = app.listen(PORT, () => {
+      console.log("🔍 Server successfully started!");
+      logger.info(`
 🚀 AI Business Toolkit Server is running!
 📡 Port: ${PORT}
 🌍 Environment: ${config.nodeEnv}
-🗄️  Database: ${config.mongoUri.includes("localhost") ? "Local MongoDB" : "MongoDB Atlas"}
+🗄️  Database: ${config.mongoUri ? (config.mongoUri.includes("localhost") ? "Local MongoDB" : "MongoDB Atlas") : "NONE - Running without database"}
 ⚡ Features: Website Gen, Email Marketing, Image Gen, Chatbot, Analytics
 🤖 AI Models: ${config.geminiApiKey ? "Gemini" : "Disabled"}, Ollama
 📊 Vector Store: Chroma
 🔒 Security: Helmet, CORS, Rate Limiting, Data Sanitization
-  `);
+      `);
+    });
+
+    console.log("🔍 Step 5: Registering server error handlers");
+    server.on('error', (err) => {
+      console.error('Server Error:', err); // Direct console output for visibility
+      if (err.code === 'EADDRINUSE') {
+        logger.error(`Port ${PORT} is already in use`);
+        process.exit(1);
+      } else {
+        logger.error('Server error:', err);
+        process.exit(1);
+      }
+    });
+
+    console.log("🔍 Step 6: Server initialization complete");
+    return server;
+  } catch (error) {
+    // Force console output for critical errors
+    console.error('SERVER STARTUP CRITICAL ERROR:', error);
+    logger.error('Failed to start server:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
+    process.exit(1);
+  }
+};
+
+// Add this function before startServer()
+
+const checkRequiredServices = async () => {
+  console.log("🔍 Checking required services...");
+  
+  // For emergency debugging, bypass all service checks
+  if (process.env.BYPASS_ALL_CHECKS === 'true') {
+    console.log("🔍 WARNING: All service checks bypassed by BYPASS_ALL_CHECKS flag");
+    return true;
+  }
+  
+  // Check LangChain service availability
+  try {
+    console.log("🔍 Checking LangChain services...");
+    const langchainServices = require('./services/langchain/models');
+    
+    if (!langchainServices.geminiModel && !langchainServices.ollamaModel) {
+      throw new Error("No LangChain models available");
+    }
+    
+    console.log("✅ LangChain services check passed");
+  } catch (error) {
+    console.error("❌ LangChain services check failed:", error.message);
+    if (process.env.ALLOW_NO_SERVICES === 'true') {
+      console.warn("⚠️ Continuing without LangChain services (ALLOW_NO_SERVICES=true)");
+    } else {
+      throw new Error(`LangChain services required but not available: ${error.message}`);
+    }
+  }
+  
+  // Initialize the memory vector service
+  try {
+    console.log("🔍 Initializing memory vector service...");
+    const { vectorContextService } = require("./services/langchain/vectorContext");
+    await vectorContextService.initialize();
+    console.log("✅ Memory vector service initialized successfully");
+  } catch (error) {
+    console.error("❌ Memory vector service initialization failed:", error.message);
+    if (process.env.NODE_ENV === 'development') {
+      console.warn("⚠️ Continuing without vector service in development mode");
+    } else {
+      throw new Error(`Vector service required but initialization failed: ${error.message}`);
+    }
+  }
+  
+  console.log("✅ All required service checks completed");
+  return true;
+};
+
+// Replace the existing app.listen() call with:
+startServer();
+
+// Environment check:
+console.log('Environment check:');
+console.log('- NODE_ENV:', process.env.NODE_ENV);
+console.log('- MongoDB URI configured:', !!process.env.DBURL || !!process.env.MONGO_URI);
+console.log('- Port:', process.env.PORT || 4000);
+
+// Only show MongoDB connection string format (not actual credentials)
+const dbUrlCheck = process.env.DBURL || process.env.MONGO_URI || '';
+if (dbUrlCheck) {
+  console.log('- MongoDB string format:', 
+    dbUrlCheck.replace(/mongodb(\+srv)?:\/\/([^:]+:)?([^@]+@)?([^/]+)\/(.+)/, 
+    'mongodb$1://user:****@$4/$5')
+  );
+}
+
+// Add near the top of your file, before any other code
+process.on('uncaughtException', (err) => {
+  console.error('CRITICAL - Uncaught Exception:');
+  console.error(err);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('CRITICAL - Unhandled Promise Rejection:');
+  console.error(reason);
+  process.exit(1);
 });
 
 module.exports = app;

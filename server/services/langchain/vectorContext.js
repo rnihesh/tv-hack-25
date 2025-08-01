@@ -1,4 +1,3 @@
-const { ChromaClient } = require("chromadb");
 const { OllamaEmbeddings } = require("@langchain/community/embeddings/ollama");
 const { GoogleGenerativeAIEmbeddings } = require("@langchain/google-genai");
 const { Document } = require("@langchain/core/documents");
@@ -6,22 +5,16 @@ const { VectorStore } = require("../../models/VectorStore");
 const { AIContext } = require("../../models/AIContext");
 const config = require("../../config/env-config");
 const { logger, aiLogger } = require("../../utils/logger");
+const { memoryVectorStore } = require("./memoryVectorStore");
 
 class VectorContextService {
   constructor() {
-    this.chromaClient = null;
     this.embeddings = null;
-    this.collections = new Map(); // Cache for collection instances
-    this.initialize();
+    this.initialized = false;
   }
 
   async initialize() {
     try {
-      // Initialize ChromaDB client
-      this.chromaClient = new ChromaClient({
-        path: config.chromaUrl || "http://localhost:8000",
-      });
-
       // Initialize embeddings - prefer Ollama for local, fallback to Google
       if (config.ollamaUrl) {
         this.embeddings = new OllamaEmbeddings({
@@ -41,121 +34,82 @@ class VectorContextService {
         );
       }
 
-      // Test connection
-      await this.chromaClient.heartbeat();
-      logger.info("ChromaDB connection established successfully");
+      this.initialized = true;
+      return true;
     } catch (error) {
       logger.error("Failed to initialize vector context service:", error);
+      if (process.env.NODE_ENV === 'development') {
+        logger.warn("Continuing without vector context service in development mode");
+        this.initialized = true;
+        return false;
+      }
       throw error;
     }
   }
 
   async getOrCreateCollection(companyId) {
-    const collectionName = `company_${companyId}`;
-
-    try {
-      // Check if collection exists in cache
-      if (this.collections.has(collectionName)) {
-        return this.collections.get(collectionName);
-      }
-
-      // Try to get existing collection
-      let collection;
-      try {
-        collection = await this.chromaClient.getCollection({
-          name: collectionName,
-        });
-        logger.info(`Retrieved existing collection: ${collectionName}`);
-      } catch (error) {
-        // Collection doesn't exist, create it
-        collection = await this.chromaClient.createCollection({
-          name: collectionName,
-          metadata: {
-            companyId: companyId.toString(),
-            createdAt: new Date().toISOString(),
-          },
-        });
-        logger.info(`Created new collection: ${collectionName}`);
-      }
-
-      // Cache the collection
-      this.collections.set(collectionName, collection);
-      return collection;
-    } catch (error) {
-      logger.error(
-        `Error managing collection for company ${companyId}:`,
-        error
-      );
-      throw error;
-    }
+    // Use the memory vector store directly
+    return memoryVectorStore.getCollection(companyId);
   }
 
-  async addDocumentToContext(companyId, content, metadata = {}) {
+  async addDocumentToContext(companyId, document, metadata) {
     try {
-      const collection = await this.getOrCreateCollection(companyId);
+      if (!this.initialized) {
+        await this.initialize();
+      }
+      
+      // Generate embedding for document
+      const embedding = await this.embeddings.embedQuery(document);
+      
+      // Generate unique ID
+      const id = `doc_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+      
+      // Store in memory vector store
+      await memoryVectorStore.addDocuments(
+        companyId,
+        [document],
+        [metadata],
+        [embedding],
+        [id]
+      );
 
-      // Generate embedding
-      const embedding = await this.embeddings.embedQuery(content);
-
-      // Create unique document ID
-      const documentId = `doc_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-      // Add to ChromaDB
-      await collection.add({
-        ids: [documentId],
-        embeddings: [embedding],
-        documents: [content],
-        metadatas: [
-          {
-            ...metadata,
-            timestamp: new Date().toISOString(),
-            companyId: companyId.toString(),
+      // Update MongoDB record if applicable
+      try {
+        await VectorStore.updateOne(
+          { companyId },
+          { 
+            $inc: { documentCount: 1 },
+            $set: { lastUpdated: new Date() }
           },
-        ],
-      });
-
-      // Update MongoDB record
-      let vectorStore = await VectorStore.findOne({ companyId });
-      if (!vectorStore) {
-        vectorStore = await VectorStore.createForCompany(
-          companyId,
-          metadata.businessType || "general"
+          { upsert: true }
         );
+      } catch (dbError) {
+        logger.warn(`MongoDB update failed, but document was added to memory store: ${dbError.message}`);
       }
 
-      vectorStore.addDocument(content, metadata);
-      await vectorStore.save();
-
-      aiLogger.request("vector_add", "chroma", content, {
-        documentId,
-        companyId,
-      });
-
-      return documentId;
+      return { id };
     } catch (error) {
-      aiLogger.error("vector_add", "chroma", error, {
-        companyId,
-        content: content.substring(0, 100),
-      });
+      logger.error("Error adding document to context:", error);
       throw error;
     }
   }
 
   async searchContext(companyId, query, options = {}) {
     try {
-      const collection = await this.getOrCreateCollection(companyId);
-
+      if (!this.initialized) {
+        await this.initialize();
+      }
+      
       // Generate query embedding
       const queryEmbedding = await this.embeddings.embedQuery(query);
-
-      // Search in ChromaDB
-      const results = await collection.query({
-        queryEmbeddings: [queryEmbedding],
-        nResults: options.limit || 5,
-        where: options.filter || {},
-        include: ["documents", "metadatas", "distances"],
-      });
-
+      
+      // Search in memory store
+      const results = await memoryVectorStore.queryCollection(
+        companyId,
+        queryEmbedding,
+        { limit: options.limit || 5 }
+      );
+      
       // Format results
       const contextDocuments = results.documents[0].map((doc, index) => ({
         content: doc,
@@ -163,25 +117,11 @@ class VectorContextService {
         score: 1 - results.distances[0][index], // Convert distance to similarity
         id: results.ids[0][index],
       }));
-
-      // Filter by relevance threshold
-      const threshold = options.threshold || 0.7;
-      const relevantDocs = contextDocuments.filter(
-        (doc) => doc.score >= threshold
-      );
-
-      aiLogger.response("vector_search", "chroma", query, {
-        companyId,
-        resultsCount: relevantDocs.length,
-        avgScore:
-          relevantDocs.reduce((sum, doc) => sum + doc.score, 0) /
-          relevantDocs.length,
-      });
-
-      return relevantDocs;
+      
+      return contextDocuments;
     } catch (error) {
-      aiLogger.error("vector_search", "chroma", error, { companyId, query });
-      throw error;
+      logger.error("Error searching context:", error);
+      return []; // Return empty results on error
     }
   }
 

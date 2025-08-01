@@ -6,18 +6,18 @@ const aiContextSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Company",
       required: true,
-      index: true,
+      
     },
     contextType: {
       type: String,
       enum: ["chatbot", "email", "website", "image_gen", "general"],
       required: true,
-      index: true,
+      
     },
     sessionId: {
       type: String,
       required: true,
-      index: true,
+      
     },
     conversationHistory: [
       {
@@ -82,7 +82,7 @@ const aiContextSchema = new mongoose.Schema(
     vectorDocumentIds: [
       {
         type: String,
-        index: true,
+        
       },
     ],
     contextualState: {
