@@ -152,7 +152,7 @@ const CompanySchema = new mongoose.Schema(
       contextualPreferences: {
         preferredAIModel: {
           type: String,
-          enum: ["gemini-pro", "ollama-llama3", "auto"],
+          enum: ["gemini-2.5-flash", "ollama-llama3", "auto"],
           default: "auto",
         },
         responseStyle: {

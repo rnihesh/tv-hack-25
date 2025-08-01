@@ -154,12 +154,12 @@ const companySchema = new mongoose.Schema(
         preferredAIModel: {
           type: String,
           enum: [
-            "gemini-pro",
+            "gemini-2.5-flash",
             "ollama-llama3",
             "ollama-mistral",
             "gpt-3.5-turbo",
           ],
-          default: "gemini-pro",
+          default: "gemini-2.5-flash",
         },
         responseStyle: {
           type: String,

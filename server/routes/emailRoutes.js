@@ -4,7 +4,7 @@ const {
   generateEmail,
   generateEmailCampaign,
 } = require("../controllers/emailController");
-const { protect } = require("../middlewares/authMiddleware");
+const { protect, checkCredits } = require("../middlewares/authMiddleware");
 const {
   emailGenerationValidation,
 } = require("../middlewares/validator");
@@ -17,6 +17,7 @@ const router = express.Router();
 router.post(
   "/generate",
   protect,
+  checkCredits(3), // 3 credits required for email generation
   emailGenerationValidation,
   generateEmail
 );
@@ -27,6 +28,7 @@ router.post(
 router.post(
   "/campaign",
   protect,
+  checkCredits(5), // 5 credits required for email campaign
   emailGenerationValidation,
   generateEmailCampaign
 );

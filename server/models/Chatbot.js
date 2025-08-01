@@ -142,7 +142,7 @@ const ChatbotConfigSchema = new mongoose.Schema(
     },
     aiModel: {
       type: String,
-      enum: ["gemini-pro", "ollama-llama3", "hybrid"],
+      enum: ["gemini-2.5-flash", "ollama-llama3", "hybrid"],
       default: "ollama-llama3",
     },
     isActive: {

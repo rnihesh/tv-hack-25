@@ -70,7 +70,7 @@ const GeneratedContentSchema = new mongoose.Schema(
     aiModel: {
       type: String,
       enum: [
-        "gemini-pro",
+        "gemini-2.5-flash",
         "ollama-llama3",
         "dalle-3",
         "stable-diffusion",

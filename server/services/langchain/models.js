@@ -6,7 +6,7 @@ try {
 
   // Simplified model configurations - just two basic models
   const MODEL_CONFIGS = {
-    "gemini-pro": {
+    "gemini-2.5-flash": {
       provider: "google",
       model: "gemini-2.5-flash",
       costPer1kTokens: 0.0005,
@@ -29,10 +29,10 @@ try {
         // Initialize Google Gemini model
         if (config.geminiApiKey) {
           this.models.set(
-            "gemini-pro",
+            "gemini-2.5-flash",
             new ChatGoogleGenerativeAI({
               apiKey: config.geminiApiKey,
-              modelName: "gemini-pro",
+              modelName: "gemini-2.5-flash",
             })
           );
           logger.info("Google Gemini model initialized");
@@ -99,11 +99,28 @@ try {
 
     async invokeWithMetrics(modelName, prompt, options = {}) {
       const model = this.getModel(modelName);
+      const startTime = Date.now();
+      
       try {
         const response = await model.invoke(prompt);
+        const endTime = Date.now();
+        const duration = endTime - startTime;
+        
+        // Estimate token usage (rough estimation)
+        const tokenCount = Math.ceil((prompt.length + (response.content || response).length) / 4);
+        
         return {
           content: response.content || response,
           rawResponse: response,
+          modelUsed: modelName,
+          metrics: {
+            duration: duration,
+            tokenUsage: {
+              total: tokenCount,
+              prompt: Math.ceil(prompt.length / 4),
+              completion: Math.ceil((response.content || response).length / 4)
+            }
+          }
         };
       } catch (error) {
         throw error;
@@ -149,6 +166,36 @@ try {
       }
 
       return results;
+    }
+
+    // Get best model for specific task type
+    getBestModelForTask(taskType) {
+      const availableModels = this.getAvailableModels();
+      
+      if (availableModels.length === 0) {
+        throw new Error("No models available");
+      }
+
+      // Task-specific model preferences - temporarily prefer Ollama for debugging
+      const taskPreferences = {
+        "email_generation": ["ollama-llama3", "gemini-2.5-flash"],
+        "website_generation": ["ollama-llama3", "gemini-2.5-flash"],
+        "chatbot": ["ollama-llama3", "gemini-2.5-flash"],
+        "image_generation": ["ollama-llama3", "gemini-2.5-flash"],
+        "general": ["ollama-llama3", "gemini-2.5-flash"]
+      };
+
+      const preferences = taskPreferences[taskType] || taskPreferences["general"];
+      
+      // Return first available model from preferences
+      for (const modelName of preferences) {
+        if (availableModels.includes(modelName)) {
+          return modelName;
+        }
+      }
+
+      // Fallback to first available model
+      return availableModels[0];
     }
   }
 

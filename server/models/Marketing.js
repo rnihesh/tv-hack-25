@@ -114,7 +114,7 @@ const EmailCampaignSchema = new mongoose.Schema(
     },
     aiModel: {
       type: String,
-      enum: ["gemini-pro", "ollama-llama3", "custom"],
+      enum: ["gemini-2.5-flash", "ollama-llama3", "custom"],
     },
     personalizations: [
       {

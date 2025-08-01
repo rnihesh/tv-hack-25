@@ -311,9 +311,10 @@ const checkRequiredServices = async () => {
   // Check LangChain service availability
   try {
     console.log("🔍 Checking LangChain services...");
-    const langchainServices = require('./services/langchain/models');
+    const { modelManager } = require('./services/langchain/models');
     
-    if (!langchainServices.geminiModel && !langchainServices.ollamaModel) {
+    const availableModels = modelManager.getAvailableModels();
+    if (availableModels.length === 0) {
       throw new Error("No LangChain models available");
     }
     

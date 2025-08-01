@@ -244,8 +244,8 @@ MAX_CONTEXT_DOCS=10
 ```javascript
 // In services/langchain/models.js
 const contextualModels = {
-  website_generation: "gemini-pro",
-  email_generation: "gemini-pro",
+  website_generation: "gemini-2.5-flash",
+  email_generation: "gemini-2.5-flash",
   chatbot_response: "ollama-llama2",
   image_generation: "dall-e-3",
 };
