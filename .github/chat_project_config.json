@@ -1,0 +1,87 @@
+{
+  "project": {
+    "name": "AI Digital Toolkit for Small Businesses",
+    "version": "1.0.0",
+    "type": "full-stack-ai-platform"
+  },
+  "architecture": {
+    "frontend": {
+      "framework": "React",
+      "bundler": "Vite",
+      "styling": "Tailwind CSS",
+      "stateManagement": "React Hooks/Context"
+    },
+    "backend": {
+      "runtime": "Node.js",
+      "framework": "Express.js",
+      "database": "MongoDB",
+      "orm": "Mongoose"
+    },
+    "ai": {
+      "framework": "LangChain",
+      "models": ["Ollama", "Gemini"],
+      "vectorDB": "Chroma",
+      "embeddings": "OllamaEmbeddings"
+    }
+  },
+  "features": {
+    "coreServices": [
+      "AI Website Generator",
+      "Email Marketing Automation",
+      "Image Generation",
+      "AI Chatbot",
+      "Customer Feedback Analysis"
+    ],
+    "aiCapabilities": {
+      "contextMemory": true,
+      "personalizedContent": true,
+      "sentimentAnalysis": true,
+      "businessInsights": true,
+      "multiModalGeneration": true
+    }
+  },
+  "userFlow": {
+    "onboarding": [
+      "Company Registration",
+      "Business Profile Setup",
+      "Preferences Collection",
+      "AI Context Initialization"
+    ],
+    "dashboard": [
+      "Overview Analytics",
+      "Quick Actions",
+      "AI Services Menu",
+      "Content Management"
+    ],
+    "aiServices": {
+      "websiteBuilder": "Business info → AI generation → Customization → Deployment",
+      "emailMarketing": "Campaign goals → AI drafting → Audience targeting → Scheduling",
+      "imageGenerator": "Text prompts → AI generation → Brand consistency → Download",
+      "chatbot": "Knowledge base setup → Personality config → Training → Deployment",
+      "feedbackAnalysis": "Data ingestion → NLP processing → Insights generation → Action items"
+    }
+  },
+  "dataFlow": {
+    "contextMaintenance": {
+      "userInteractions": "MongoDB → Vector embeddings → Chroma",
+      "businessLearning": "Continuous feedback → Context updates → Improved generations"
+    },
+    "aiPipeline": {
+      "input": "User request + Business context",
+      "processing": "LangChain retrieval + Model generation",
+      "output": "Personalized content + Context update"
+    }
+  },
+  "integration": {
+    "vectorDB": {
+      "strategy": "Hybrid (MongoDB + Chroma)",
+      "syncMethod": "Real-time embedding updates",
+      "contextRetrieval": "Semantic search with business context"
+    },
+    "aiModels": {
+      "primary": "Gemini (for complex tasks)",
+      "secondary": "Ollama (for quick responses)",
+      "fallback": "Rule-based responses"
+    }
+  }
+}
