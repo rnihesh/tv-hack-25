@@ -3,7 +3,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import AuthWrapper from './components/auth/AuthWrapper'
 import Dashboard from './components/Dashboard'
-import WebsiteViewer from './website-generator/WebsiteGenerator'
+import WebsiteGenerator from './website-generator/WebsiteGenerator'
+// import ChatInterface from './chatbot/ChatInterface'
+// import MailingDashboard from './mailer/MailingDashboard'
 
 // Protected Route Component
 function ProtectedRoute({ children }) {
@@ -68,10 +70,28 @@ function AppContent() {
         path="/website-generator" 
         element={
           <ProtectedRoute>
-            <WebsiteViewer />
+            <WebsiteGenerator />
           </ProtectedRoute>
         } 
       />
+      
+      {/* <Route 
+        path="/chatbot" 
+        element={
+          <ProtectedRoute>
+            <ChatInterface />
+          </ProtectedRoute>
+        } 
+      /> */}
+
+      {/* <Route 
+        path="/mailer" 
+        element={
+          <ProtectedRoute>
+            <MailingDashboard />
+          </ProtectedRoute>
+        } 
+      /> */}
 
       {/* Default redirect */}
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
