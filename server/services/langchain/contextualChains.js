@@ -165,24 +165,78 @@ class WebsiteGenerationChain extends ContextAwareChain {
   }
 
   async generateWebsite(companyId, prompt, options = {}) {
+    const {
+      templateType = "business",
+      style = "modern",
+      colorScheme = "blue",
+      sections = ["hero", "about", "services", "contact"],
+      ...invokeOptions
+    } = options;
+
+    const websitePrompt = `Generate a complete, professional website based on the following requirements:
+
+User Requirements: ${prompt}
+
+Template Type: ${templateType}
+Style: ${style}
+Color Scheme: ${colorScheme}
+Required Sections: ${sections.join(", ")}
+
+IMPORTANT: Return ONLY the complete HTML document with embedded CSS and JavaScript. No explanations, no markdown formatting, no code blocks. Just the raw HTML that can be directly saved as an .html file.
+
+The website should include:
+1. Modern, responsive design with CSS Grid/Flexbox
+2. Navigation header with company name and menu
+3. Hero section with compelling headline and call-to-action
+4. About section highlighting the business
+5. Services/Products section showcasing offerings
+6. Contact section with form
+7. Footer with contact information
+8. Embedded CSS for styling (${colorScheme} color scheme, ${style} style)
+9. Basic JavaScript for interactivity (smooth scrolling, form handling, mobile menu)
+10. Mobile-responsive design
+11. Semantic HTML5 and good accessibility
+
+Use the company's actual business information, target audience, and brand preferences from the context.`;
+
     const basePrompt = `
-You are an expert web designer and content creator specializing in small business websites.
+You are an expert web designer and developer specializing in small business websites.
 
-Create a comprehensive website structure based on the user's requirements and the company's specific context.
+Create a complete, professional HTML website that:
+- Reflects the company's brand voice and communication style
+- Addresses the target audience appropriately
+- Includes relevant business information and services
+- Follows modern web design best practices
+- Is optimized for the company's business type
+- Is mobile-responsive and accessible
 
-The website should:
-- Reflect the company's brand voice and communication style
-- Address the target audience appropriately  
-- Include relevant business information and services
-- Follow modern web design best practices
-- Be optimized for the company's business type
+Generate clean, semantic HTML5 with embedded CSS and JavaScript. Make it production-ready.`;
 
-Provide the response in a structured JSON format with sections for header, hero, about, services, testimonials, contact, and footer.`;
-
-    return await this.invoke(companyId, prompt, {
+    const result = await this.invoke(companyId, websitePrompt, {
       basePrompt,
-      ...options,
+      ...invokeOptions,
     });
+
+    // Clean up the HTML content by removing any markdown formatting
+    let htmlContent = result.content;
+    htmlContent = htmlContent.replace(/```html\s*|```/g, '').trim();
+    
+    // If the content doesn't start with <!DOCTYPE or <html>, it might be wrapped incorrectly
+    if (!htmlContent.toLowerCase().startsWith('<!doctype') && !htmlContent.toLowerCase().startsWith('<html')) {
+      // Try to extract HTML from the response
+      const htmlMatch = htmlContent.match(/<!DOCTYPE[\s\S]*<\/html>/i);
+      if (htmlMatch) {
+        htmlContent = htmlMatch[0];
+      }
+    }
+
+    return {
+      content: htmlContent,
+      modelUsed: result.modelUsed || "ollama-llama3",
+      metrics: result.metrics || { tokenUsage: { total: 0 }, duration: 0 },
+      contextUsed: result.contextUsed || false,
+      contextInsights: "Website generated with company context",
+    };
   }
 }
 
