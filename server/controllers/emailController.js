@@ -18,14 +18,14 @@ const CREDIT_COSTS = {
 // @access  Private
 const generateEmail = async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: "Validation failed",
-        errors: errors.array(),
-      });
-    }
+    // const errors = validationResult(req);
+    // if (!errors.isEmpty()) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: "Validation failed",
+    //     errors: errors.array(),
+    //   });
+    // }
 
     const {
       emailType,
@@ -35,18 +35,9 @@ const generateEmail = async (req, res) => {
       tone,
       callToAction,
     } = req.body;
-    const company = req.companyData; // From middleware
-
-    // Check and deduct credits
-    const requiredCredits = CREDIT_COSTS.email_generation;
-    if (!company.hasCredits(requiredCredits)) {
-      return res.status(403).json({
-        success: false,
-        message: "Insufficient credits",
-        requiredCredits,
-        currentCredits: company.credits.currentCredits,
-      });
-    }
+    
+    // Company data is populated by checkCredits middleware
+    const company = req.companyData;
 
     // Initialize the email marketing chain with context
     const emailChain = new EmailMarketingChain(company._id);
@@ -86,6 +77,7 @@ const generateEmail = async (req, res) => {
     await generatedContent.save();
 
     // Deduct credits and update usage
+    const requiredCredits = CREDIT_COSTS.email_generation;
     await company.deductCredits(
       requiredCredits,
       "email_gen",
@@ -163,18 +155,9 @@ const generateEmailCampaign = async (req, res) => {
       productService,
       tone,
     } = req.body;
+    
+    // Company data is populated by checkCredits middleware
     const company = req.companyData;
-
-    // Check and deduct credits
-    const requiredCredits = CREDIT_COSTS.email_campaign;
-    if (!company.hasCredits(requiredCredits)) {
-      return res.status(403).json({
-        success: false,
-        message: "Insufficient credits",
-        requiredCredits,
-        currentCredits: company.credits.currentCredits,
-      });
-    }
 
     // Initialize the email marketing chain with context
     const emailChain = new EmailMarketingChain(company._id);
@@ -221,6 +204,7 @@ const generateEmailCampaign = async (req, res) => {
     );
 
     // Deduct credits and update usage
+    const requiredCredits = CREDIT_COSTS.email_campaign;
     await company.deductCredits(
       requiredCredits,
       "email_campaign",

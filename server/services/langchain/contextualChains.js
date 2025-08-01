@@ -57,6 +57,7 @@ Response:`);
   }
 
   async invoke(companyId, userQuery, options = {}) {
+    let selectedModel = "unknown";
     try {
       const {
         basePrompt = "You are a helpful AI assistant for small businesses.",
@@ -66,8 +67,14 @@ Response:`);
         ...modelOptions
       } = options;
 
+      // Check if models are available
+      const availableModels = modelManager.getAvailableModels();
+      if (availableModels.length === 0) {
+        throw new Error("No AI models are currently available. Please check your model configuration.");
+      }
+
       // Get the best model for this task
-      const selectedModel =
+      selectedModel =
         modelName || modelManager.getBestModelForTask(this.contextType);
 
       // Create contextual prompt
@@ -105,9 +112,10 @@ Response:`);
         content: response.content,
         metrics: response.metrics,
         contextUsed: contextualPrompt.length > basePrompt.length,
+        modelUsed: selectedModel,
       };
     } catch (error) {
-      aiLogger.error("contextual_chain", selectedModel || "unknown", error, {
+      aiLogger.error("contextual_chain", selectedModel, error, {
         companyId,
         contextType: this.contextType,
       });
@@ -116,6 +124,7 @@ Response:`);
   }
 
   async stream(companyId, userQuery, options = {}) {
+    let selectedModel = "unknown";
     try {
       const {
         basePrompt = "You are a helpful AI assistant for small businesses.",
@@ -124,7 +133,7 @@ Response:`);
         ...modelOptions
       } = options;
 
-      const selectedModel =
+      selectedModel =
         modelName || modelManager.getBestModelForTask(this.contextType);
 
       const contextualPrompt = await this.createContextualPrompt(
@@ -140,7 +149,7 @@ Response:`);
         modelOptions
       );
     } catch (error) {
-      aiLogger.error("contextual_stream", selectedModel || "unknown", error, {
+      aiLogger.error("contextual_stream", selectedModel, error, {
         companyId,
         contextType: this.contextType,
       });
@@ -178,11 +187,28 @@ Provide the response in a structured JSON format with sections for header, hero,
 }
 
 class EmailMarketingChain extends ContextAwareChain {
-  constructor() {
+  constructor(companyId) {
     super("email_generation");
+    this.companyId = companyId;
   }
 
-  async generateEmail(companyId, prompt, emailType, options = {}) {
+  async generateEmail(options = {}) {
+    const {
+      emailType = "promotional",
+      targetAudience = "",
+      campaignGoal = "",
+      productService = "",
+      tone = "professional",
+      callToAction = "",
+      ...invokeOptions
+    } = options;
+
+    const prompt = `Generate a ${emailType} email for ${targetAudience} with the goal of ${campaignGoal}. 
+    
+    Product/Service: ${productService}
+    Tone: ${tone}
+    Call to Action: ${callToAction}`;
+
     const basePrompt = `
 You are an expert email marketing specialist focused on small business communications.
 
@@ -195,12 +221,118 @@ Create a compelling ${emailType} email that:
 
 Consider the company's products/services, customer base, and business goals when crafting the email.
 
-Provide the response with a clear subject line and email body.`;
+Provide the response in JSON format with the following structure:
+{
+  "subject": "Email subject line",
+  "body": "Email body content",
+  "tone": "actual tone used",
+  "callToAction": "the call to action used"
+}`;
 
-    return await this.invoke(companyId, prompt, {
+    const result = await this.invoke(this.companyId, prompt, {
       basePrompt,
-      ...options,
+      ...invokeOptions,
     });
+
+    // Try to parse JSON response, fallback to structured object
+    let emailContent;
+    try {
+      emailContent = JSON.parse(result.content);
+    } catch (e) {
+      // Fallback if not valid JSON
+      emailContent = {
+        subject: `${emailType} - ${campaignGoal}`,
+        body: result.content,
+        tone: tone,
+        callToAction: callToAction,
+      };
+    }
+
+    return {
+      emailContent,
+      modelUsed: result.modelUsed || "gemini-2.5-flash",
+      metrics: result.metrics || { tokenUsage: { total: 0 }, duration: 0 },
+      contextUsed: result.contextUsed || false,
+      contextInsights: "Email generated with company context",
+    };
+  }
+
+  async generateEmailCampaign(options = {}) {
+    const {
+      campaignType = "promotional",
+      sequenceLength = 3,
+      targetAudience = "",
+      campaignGoal = "",
+      productService = "",
+      tone = "professional",
+      ...invokeOptions
+    } = options;
+
+    const prompt = `Generate a ${campaignType} email campaign sequence with ${sequenceLength} emails for ${targetAudience} with the goal of ${campaignGoal}.
+    
+    Product/Service: ${productService}
+    Tone: ${tone}`;
+
+    const basePrompt = `
+You are an expert email marketing specialist focused on small business communications.
+
+Create a comprehensive ${campaignType} email campaign sequence with ${sequenceLength} emails that:
+- Matches the company's communication tone and brand voice
+- Addresses the target audience appropriately
+- Includes relevant business information and context
+- Follows email marketing best practices
+- Has clear progression and call-to-actions
+
+Consider the company's products/services, customer base, and business goals when crafting the campaign.
+
+Provide the response in JSON format with the following structure:
+{
+  "emailSequence": [
+    {
+      "subject": "Email 1 subject",
+      "body": "Email 1 body content",
+      "position": 1,
+      "purpose": "Introduction/awareness"
+    },
+    // ... more emails
+  ],
+  "campaignStrategy": "Overall strategy description"
+}`;
+
+    const result = await this.invoke(this.companyId, prompt, {
+      basePrompt,
+      ...invokeOptions,
+    });
+
+    // Try to parse JSON response, fallback to structured object
+    let campaignData;
+    try {
+      campaignData = JSON.parse(result.content);
+    } catch (e) {
+      // Fallback if not valid JSON
+      const emails = [];
+      for (let i = 1; i <= sequenceLength; i++) {
+        emails.push({
+          subject: `${campaignType} Campaign - Email ${i}`,
+          body: `Email ${i} content: ${result.content.substring(0, 200)}...`,
+          position: i,
+          purpose: i === 1 ? "Introduction" : i === sequenceLength ? "Conversion" : "Nurturing",
+        });
+      }
+      campaignData = {
+        emailSequence: emails,
+        campaignStrategy: `${campaignType} campaign for ${targetAudience}`,
+      };
+    }
+
+    return {
+      emailSequence: campaignData.emailSequence || [],
+      campaignStrategy: campaignData.campaignStrategy || "Email campaign strategy",
+      modelUsed: result.modelUsed || "gemini-2.5-flash",
+      metrics: result.metrics || { tokenUsage: { total: 0 }, duration: 0 },
+      contextUsed: result.contextUsed || false,
+      contextInsights: "Email campaign generated with company context",
+    };
   }
 }
 

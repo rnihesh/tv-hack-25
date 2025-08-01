@@ -114,8 +114,8 @@
 
   "aiServices": {
     "websiteGeneration": {
-      "models": ["gemini-pro", "ollama-llama3"],
-      "defaultModel": "gemini-pro",
+      "models": ["gemini-2.5-flash", "ollama-llama3"],
+      "defaultModel": "gemini-2.5-flash",
       "contextRequired": true,
       "vectorSearchEnabled": true,
       "features": [
@@ -125,8 +125,8 @@
       ]
     },
     "emailMarketing": {
-      "models": ["gemini-pro", "ollama-llama3"],
-      "defaultModel": "gemini-pro",
+      "models": ["gemini-2.5-flash", "ollama-llama3"],
+      "defaultModel": "gemini-2.5-flash",
       "contextRequired": true,
       "vectorSearchEnabled": true,
       "features": ["personalization", "a_b_testing", "analytics"]
@@ -139,7 +139,7 @@
       "features": ["text_to_image", "image_enhancement", "brand_consistency"]
     },
     "chatbot": {
-      "models": ["gemini-pro", "ollama-llama3"],
+      "models": ["gemini-2.5-flash", "ollama-llama3"],
       "defaultModel": "ollama-llama3",
       "contextRequired": true,
       "vectorSearchEnabled": true,

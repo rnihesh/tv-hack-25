@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const Company = require("../models/Company");
 const config = require("../config/env-config");
-const logger = require("../utils/logger");
+const { logger } = require("../utils/logger");
 
 // Middleware to protect routes
 const protect = async (req, res, next) => {
