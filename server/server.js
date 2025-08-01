@@ -253,6 +253,15 @@ const startServer = async () => {
       }
     }
 
+    // Initialize vector context for all companies
+    try {
+      console.log("🔍 Step 2.5: Initializing vector context...");
+      await initializeVectorContext();
+    } catch (contextError) {
+      console.error("Vector context initialization failed:", contextError.message);
+      logger.warn("Vector context initialization failed, but continuing...");
+    }
+
     console.log("🔍 Step 3: Setting up HTTP server...");
     const PORT = config.port;
 
@@ -298,6 +307,65 @@ const startServer = async () => {
 };
 
 // Add this function before startServer()
+
+const initializeVectorContext = async () => {
+  try {
+    console.log("🧠 Initializing vector context for all companies...");
+    
+    const { vectorContextService } = require('./services/langchain/vectorContext');
+    const { memoryVectorStore } = require('./services/langchain/memoryVectorStore');
+    const Company = require('./models/Company');
+    
+    // Clear any existing contaminated context to ensure clean slate
+    console.log("🧹 Clearing any existing vector collections to prevent contamination...");
+    memoryVectorStore.collections.clear();
+    
+    // Initialize the vector context service
+    await vectorContextService.initialize();
+    
+    // Get all companies
+    const companies = await Company.find({}).select('companyName businessType businessDescription targetAudience preferences aiContextProfile');
+    console.log(`📋 Found ${companies.length} companies to initialize context for`);
+    
+    let successCount = 0;
+    for (const company of companies) {
+      try {
+        // Seed context for this company with their ACTUAL data
+        const contextData = {
+          companyName: company.companyName,
+          businessType: company.businessType,
+          businessDescription: company.businessDescription || `${company.companyName} is a ${company.businessType} business`,
+          targetAudience: company.targetAudience || `Customers interested in ${company.businessType} services`,
+          preferences: company.preferences || {},
+          keyMessages: company.aiContextProfile?.keyMessages || [],
+          productServices: company.aiContextProfile?.productServices || [],
+          businessPersonality: company.aiContextProfile?.businessPersonality,
+          brandVoice: company.aiContextProfile?.brandVoice
+        };
+        
+        await vectorContextService.seedCompanyContext(company._id, contextData);
+        
+        // Verify context isolation
+        const verification = await vectorContextService.getCompanyContext(company._id);
+        if (verification.companyInfo.name !== company.companyName) {
+          console.warn(`⚠️  Context verification failed for ${company.companyName} - expected "${company.companyName}" but got "${verification.companyInfo.name}"`);
+        }
+        
+        successCount++;
+      } catch (error) {
+        console.warn(`⚠️  Failed to initialize context for ${company.companyName}:`, error.message);
+      }
+    }
+    
+    console.log(`✅ Successfully initialized vector context for ${successCount}/${companies.length} companies`);
+    console.log(`📊 Memory store now has ${memoryVectorStore.collections.size} isolated company collections`);
+    logger.info(`Vector context initialized for ${successCount}/${companies.length} companies with proper isolation`);
+    
+  } catch (error) {
+    console.error("❌ Vector context initialization error:", error.message);
+    throw error;
+  }
+};
 
 const checkRequiredServices = async () => {
   console.log("🔍 Checking required services...");

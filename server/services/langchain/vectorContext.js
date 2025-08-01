@@ -561,17 +561,54 @@ class VectorContextService {
     // Company information
     if (fullContext.companyInfo) {
       const company = fullContext.companyInfo;
-      sections.push(`Company: ${company.name}
-Business Type: ${company.businessType}
-Description: ${company.description || "Not provided"}
-Target Audience: ${company.targetAudience || "General audience"}
-Communication Tone: ${company.preferences?.communicationTone || "professional"}`);
+      let companySection = `Company: ${company.name || "Unknown Company"}
+Business Type: ${company.businessType || "General Business"}`;
+      
+      if (company.description && company.description !== "undefined") {
+        companySection += `\nDescription: ${company.description}`;
+      }
+      
+      if (company.targetAudience && company.targetAudience !== "undefined") {
+        companySection += `\nTarget Audience: ${company.targetAudience}`;
+      }
+      
+      if (company.preferences?.communicationTone) {
+        companySection += `\nCommunication Tone: ${company.preferences.communicationTone}`;
+      }
+      
+      if (company.preferences?.brandStyle) {
+        companySection += `\nBrand Style: ${company.preferences.brandStyle}`;
+      }
+      
+      if (company.preferences?.colorScheme) {
+        companySection += `\nPreferred Colors: ${company.preferences.colorScheme}`;
+      }
+      
+      // Add AI context profile information
+      if (company.aiProfile?.businessPersonality) {
+        companySection += `\nBusiness Personality: ${company.aiProfile.businessPersonality}`;
+      }
+      
+      if (company.aiProfile?.keyMessages?.length > 0) {
+        companySection += `\nKey Messages: ${company.aiProfile.keyMessages.join(", ")}`;
+      }
+      
+      if (company.aiProfile?.brandVoice) {
+        companySection += `\nBrand Voice: ${company.aiProfile.brandVoice}`;
+      }
+      
+      sections.push(companySection);
     }
 
-    // Relevant business context
-    if (queryContext.length > 0) {
-      const relevantInfo = queryContext.map((doc) => doc.content).join("\n");
-      sections.push(`Relevant Business Context:\n${relevantInfo}`);
+    // Relevant business context from vector store
+    if (queryContext && queryContext.length > 0) {
+      const relevantInfo = queryContext
+        .filter(doc => doc.content && doc.content.trim()) // Filter out empty content
+        .map((doc) => doc.content)
+        .join("\n");
+      if (relevantInfo.trim()) {
+        sections.push(`Relevant Business Context:\n${relevantInfo}`);
+      }
     }
 
     // Recent conversation context
