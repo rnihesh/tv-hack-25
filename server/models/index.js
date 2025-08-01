@@ -5,6 +5,7 @@ const WebsiteTemplate = require("./Website");
 const EmailCampaign = require("./Marketing");
 const GeneratedContent = require("./Media");
 const ChatbotConfig = require("./Chatbot");
+const ImageGen = require("./ImageGen");
 const { Feedback, FeedbackAnalytics } = require("./Feedback");
 const {
   SubscriptionPlan,
@@ -25,6 +26,7 @@ module.exports = {
   EmailCampaign,
   GeneratedContent,
   ChatbotConfig,
+  ImageGen,
 
   // Feedback & Analytics Models
   Feedback,

@@ -26,6 +26,7 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const compression = require("compression");
 const cookieParser = require("cookie-parser");
+const path = require("path");
 
 // Internal imports
 const connectDB = require("./config/db");
@@ -41,6 +42,7 @@ const mediaRoutes = require("./routes/mediaRoutes");
 const chatbotRoutes = require("./routes/chatbotRoutes");
 const feedbackRoutes = require("./routes/feedbackRoutes");
 const emailRoutes = require("./routes/emailRoutes");
+const imageGenRoutes = require("./routes/imageGenRoutes");
 
 const app = express();
 
@@ -58,7 +60,8 @@ app.use(
         defaultSrc: ["'self'"],
         styleSrc: ["'self'", "'unsafe-inline'"],
         scriptSrc: ["'self'"],
-        imgSrc: ["'self'", "data:", "https:"],
+        imgSrc: ["'self'", "data:", "https:", "http:", "http://localhost:*", "*.placeholder.com", "*.unsplash.com", "*.picsum.photos"],
+        connectSrc: ["'self'", "http://localhost:*"],
       },
     },
     crossOriginEmbedderPolicy: false,
@@ -66,7 +69,10 @@ app.use(
 );
 
 // CORS Configuration
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:5174'],
+  credentials: true
+}));
 app.set("trust proxy", true);
 // Rate Limiting
 // const limiter = rateLimit({
@@ -93,6 +99,14 @@ app.use(
 );
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(cookieParser());
+
+// Static file serving for uploaded images
+app.use('/uploads', (req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+}, express.static(path.join(__dirname, 'uploads')));
 
 // Compression middleware
 app.use(compression());
@@ -130,6 +144,34 @@ app.get("/api/status", (req, res) => {
   });
 });
 
+// Test image endpoint for debugging
+app.get("/api/test-image", async (req, res) => {
+  try {
+    const testResponse = await fetch('http://localhost:4000/api/images/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        prompt: 'test image',
+        style: 'realistic',
+        aspectRatio: '1:1'
+      })
+    });
+    
+    const data = await testResponse.json();
+    res.json({
+      success: true,
+      message: "Test image generation endpoint working",
+      data: data
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Test image generation failed",
+      error: error.message
+    });
+  }
+});
+
 // API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/websites", websiteRoutes);
@@ -138,6 +180,7 @@ app.use("/api/media", mediaRoutes);
 app.use("/api/chatbot", chatbotRoutes);
 app.use("/api/feedback", feedbackRoutes);
 app.use("/api/email", emailRoutes);
+app.use("/api/images", imageGenRoutes);
 
 // Stripe webhook endpoint (before JSON parsing middleware)
 app.post(
