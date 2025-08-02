@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }) => {
   // Helper function to clear user from localStorage
   const clearUserFromStorage = () => {
     try {
-      localStorage.removeItem('userData');
+      // localStorage.removeItem('userData');
     } catch (error) {
       console.error('Failed to clear user data from localStorage:', error);
     }

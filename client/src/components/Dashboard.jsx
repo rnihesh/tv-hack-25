@@ -12,6 +12,8 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchCredits();
+    console.log(JSON.parse(localStorage.getItem("userData"))?.company?.companyName)
+    console.log(JSON.parse(localStorage.getItem("userData"))?.company?.companyName?.charAt(0)?.toUpperCase())
   }, []);
 
   const fetchCredits = async () => {
@@ -45,7 +47,7 @@ const Dashboard = () => {
               <div className="flex items-center justify-between">
                 <div className="space-y-2">
                   <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                    Welcome back, {user?.companyName}! 👋
+                    Welcome back, {JSON.parse(localStorage.getItem("userData"))?.company?.companyName} ! 👋
                   </h1>
                   <p className="text-gray-600 dark:text-gray-300 text-lg">
                     Ready to power your business with AI?
@@ -362,7 +364,7 @@ const Dashboard = () => {
                 onClick={() => setCurrentView("home")}
                 className="text-2xl font-bold text-blue-600 dark:text-blue-500 hover:text-blue-700 dark:hover:text-blue-400 transition-colors duration-200"
               >
-                AI Digital Toolkit
+                Phoenix
               </button>
               {currentView !== "home" && (
                 <nav className="flex space-x-6">
@@ -380,14 +382,14 @@ const Dashboard = () => {
               {/* <ThemeToggle /> */}
               <div className="flex items-center space-x-3 bg-gray-50 dark:bg-gray-700 rounded-lg px-4 py-2">
                 <div className="w-8 h-8 bg-blue-600 dark:bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                  {user?.companyName?.charAt(0)?.toUpperCase()}
+                  {JSON.parse(localStorage.getItem("userData"))?.company?.companyName?.charAt(0)?.toUpperCase()}
                 </div>
                 <div className="text-sm">
                   <div className="font-medium text-gray-900 dark:text-white">
-                    {user?.companyName}
+                    {JSON.parse(localStorage.getItem("userData"))?.company?.companyName}
                   </div>
                   <div className="text-gray-500 dark:text-gray-400">
-                    {user?.email}
+                    {JSON.parse(localStorage.getItem("userData"))?.email}
                   </div>
                 </div>
               </div>
