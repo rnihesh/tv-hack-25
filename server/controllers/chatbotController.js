@@ -111,6 +111,7 @@ INSTRUCTIONS:
 - Be helpful, friendly, and professional
 - If you don't know specific details, suggest contacting the business directly
 - Keep responses concise but informative (max 200 words)
+- Avoid generic responses, no matter how common the query is, and tailor your answers to the specific business context.
 
 User Message: ${message}
 

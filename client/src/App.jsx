@@ -122,14 +122,14 @@ function AppContent() {
         } 
       />
 
-      <Route 
+      {/* <Route 
         path="/subscription" 
         element={
           <ProtectedRoute>
             <SubscriptionPage />
           </ProtectedRoute>
         } 
-      />
+      /> */}
 
       {/* Default redirect */}
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
@@ -145,7 +145,7 @@ function App() {
     <AuthProvider>
       <Router>
         <AppContent />
-        <ThemeToggle />
+        {/* <ThemeToggle /> */}
         <ChatInterface />
       </Router>
     </AuthProvider>

@@ -252,7 +252,7 @@ const WebsiteForm = ({ onSubmit, loading, userCredits }) => {
         </div>
 
         {/* Additional Requirements */}
-        <div>
+        {/* <div>
           <label
             htmlFor="requirements"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
@@ -275,10 +275,10 @@ const WebsiteForm = ({ onSubmit, loading, userCredits }) => {
           <div className="mt-1 text-xs text-gray-500 dark:text-gray-400 text-right">
             {formData.requirements.length}/500 characters
           </div>
-        </div>
+        </div> */}
 
         {/* Template Type */}
-        <div>
+        {/* <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
             Website Template Type
           </label>
@@ -317,7 +317,7 @@ const WebsiteForm = ({ onSubmit, loading, userCredits }) => {
               </div>
             ))}
           </div>
-        </div>
+        </div> */}
 
         {/* Style */}
         <div>

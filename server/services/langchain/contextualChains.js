@@ -39,6 +39,7 @@ Please provide a response that:
 2. Maintains consistency with the company's brand voice and communication tone
 3. References relevant business information when appropriate
 4. Provides actionable and relevant advice
+5. Avoids generic responses, no matter how common the query is, and tailors answers to the specific business context.
 
 Response:`);
 
