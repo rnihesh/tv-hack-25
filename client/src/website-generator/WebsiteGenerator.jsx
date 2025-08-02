@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { api } from "./api";
 import WebsiteForm from "./components/WebsiteForm";
 import WebsiteViewer from "./components/WebsiteViewer";
-import { useRef } from "react";
 import LoadingSpinner from "./components/LoadingSpinner";
 import Toast from "./components/Toast";
 import AppNavigation from "../components/AppNavigation";
 
 const WebsiteGenerator = () => {
   const [currentStep, setCurrentStep] = useState("home"); // home, create, deploy, preview
+  const [activeTab, setActiveTab] = useState("generate"); // Add missing activeTab state
   const [websites, setWebsites] = useState([]);
   const [selectedWebsite, setSelectedWebsite] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -189,43 +189,8 @@ const WebsiteGenerator = () => {
   const pulse = "animate-pulse";
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-      <AppNavigation />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <header className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-8 mb-8 shadow-sm">
-          <div className="text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full mb-4">
-              <svg
-                className="w-8 h-8 text-blue-600 dark:text-blue-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9"
-                />
-              </svg>
-            </div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              AI Website Generator
-            </h1>
-            <p className="text-gray-600 dark:text-gray-300 mb-6">
-              Generate professional websites with AI assistance in seconds
-            </p>
-            <div className="flex justify-center gap-6 text-sm">
-              <div className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600">
-                <span className="font-medium">Company:</span>{" "}
-                {dummyUser.companyName}
-              </div>
-              <div className="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-4 py-2 rounded-lg border border-blue-200 dark:border-blue-800">
-                <span className="font-medium">Credits:</span>{" "}
-                {dummyUser.credits.toLocaleString()}
-
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <AppNavigation />
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
         {/* Header */}
@@ -246,12 +211,10 @@ const WebsiteGenerator = () => {
                 <span className="bg-white bg-opacity-20 px-4 py-2 rounded-full backdrop-blur-sm">
                   💰 {dummyUser.credits} Credits
                 </span>
-
               </div>
             </div>
           </div>
         </header>
-
 
         {/* Tab Navigation */}
         <nav className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-1 mb-8 shadow-sm">
@@ -390,8 +353,8 @@ const WebsiteGenerator = () => {
                 userCredits={dummyUser.credits}
               />
 
-              {/* Deploy UI */}
-              {!selectedWebsite.isDeployed && (
+              {/* This section is only shown if selectedWebsite exists and is being created */}
+              {selectedWebsite && !selectedWebsite.isDeployed && (
                 <div className="mt-8 flex flex-col items-center">
                   <div className="mb-4 flex flex-col gap-3">
                     <input
@@ -434,7 +397,11 @@ const WebsiteGenerator = () => {
                         </div>
                       ) : (
                         "Deploy Website"
-
+                      )}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -584,7 +551,6 @@ const WebsiteGenerator = () => {
                         </span>
                       ) : (
                         "🚀 Deploy Website"
-
                       )}
                     </button>
                     
@@ -641,96 +607,33 @@ const WebsiteGenerator = () => {
                       </div>
                     </div>
                   )}
-                  {deployResult && deployResult.success && (
-                    <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 text-center">
-                      <div className="text-green-700 dark:text-green-300 font-semibold mb-2">
-                        🎉 Website deployed successfully!
-                      </div>
-                      <a
-                        href={deployResult.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 bg-green-600 dark:bg-green-600 hover:bg-green-700 dark:hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-                      >
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                          />
-                        </svg>
-                        View Live Site
-                      </a>
-                    </div>
-                  )}
-                  {deployResult && !deployResult.success && (
-                    <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 text-center">
-                      <div className="text-red-700 dark:text-red-300 font-semibold mb-2">
-                        ❌ Deployment failed
-                      </div>
-                      <p className="text-red-600 dark:text-red-400">
-                        {deployResult.message}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              )}
-              {selectedWebsite.isDeployed && selectedWebsite.deploymentUrl && (
-                <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 text-center">
-                  <div className="text-green-700 dark:text-green-300 font-semibold mb-2">
-                    ✅ Website is live
-                  </div>
-                  <a
-                    href={selectedWebsite.deploymentUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 bg-green-600 dark:bg-green-600 hover:bg-green-700 dark:hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-                  >
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                      />
-                    </svg>
-                    View Live Site
-
                 </div>
               ) : (
-                <div className="mt-8 bg-green-50 rounded-xl p-8 border border-green-200 text-center">
-                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
+                selectedWebsite.isDeployed && selectedWebsite.deploymentUrl ? (
+                  <div className="mt-8 bg-green-50 rounded-xl p-8 border border-green-200 text-center">
+                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <h3 className="text-2xl font-bold text-green-800 mb-4">Already Deployed!</h3>
+                    <p className="text-green-700 mb-6">Your website is live and accessible on the internet.</p>
+                    <a 
+                      href={selectedWebsite.deploymentUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="bg-green-600 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:bg-green-700 hover:shadow-xl transition-all inline-block"
+                    >
+                      🌐 View Live Website
+                    </a>
                   </div>
-                  <h3 className="text-2xl font-bold text-green-800 mb-4">Already Deployed!</h3>
-                  <p className="text-green-700 mb-6">Your website is live and accessible on the internet.</p>
-                  <a 
-                    href={selectedWebsite.deploymentUrl} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="bg-green-600 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:bg-green-700 hover:shadow-xl transition-all inline-block"
-                  >
-                    🌐 View Live Website
-
-                  </a>
-                </div>
+                ) : null
               )}
             </div>
           </div>
         )}
+
+        </main>
 
         {/* Toast */}
         {toast.show && (
