@@ -27,7 +27,7 @@ export default function CommunityChat() {
 
   const fetchMessages = async () => {
     try {
-      const response = await axios.get("/api/community/messages", {
+      const response = await axios.get("http://localhost:3000/api/community/messages", {
         withCredentials: true,
         headers: {
           'Authorization': 'Bearer dummy-jwt-token-for-testing'
@@ -67,7 +67,7 @@ export default function CommunityChat() {
     setLoading(true);
     setError(null);
     try {
-      await axios.post("/api/community/messages", { 
+      await axios.post("http://localhost:3000/api/community/messages", { 
         content: newMsg,
         topics: messageTopics
       }, { 
