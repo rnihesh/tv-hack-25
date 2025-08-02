@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { authAPI } from '../utils/api';
-import ThemeToggle from '../utils/ThemeToggle';
+import React, { useState, useEffect } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import { authAPI } from "../utils/api";
+import ThemeToggle from "../utils/ThemeToggle";
+import AppNavigation from "./AppNavigation";
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
-  const [currentView, setCurrentView] = useState('home');
+  const [currentView, setCurrentView] = useState("home");
   const [credits, setCredits] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -20,39 +21,41 @@ const Dashboard = () => {
         setCredits(response.data);
       }
     } catch (error) {
-      console.error('Failed to fetch credits:', error);
+      console.error("Failed to fetch credits:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const handleLogout = async () => {
-    if (window.confirm('Are you sure you want to logout?')) {
+    if (window.confirm("Are you sure you want to logout?")) {
       await logout();
     }
   };
 
   const renderView = () => {
     switch (currentView) {
-      case 'mailing':
-        return window.location.href = '/mailer';
+      case "mailing":
+        return (window.location.href = "/mailer");
       default:
         return (
           <div className="space-y-8">
             {/* Welcome Section */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-8 transition-all duration-300">
+            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-8 transition-all duration-300">
               <div className="flex items-center justify-between">
                 <div className="space-y-2">
-                  <h1 className="text-3xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
+                  <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                     Welcome back, {user?.companyName}! 👋
                   </h1>
                   <p className="text-gray-600 dark:text-gray-300 text-lg">
                     Ready to power your business with AI?
                   </p>
                 </div>
-                <div className="text-right bg-gradient-to-br from-violet-50 to-purple-50 dark:from-gray-700 dark:to-gray-600 rounded-xl p-6">
-                  <div className="text-sm text-gray-500 dark:text-gray-400 font-medium">Available Credits</div>
-                  <div className="text-3xl font-bold text-violet-600 dark:text-violet-400">
+                <div className="text-right bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                  <div className="text-sm text-gray-500 dark:text-gray-400 font-medium">
+                    Available Credits
+                  </div>
+                  <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
                     {loading ? (
                       <div className="animate-pulse bg-gray-200 dark:bg-gray-600 h-8 w-16 rounded"></div>
                     ) : (
@@ -69,34 +72,44 @@ const Dashboard = () => {
             </div>
 
             {/* Business Info */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-8 transition-all duration-300">
+            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-8 transition-all duration-300">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
-                <span className="bg-violet-100 dark:bg-violet-900 p-2 rounded-lg mr-3">🏢</span>
+                <span className="bg-blue-100 dark:bg-blue-900/50 p-2 rounded-lg mr-3">
+                  🏢
+                </span>
                 Your Business Profile
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
-                  <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">Business Type</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">
+                    Business Type
+                  </span>
                   <p className="font-semibold text-gray-900 dark:text-white capitalize mt-1">
-                    {user?.businessType?.replace('_', ' ') || 'Not specified'}
+                    {user?.businessType?.replace("_", " ") || "Not specified"}
                   </p>
                 </div>
                 <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
-                  <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">Communication Style</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">
+                    Communication Style
+                  </span>
                   <p className="font-semibold text-gray-900 dark:text-white capitalize mt-1">
-                    {user?.preferences?.communicationTone || 'Professional'}
+                    {user?.preferences?.communicationTone || "Professional"}
                   </p>
                 </div>
                 <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
-                  <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">Industry</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">
+                    Industry
+                  </span>
                   <p className="font-semibold text-gray-900 dark:text-white capitalize mt-1">
-                    {user?.industry || 'Not specified'}
+                    {user?.industry || "Not specified"}
                   </p>
                 </div>
                 <div className="md:col-span-3 bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
-                  <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">Target Audience</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">
+                    Target Audience
+                  </span>
                   <p className="font-semibold text-gray-900 dark:text-white mt-1">
-                    {user?.targetAudience || 'Not specified'}
+                    {user?.targetAudience || "Not specified"}
                   </p>
                 </div>
               </div>
@@ -105,85 +118,129 @@ const Dashboard = () => {
             {/* AI Services Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <button
-                onClick={() => window.location.href = '/mailer'}
-                className="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-8 hover:shadow-xl hover:scale-105 transition-all duration-300 text-left"
+                onClick={() => (window.location.href = "/mailer")}
+                className="group bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-8 hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300 text-left"
               >
                 <div className="flex items-center space-x-4 mb-4">
-                  <div className="bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 rounded-xl p-3 group-hover:scale-110 transition-transform duration-300">
+                  <div className="bg-blue-100 dark:bg-blue-900/50 rounded-lg p-3 group-hover:scale-110 transition-transform duration-300">
                     <span className="text-3xl">📧</span>
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">Email Marketing</h3>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                    Email Marketing
+                  </h3>
                 </div>
                 <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Generate personalized email campaigns using AI. Perfect for customer engagement and retention.
+                  Generate personalized email campaigns using AI. Perfect for
+                  customer engagement and retention.
                 </p>
                 <div className="flex items-center text-blue-600 dark:text-blue-400 font-semibold">
-                  Start creating 
-                  <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                  Start creating
+                  <svg
+                    className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                 </div>
               </button>
 
               <button
-                onClick={() => window.location.href = '/website-generator'}
-                className="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-8 hover:shadow-xl hover:scale-105 transition-all duration-300 text-left"
+                onClick={() => (window.location.href = "/website-generator")}
+                className="group bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-8 hover:border-green-300 dark:hover:border-green-600 transition-all duration-300 text-left"
               >
                 <div className="flex items-center space-x-4 mb-4">
-                  <div className="bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900 dark:to-purple-800 rounded-xl p-3 group-hover:scale-110 transition-transform duration-300">
+                  <div className="bg-green-100 dark:bg-green-900/50 rounded-lg p-3 group-hover:scale-110 transition-transform duration-300">
                     <span className="text-3xl">🌐</span>
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">Website Generator</h3>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                    Website Generator
+                  </h3>
                 </div>
                 <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Create professional websites tailored to your business. Generate your site in minutes!
-                </p>
-                <div className="flex items-center text-purple-600 dark:text-purple-400 font-semibold">
-                  Start creating 
-                  <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                  </svg>
-                </div>
-              </button>
-
-              <button
-                onClick={() => window.location.href = '/chatbot'}
-                className="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-8 hover:shadow-xl hover:scale-105 transition-all duration-300 text-left"
-              >
-                <div className="flex items-center space-x-4 mb-4">
-                  <div className="bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900 dark:to-green-800 rounded-xl p-3 group-hover:scale-110 transition-transform duration-300">
-                    <span className="text-3xl">🤖</span>
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">AI Chatbot</h3>
-                </div>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Deploy intelligent customer service chatbots. Engage with customers 24/7.
+                  Create professional websites tailored to your business.
+                  Generate your site in minutes!
                 </p>
                 <div className="flex items-center text-green-600 dark:text-green-400 font-semibold">
-                  Start creating 
-                  <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                  Start creating
+                  <svg
+                    className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                 </div>
               </button>
 
               <button
-                onClick={() => window.location.href = '/image-generator'}
-                className="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-8 hover:shadow-xl hover:scale-105 transition-all duration-300 text-left"
+                onClick={() => (window.location.href = "/chatbot")}
+                className="group bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-8 hover:border-purple-300 dark:hover:border-purple-600 transition-all duration-300 text-left"
               >
                 <div className="flex items-center space-x-4 mb-4">
-                  <div className="bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-900 dark:to-orange-800 rounded-xl p-3 group-hover:scale-110 transition-transform duration-300">
-                    <span className="text-3xl">🎨</span>
+                  <div className="bg-purple-100 dark:bg-purple-900/50 rounded-lg p-3 group-hover:scale-110 transition-transform duration-300">
+                    <span className="text-3xl">🤖</span>
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">AI Image Generator</h3>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                    AI Chatbot
+                  </h3>
                 </div>
                 <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Create stunning visuals and artwork using AI. Perfect for marketing campaigns and social media.
+                  Deploy intelligent customer service chatbots. Engage with
+                  customers 24/7.
+                </p>
+                <div className="flex items-center text-purple-600 dark:text-purple-400 font-semibold">
+                  Start creating
+                  <svg
+                    className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+              </button>
+
+              <button
+                onClick={() => (window.location.href = "/image-generator")}
+                className="group bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-8 hover:border-orange-300 dark:hover:border-orange-600 transition-all duration-300 text-left"
+              >
+                <div className="flex items-center space-x-4 mb-4">
+                  <div className="bg-orange-100 dark:bg-orange-900/50 rounded-lg p-3 group-hover:scale-110 transition-transform duration-300">
+                    <span className="text-3xl">🎨</span>
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                    AI Image Generator
+                  </h3>
+                </div>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  Create stunning visuals and artwork using AI. Perfect for
+                  marketing campaigns and social media.
                 </p>
                 <div className="flex items-center text-orange-600 dark:text-orange-400 font-semibold">
-                  Start creating 
-                  <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                  Start creating
+                  <svg
+                    className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                 </div>
               </button>
@@ -212,35 +269,45 @@ const Dashboard = () => {
 
             {/* Quick Stats */}
             {credits?.usage && (
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-8 transition-all duration-300">
+              <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-8 transition-all duration-300">
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
-                  <span className="bg-violet-100 dark:bg-violet-900 p-2 rounded-lg mr-3">📊</span>
+                  <span className="bg-gray-100 dark:bg-gray-700 p-2 rounded-lg mr-3">
+                    📊
+                  </span>
                   Usage Statistics
                 </h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                  <div className="text-center bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900 dark:to-emerald-900 rounded-xl p-4">
+                  <div className="text-center bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
                     <div className="text-3xl font-bold text-green-600 dark:text-green-400">
                       {credits.usage.totalCreditsUsed || 0}
                     </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-300 font-medium mt-1">Credits Used</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-300 font-medium mt-1">
+                      Credits Used
+                    </div>
                   </div>
-                  <div className="text-center bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900 dark:to-cyan-900 rounded-xl p-4">
+                  <div className="text-center bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                     <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
                       {credits.usage.emailsGenerated || 0}
                     </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-300 font-medium mt-1">Emails Created</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-300 font-medium mt-1">
+                      Emails Created
+                    </div>
                   </div>
-                  <div className="text-center bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-900 dark:to-violet-900 rounded-xl p-4">
+                  <div className="text-center bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4">
                     <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">
                       {credits.usage.websitesGenerated || 0}
                     </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-300 font-medium mt-1">Websites Built</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-300 font-medium mt-1">
+                      Websites Built
+                    </div>
                   </div>
-                  <div className="text-center bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900 dark:to-red-900 rounded-xl p-4">
+                  <div className="text-center bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-4">
                     <div className="text-3xl font-bold text-orange-600 dark:text-orange-400">
                       {credits.usage.chatbotResponses || 0}
                     </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-300 font-medium mt-1">Bot Responses</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-300 font-medium mt-1">
+                      Bot Responses
+                    </div>
                   </div>
                 </div>
               </div>
@@ -258,32 +325,36 @@ const Dashboard = () => {
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center space-x-6">
               <button
-                onClick={() => setCurrentView('home')}
-                className="text-2xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent hover:from-violet-700 hover:to-purple-700 transition-all duration-300"
+                onClick={() => setCurrentView("home")}
+                className="text-2xl font-bold text-blue-600 dark:text-blue-500 hover:text-blue-700 dark:hover:text-blue-400 transition-colors duration-200"
               >
                 AI Digital Toolkit
               </button>
-              {currentView !== 'home' && (
+              {currentView !== "home" && (
                 <nav className="flex space-x-6">
                   <button
-                    onClick={() => setCurrentView('home')}
-                    className="text-gray-600 dark:text-gray-300 hover:text-violet-600 dark:hover:text-violet-400 font-medium transition-colors duration-200"
+                    onClick={() => setCurrentView("home")}
+                    className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors duration-200"
                   >
                     Dashboard
                   </button>
                 </nav>
               )}
             </div>
-            
+
             <div className="flex items-center space-x-6">
-              <ThemeToggle />
+              {/* <ThemeToggle /> */}
               <div className="flex items-center space-x-3 bg-gray-50 dark:bg-gray-700 rounded-lg px-4 py-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                <div className="w-8 h-8 bg-blue-600 dark:bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
                   {user?.companyName?.charAt(0)?.toUpperCase()}
                 </div>
                 <div className="text-sm">
-                  <div className="font-medium text-gray-900 dark:text-white">{user?.companyName}</div>
-                  <div className="text-gray-500 dark:text-gray-400">{user?.email}</div>
+                  <div className="font-medium text-gray-900 dark:text-white">
+                    {user?.companyName}
+                  </div>
+                  <div className="text-gray-500 dark:text-gray-400">
+                    {user?.email}
+                  </div>
                 </div>
               </div>
               <button
