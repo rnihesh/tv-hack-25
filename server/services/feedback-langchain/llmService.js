@@ -31,12 +31,10 @@ class FeedbackLLMService {
               model: "llama3", // Good for analysis tasks
               temperature: 0.3, // Lower temperature for consistent analysis
             });
-            
+
             // Test the model
-            await this.primaryModel.invoke([
-              { role: "user", content: "Test message" }
-            ]);
-            
+            await this.primaryModel.invoke("Test message");
+
             logger.info("Feedback LLM service initialized with Ollama");
             primaryInitialized = true;
           }
@@ -56,9 +54,7 @@ class FeedbackLLMService {
           });
 
           // Test the model
-          await this.primaryModel.invoke([
-            { role: "user", content: "Test message" }
-          ]);
+          await this.primaryModel.invoke("Test message");
 
           logger.info("Feedback LLM service initialized with Google Gemini");
           primaryInitialized = true;
@@ -85,8 +81,19 @@ class FeedbackLLMService {
     }
 
     try {
-      const response = await this.primaryModel.invoke(messages);
-      return response.content;
+      // Handle both string and array inputs
+      let input;
+      if (typeof messages === "string") {
+        input = messages;
+      } else if (Array.isArray(messages) && messages.length > 0) {
+        // Extract content from message array format
+        input = messages.map((msg) => msg.content || msg).join("\n");
+      } else {
+        throw new Error("Invalid message format");
+      }
+
+      const response = await this.primaryModel.invoke(input);
+      return response.content || response;
     } catch (error) {
       logger.error("Error generating LLM response:", error);
       throw error;
@@ -100,7 +107,7 @@ class FeedbackLLMService {
 
     try {
       let prompt = "";
-      
+
       switch (analysisType) {
         case "sentiment":
           prompt = `Analyze the sentiment of the following text. Respond with only a JSON object containing:
@@ -112,7 +119,7 @@ class FeedbackLLMService {
 
 Text: "${text}"`;
           break;
-          
+
         case "emotion":
           prompt = `Analyze the emotions in the following text. Respond with only a JSON object containing:
 {
@@ -124,7 +131,7 @@ Text: "${text}"`;
 
 Text: "${text}"`;
           break;
-          
+
         case "themes":
           prompt = `Extract the main themes and topics from the following text. Respond with only a JSON object containing:
 {
@@ -136,18 +143,25 @@ Text: "${text}"`;
 
 Text: "${text}"`;
           break;
-          
+
         default:
           throw new Error(`Unknown analysis type: ${analysisType}`);
       }
 
-      const response = await this.generateResponse([
-        { role: "user", content: prompt }
-      ]);
+      const response = await this.generateResponse(prompt);
 
       // Try to parse JSON response
       try {
-        return JSON.parse(response);
+        // Clean up the response to extract JSON
+        let cleanResponse = response.trim();
+
+        // Look for JSON within the response
+        const jsonMatch = cleanResponse.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          cleanResponse = jsonMatch[0];
+        }
+
+        return JSON.parse(cleanResponse);
       } catch (parseError) {
         logger.warn("Failed to parse LLM JSON response, returning raw text");
         return { raw_response: response };
