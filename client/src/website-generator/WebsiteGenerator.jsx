@@ -3,6 +3,7 @@ import { api } from "./api";
 import WebsiteForm from "./components/WebsiteForm";
 import WebsiteList from "./components/WebsiteList";
 import WebsiteViewer from "./components/WebsiteViewer";
+import { useRef } from "react";
 import LoadingSpinner from "./components/LoadingSpinner";
 import Toast from "./components/Toast";
 
@@ -11,7 +12,11 @@ const WebsiteGenerator = () => {
   const [websites, setWebsites] = useState([]);
   const [selectedWebsite, setSelectedWebsite] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [deployingWebsites, setDeployingWebsites] = useState(new Set());
+  const [deploying, setDeploying] = useState(false);
+  const [deployTimer, setDeployTimer] = useState(0);
+  const [deployInterval, setDeployInterval] = useState(null);
+  const [deployResult, setDeployResult] = useState(null);
+  const [siteName, setSiteName] = useState("");
   const [toast, setToast] = useState({
     show: false,
     message: "",
@@ -123,26 +128,31 @@ const WebsiteGenerator = () => {
     }
   };
 
+  const deployTimerRef = useRef();
   const handleDeployWebsite = async (websiteId, siteName) => {
+    setDeploying(true);
+    setDeployResult(null);
+    setDeployTimer(0);
+    deployTimerRef.current = setInterval(() => {
+      setDeployTimer((t) => t + 1);
+    }, 1000);
     try {
-      setDeployingWebsites((prev) => new Set([...prev, websiteId]));
       const response = await api.deployWebsite(websiteId, { siteName });
-
       if (response.success) {
         showToast("Website deployed successfully!", "success");
-        loadWebsites(); // Refresh the list to show deployment status
+        setDeployResult({ success: true, url: response.data.websiteUrl });
+        loadWebsites();
+      } else {
+        setDeployResult({ success: false, message: response.message || "Unknown error" });
       }
     } catch (error) {
-      const message =
-        error.response?.data?.message || "Failed to deploy website";
+      const message = error.response?.data?.message || "Failed to deploy website";
       showToast(message, "error");
+      setDeployResult({ success: false, message });
       console.error("Deploy website error:", error);
     } finally {
-      setDeployingWebsites((prev) => {
-        const newSet = new Set(prev);
-        newSet.delete(websiteId);
-        return newSet;
-      });
+      setDeploying(false);
+      clearInterval(deployTimerRef.current);
     }
   };
 
@@ -283,12 +293,56 @@ const WebsiteGenerator = () => {
           )}
 
           {activeTab === "preview" && selectedWebsite && (
-            <WebsiteViewer
-              website={selectedWebsite}
-              onUpdate={handleUpdateWebsite}
-              onDeploy={handleDeployWebsite}
-              loading={loading}
-            />
+            <div>
+              <WebsiteViewer
+                website={selectedWebsite}
+                onUpdate={handleUpdateWebsite}
+                loading={loading}
+              />
+              {/* Deploy UI */}
+              {!selectedWebsite.isDeployed && (
+                <div className="mt-8 flex flex-col items-center">
+                  <div className="mb-2 flex gap-2 items-center">
+                    <input
+                      type="text"
+                      className="border rounded px-2 py-1"
+                      placeholder="Optional site name"
+                      value={siteName}
+                      onChange={e => setSiteName(e.target.value)}
+                      disabled={deploying}
+                      style={{ minWidth: 180 }}
+                    />
+                    <button
+                      className="bg-blue-600 text-white px-6 py-2 rounded font-semibold shadow hover:bg-blue-700 disabled:opacity-60"
+                      onClick={() => handleDeployWebsite(selectedWebsite._id, siteName)}
+                      disabled={deploying}
+                    >
+                      {deploying ? "Deploying..." : "Deploy Website"}
+                    </button>
+                  </div>
+                  {deploying && (
+                    <div className="text-sm text-gray-500 mt-2">Deploying... <span>{deployTimer}s</span></div>
+                  )}
+                  {deployResult && deployResult.success && (
+                    <div className="mt-4 text-green-600 font-semibold">
+                      Deployed! &nbsp;
+                      <a href={deployResult.url} target="_blank" rel="noopener noreferrer" className="underline text-blue-700">View Site</a>
+                    </div>
+                  )}
+                  {deployResult && !deployResult.success && (
+                    <div className="mt-4 text-red-600 font-semibold">
+                      {deployResult.message}
+                    </div>
+                  )}
+                </div>
+              )}
+              {selectedWebsite.isDeployed && selectedWebsite.deploymentUrl && (
+                <div className="mt-8 text-green-700 font-semibold text-center">
+                  Already Deployed: &nbsp;
+                  <a href={selectedWebsite.deploymentUrl} target="_blank" rel="noopener noreferrer" className="underline text-blue-700">View Site</a>
+                </div>
+              )}
+            </div>
           )}
         </main>
 

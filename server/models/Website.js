@@ -10,7 +10,7 @@ const WebsiteTemplateSchema = new mongoose.Schema(
     },
     templateName: {
       type: String,
-      required: true,
+      // required: true,
       maxlength: 100,
     },
     industry: {
