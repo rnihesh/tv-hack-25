@@ -1,12 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { api } from "./api";
 import WebsiteForm from "./components/WebsiteForm";
 import WebsiteViewer from "./components/WebsiteViewer";
 import LoadingSpinner from "./components/LoadingSpinner";
 import Toast from "./components/Toast";
 import AppNavigation from "../components/AppNavigation";
+import { useAuth } from "../contexts/AuthContext";
 
 const WebsiteGenerator = () => {
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState("home"); // home, create, deploy, preview
   const [activeTab, setActiveTab] = useState("generate"); // Add missing activeTab state
   const [websites, setWebsites] = useState([]);
@@ -21,14 +25,51 @@ const WebsiteGenerator = () => {
     message: "",
     type: "success",
   });
+  console.log("user",user);
 
-  // Dummy user for testing (will be replaced with auth later)
-  const dummyUser = {
-    id: "dummy-user-123",
-    companyName: "Demo Company",
-    businessType: "Technology",
-    credits: 9999975,
-  };
+  // Safety check: redirect to auth if not authenticated after loading
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      console.log("User not authenticated, redirecting to auth...");
+      navigate("/auth", { replace: true });
+    }
+  }, [authLoading, isAuthenticated, navigate]);
+
+  // Log user details to console for debugging
+  useEffect(() => {
+    if (user?.company) {
+      console.log("=== Authenticated User Details ===");
+      console.log("Full User Object:", user);
+      console.log("Company Data:", user.company);
+      console.log("User ID:", user.company._id || user.company.id);
+      console.log("Company Name:", user.company.companyName || user.company.displayName);
+      console.log("Email:", user.company.email);
+      console.log("Business Type:", user.company.businessType);
+      console.log("Target Audience:", user.company.targetAudience);
+      console.log("Business Description:", user.company.businessDescription);
+      console.log("Current Credits:", user.company.credits?.currentCredits);
+      console.log("Total Credits Used:", user.company.credits?.totalCreditsUsed);
+      console.log("Daily Credits Used:", user.company.credits?.dailyCreditsUsed);
+      console.log("Subscription Plan:", user.company.subscription?.plan);
+      console.log("Subscription Status:", user.company.subscription?.status);
+      console.log("Website Usage:", user.company.usage);
+      console.log("AI Preferences:", user.company.preferences);
+      console.log("Is Authenticated:", isAuthenticated);
+      console.log("=====================================");
+    } else if (user) {
+      console.log("User exists but no company data:", user);
+    } else {
+      console.log("No authenticated user found");
+    }
+  }, [user, isAuthenticated]);
+
+  // Use the authenticated user's company data directly
+  const displayUser = user?.company || user;
+
+  // Safety check: if no valid user data after auth loading, return null to let ProtectedRoute handle
+  if (!authLoading && (!displayUser || !displayUser._id)) {
+    return null;
+  }
 
   useEffect(() => {
     // Load existing websites when component mounts
@@ -188,6 +229,15 @@ const WebsiteGenerator = () => {
   const slideUp = "animate-slideUp";
   const pulse = "animate-pulse";
 
+  // Show loading spinner while auth is checking
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       <AppNavigation />
@@ -204,12 +254,22 @@ const WebsiteGenerator = () => {
               <p className="text-xl opacity-90 mb-6">
                 Create and deploy professional websites with AI assistance
               </p>
-              <div className="flex justify-center gap-8 text-sm">
-                <span className="bg-white bg-opacity-20 px-4 py-2 rounded-full backdrop-blur-sm">
-                  🏢 {dummyUser.companyName}
+              <div className="flex justify-center gap-4 text-sm flex-wrap">
+                <span className="bg-white bg-opacity-90 px-4 py-2 rounded-full backdrop-blur-sm text-gray-800 font-semibold shadow-lg border border-white border-opacity-50">
+                  🏢 {displayUser?.companyName || displayUser?.displayName || 'Unknown Company'}
                 </span>
-                <span className="bg-white bg-opacity-20 px-4 py-2 rounded-full backdrop-blur-sm">
-                  💰 {dummyUser.credits} Credits
+                <span className="bg-white bg-opacity-90 px-4 py-2 rounded-full backdrop-blur-sm text-gray-800 font-semibold shadow-lg border border-white border-opacity-50">
+                  💰 {displayUser?.credits?.currentCredits?.toLocaleString() || '0'} Credits
+                </span>
+                <span className="bg-white bg-opacity-90 px-4 py-2 rounded-full backdrop-blur-sm text-gray-800 font-semibold shadow-lg border border-white border-opacity-50">
+                  📊 {displayUser?.subscription?.plan?.toUpperCase() || 'FREE'} Plan
+                </span>
+                <span className={`px-4 py-2 rounded-full backdrop-blur-sm font-semibold shadow-lg border ${
+                  isAuthenticated 
+                    ? 'bg-green-100 bg-opacity-95 text-green-800 border-green-200' 
+                    : 'bg-yellow-100 bg-opacity-95 text-yellow-800 border-yellow-200'
+                }`}>
+                  {isAuthenticated ? '✅ Authenticated' : '👤 Demo Mode'}
                 </span>
               </div>
             </div>
@@ -327,6 +387,47 @@ const WebsiteGenerator = () => {
                 </div>
               </div>
             )}
+
+            {/* User Statistics Dashboard */}
+            {isAuthenticated && displayUser && (
+              <div className={`bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl p-8 shadow-xl border border-gray-200 ${slideUp}`} style={{animationDelay: '0.6s'}}>
+                <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">Your Account Overview</h3>
+                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-blue-600">{displayUser?.usage?.websitesGenerated || 0}</div>
+                    <div className="text-sm text-gray-600">Websites Generated</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-green-600">{displayUser?.usage?.emailsSent || 0}</div>
+                    <div className="text-sm text-gray-600">Emails Sent</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-purple-600">{displayUser?.usage?.imagesGenerated || 0}</div>
+                    <div className="text-sm text-gray-600">Images Generated</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-orange-600">{displayUser?.usage?.chatbotQueries || 0}</div>
+                    <div className="text-sm text-gray-600">Chatbot Queries</div>
+                  </div>
+                </div>
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <div className="grid md:grid-cols-3 gap-4 text-sm">
+                    <div className="text-center">
+                      <span className="font-semibold text-gray-700">Business Type:</span>
+                      <div className="text-blue-600 capitalize">{displayUser?.businessType || 'Not specified'}</div>
+                    </div>
+                    <div className="text-center">
+                      <span className="font-semibold text-gray-700">Credits Used Today:</span>
+                      <div className="text-red-600">{displayUser?.credits?.dailyCreditsUsed || 0}</div>
+                    </div>
+                    <div className="text-center">
+                      <span className="font-semibold text-gray-700">Total Credits Used:</span>
+                      <div className="text-gray-600">{displayUser?.credits?.totalCreditsUsed?.toLocaleString() || 0}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -350,7 +451,7 @@ const WebsiteGenerator = () => {
               <WebsiteForm
                 onSubmit={handleGenerateWebsite}
                 loading={loading}
-                userCredits={dummyUser.credits}
+                userCredits={displayUser?.credits?.currentCredits || 0}
               />
 
               {/* This section is only shown if selectedWebsite exists and is being created */}
