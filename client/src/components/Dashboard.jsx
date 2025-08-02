@@ -117,38 +117,7 @@ const Dashboard = () => {
 
             {/* AI Services Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <button
-                onClick={() => (window.location.href = "/mailer")}
-                className="group bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-8 hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300 text-left"
-              >
-                <div className="flex items-center space-x-4 mb-4">
-                  <div className="bg-blue-100 dark:bg-blue-900/50 rounded-lg p-3 group-hover:scale-110 transition-transform duration-300">
-                    <span className="text-3xl">📧</span>
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                    Email Marketing
-                  </h3>
-                </div>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Generate personalized email campaigns using AI. Perfect for
-                  customer engagement and retention.
-                </p>
-                <div className="flex items-center text-blue-600 dark:text-blue-400 font-semibold">
-                  Start creating
-                  <svg
-                    className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-              </button>
-
+              
               <button
                 onClick={() => (window.location.href = "/website-generator")}
                 className="group bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-8 hover:border-green-300 dark:hover:border-green-600 transition-all duration-300 text-left"
@@ -180,6 +149,7 @@ const Dashboard = () => {
                   </svg>
                 </div>
               </button>
+              
 
               <button
                 onClick={() => (window.location.href = "/chatbot")}
@@ -213,6 +183,39 @@ const Dashboard = () => {
                 </div>
               </button>
 
+              
+              <button
+                onClick={() => (window.location.href = "/mailer")}
+                className="group bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-8 hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300 text-left"
+              >
+                <div className="flex items-center space-x-4 mb-4">
+                  <div className="bg-blue-100 dark:bg-blue-900/50 rounded-lg p-3 group-hover:scale-110 transition-transform duration-300">
+                    <span className="text-3xl">📧</span>
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                    Email Marketing
+                  </h3>
+                </div>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  Generate personalized email campaigns using AI. Perfect for
+                  customer engagement and retention.
+                </p>
+                <div className="flex items-center text-blue-600 dark:text-blue-400 font-semibold">
+                  Start creating
+                  <svg
+                    className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+              </button>
+              
               <button
                 onClick={() => (window.location.href = "/image-generator")}
                 className="group bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-8 hover:border-orange-300 dark:hover:border-orange-600 transition-all duration-300 text-left"
