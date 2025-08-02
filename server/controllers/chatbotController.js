@@ -43,7 +43,7 @@ const processMessage = async (req, res) => {
       });
     }
 
-    aiLogger.info('Processing chatbot message', {
+    logger.info('Processing chatbot message', {
       companyId,
       sessionId,
       messageLength: message.length
@@ -109,9 +109,26 @@ Response:`;
     // Call Gemini API
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
     
+    // Log AI request
+    aiLogger.request('gemini', 'gemini-2.5-flash', contextualPrompt, {
+      companyId,
+      sessionId,
+      promptLength: contextualPrompt.length
+    });
+    
+    const startTime = Date.now();
     const result = await model.generateContent(contextualPrompt);
     const response = result.response;
     const responseText = response.text();
+    const duration = Date.now() - startTime;
+
+    // Log AI response
+    aiLogger.response('gemini', 'gemini-2.5-flash', responseText, {
+      companyId,
+      sessionId,
+      duration: `${duration}ms`,
+      responseLength: responseText.length
+    });
 
     // Save conversation to context
     aiContext.conversationHistory.push(
@@ -149,13 +166,13 @@ Response:`;
     await aiContext.save();
 
     // Deduct credits after successful generation
-    await company.deductCredits('chatbot', 1, 'Chatbot message processing');
+    await company.deductCredits(1, 'chatbot', 'Chatbot message processing');
 
     // Update usage tracking
     company.usage.chatbotQueries += 1;
     await company.save();
 
-    aiLogger.info('Chatbot response generated successfully', {
+    logger.info('Chatbot response generated successfully', {
       companyId,
       sessionId,
       responseLength: responseText.length
@@ -171,6 +188,14 @@ Response:`;
     });
 
   } catch (error) {
+    // Log AI error if it's related to AI processing
+    if (error.message.includes('gemini') || error.message.includes('generative')) {
+      aiLogger.error('gemini', 'gemini-2.5-flash', error, {
+        companyId: req.company?.id,
+        sessionId: req.body?.sessionId
+      });
+    }
+
     logger.error('Chatbot processing failed:', {
       error: error.message,
       stack: error.stack,

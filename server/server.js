@@ -147,7 +147,7 @@ app.get("/api/status", (req, res) => {
 // Test image endpoint for debugging
 app.get("/api/test-image", async (req, res) => {
   try {
-    const testResponse = await fetch('http://localhost:4000/api/images/generate', {
+    const testResponse = await fetch('http://localhost:3000/api/images/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

@@ -16,8 +16,8 @@ const ImageHistory = ({ images, loading, onLoadMore, pagination, onImageSelect }
       return imageUrl;
     }
     // Convert absolute localhost URL to proxy URL for local images
-    if (imageUrl && imageUrl.startsWith('http://localhost:4000')) {
-      return imageUrl.replace('http://localhost:4000', '');
+    if (imageUrl && imageUrl.startsWith('http://localhost:3000')) {
+      return imageUrl.replace('http://localhost:3000', '');
     }
     return imageUrl;
   };

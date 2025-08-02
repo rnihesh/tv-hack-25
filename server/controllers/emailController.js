@@ -284,7 +284,7 @@ const addEmails = async (req, res) => {
     if (!company) {
       return res.status(404).json({
         success: false,
-        message: "Company not found",
+        message: "Company not found5",
       });
     }
 
@@ -385,7 +385,7 @@ const getEmails = async (req, res) => {
     if (!company) {
       return res.status(404).json({
         success: false,
-        message: "Company not found",
+        message: "Company not found6",
       });
     }
 
@@ -415,7 +415,7 @@ const updateEmails = async (req, res) => {
     if (!company) {
       return res.status(404).json({
         success: false,
-        message: "Company not found",
+        message: "Company not found7",
       });
     }
 
@@ -648,7 +648,7 @@ const enhanceEmail = async (req, res) => {
     if (!company) {
       return res.status(404).json({
         success: false,
-        message: "Company not found",
+        message: "Company not found8",
       });
     }
 

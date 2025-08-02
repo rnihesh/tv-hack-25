@@ -8,7 +8,7 @@ import ImageGenerator from './aiImageGenerator/ImageGenerator'
 import ChatbotPage from './chatbot/ChatbotPage'
 import ChatInterface from './chatbot/ChatInterface'
 import ThemeToggle from './utils/ThemeToggle'
-// import MailingDashboard from './mailer/MailingDashboard'
+import MailingDashboard from './mailer/MailingDashboard'
 
 // Protected Route Component
 function ProtectedRoute({ children }) {

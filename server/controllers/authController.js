@@ -229,7 +229,7 @@ const getProfile = async (req, res) => {
     if (!company) {
       return res.status(404).json({
         success: false,
-        message: "Company not found",
+        message: "Company not found1",
       });
     }
 
@@ -290,7 +290,7 @@ const updateProfile = async (req, res) => {
     if (!company) {
       return res.status(404).json({
         success: false,
-        message: "Company not found",
+        message: "Company not found3",
       });
     }
 
@@ -335,7 +335,7 @@ const changePassword = async (req, res) => {
     if (!company) {
       return res.status(404).json({
         success: false,
-        message: "Company not found",
+        message: "Company not found2",
       });
     }
 
@@ -382,7 +382,7 @@ const getCredits = async (req, res) => {
     if (!company) {
       return res.status(404).json({
         success: false,
-        message: "Company not found",
+        message: "Company not found4",
       });
     }
 
