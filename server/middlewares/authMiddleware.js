@@ -107,7 +107,7 @@ const checkSubscription = (requiredPlans = []) => {
       if (!company) {
         return res.status(404).json({
           success: false,
-          message: "Company not found",
+          message: "Company not found9",
         });
       }
 
@@ -154,7 +154,7 @@ const checkCredits = (requiredCredits) => {
       if (!company) {
         return res.status(404).json({
           success: false,
-          message: "Company not found",
+          message: "Company not found10",
         });
       }
 
@@ -193,7 +193,7 @@ const checkUsageLimit = (serviceType, dailyLimit = null) => {
       if (!company) {
         return res.status(404).json({
           success: false,
-          message: "Company not found",
+          message: "Company not found11",
         });
       }
 

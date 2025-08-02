@@ -15,8 +15,8 @@ const ImagePreview = ({ image, onDownload, onClose }) => {
       
       // Convert absolute localhost URL to proxy URL for local images
       let finalUrl = image.imageUrl;
-      if (finalUrl.startsWith('http://localhost:4000')) {
-        finalUrl = finalUrl.replace('http://localhost:4000', '');
+      if (finalUrl.startsWith('http://localhost:3000')) {
+        finalUrl = finalUrl.replace('http://localhost:3000', '');
       }
       
       // Add timestamp to prevent caching issues for local images only

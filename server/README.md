@@ -157,7 +157,7 @@ npm run dev
 npm start
 ```
 
-The server will start on `http://localhost:4000`
+The server will start on `http://localhost:3000`
 
 ## 📚 API Documentation
 
@@ -260,7 +260,7 @@ npm test
 npm run test:coverage
 
 # Test specific model health
-curl http://localhost:4000/health
+curl http://localhost:3000/health
 ```
 
 ## 🚀 Deployment
@@ -269,7 +269,7 @@ curl http://localhost:4000/health
 
 ```env
 NODE_ENV=production
-PORT=4000
+PORT=3000
 DBURL=mongodb://your-production-db-url
 JWT_SECRET=your-very-long-and-secure-production-jwt-secret
 GEMINI_API_KEY=your-production-gemini-key
@@ -284,7 +284,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci --only=production
 COPY . .
-EXPOSE 4000
+EXPOSE 3000
 CMD ["npm", "start"]
 ```
 
@@ -315,7 +315,7 @@ For support and questions:
 
 - Create an issue in the repository
 - Email: support@yourcompany.com
-- Documentation: [API Docs](http://localhost:4000/api-docs)
+- Documentation: [API Docs](http://localhost:3000/api-docs)
 
 ---
 

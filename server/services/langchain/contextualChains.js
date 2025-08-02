@@ -103,10 +103,10 @@ Response:`);
 
       // Log if fallback was used
       if (response.fallbackUsed) {
-        aiLogger.info(`Fallback used: ${response.originalModelRequested} -> ${response.modelUsed}`);
+        logger.info(`Fallback used: ${response.originalModelRequested} -> ${response.modelUsed}`);
       }
       if (response.emergencyFallbackUsed) {
-        aiLogger.warn(`Emergency fallback used: ${response.originalModelRequested} -> ${response.modelUsed}`);
+        logger.warn(`Emergency fallback used: ${response.originalModelRequested} -> ${response.modelUsed}`);
       }
 
       // Update context with this interaction

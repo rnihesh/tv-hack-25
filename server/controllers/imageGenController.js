@@ -22,9 +22,11 @@ try {
     genAI = new GoogleGenerativeAI(config.geminiApiKey);
     // Initialize Google GenAI for native image generation with Gemini 2.0 Flash
     imageGenAI = new GoogleGenAI({
-      apiKey: config.geminiApiKey
+      apiKey: config.geminiApiKey,
     });
-    logger.info("Google GenAI initialized for Gemini 2.0 Flash image generation");
+    logger.info(
+      "Google GenAI initialized for Gemini 2.0 Flash image generation"
+    );
   }
 } catch (error) {
   logger.error("Failed to initialize Google AI:", error);
@@ -55,12 +57,12 @@ exports.generateImage = async (req, res) => {
     }
 
     // Check if company has enough credits
-    if (company.credits < CREDIT_COSTS.image_generation) {
+    if (company.credits.currentCredits < CREDIT_COSTS.image_generation) {
       return res.status(402).json({
         success: false,
         message: `Insufficient credits. Need ${CREDIT_COSTS.image_generation} credits for image generation`,
         creditsRequired: CREDIT_COSTS.image_generation,
-        creditsAvailable: company.credits,
+        creditsAvailable: company.credits.currentCredits,
       });
     }
 
@@ -76,7 +78,7 @@ exports.generateImage = async (req, res) => {
     try {
       // Use Gemini for image generation
       const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-      
+
       // Generate image description first, then create a data URI placeholder
       // Note: Gemini doesn't directly generate images, so we'll create a descriptive response
       // In production, you'd integrate with an actual image generation service like DALL-E, Midjourney, or Stable Diffusion
@@ -84,9 +86,9 @@ exports.generateImage = async (req, res) => {
         `Create a detailed image description for: ${enhancedPrompt}. 
          Describe the image in vivid detail including colors, composition, lighting, and style. 
          Make it professional and suitable for business use.
-         Return only the description without any additional text.`
+         Return only the description without any additional text.`,
       ]);
-      
+
       const response = await result.response;
       const imageDescription = response.text();
 
@@ -99,17 +101,17 @@ exports.generateImage = async (req, res) => {
 
           // Enhance prompt based on style
           let enhancedPrompt = prompt;
-          switch(style) {
-            case 'cartoon':
+          switch (style) {
+            case "cartoon":
               enhancedPrompt = `Create a cartoon style image: ${prompt}. Make it colorful, animated, and playful.`;
               break;
-            case 'artistic':
+            case "artistic":
               enhancedPrompt = `Create an artistic style image: ${prompt}. Make it creative, expressive, and visually appealing.`;
               break;
-            case 'abstract':
+            case "abstract":
               enhancedPrompt = `Create an abstract art style image: ${prompt}. Make it conceptual, modern, and artistic.`;
               break;
-            case 'photographic':
+            case "photographic":
               enhancedPrompt = `Create a photographic style image: ${prompt}. Make it realistic, high quality, and professional.`;
               break;
             default: // realistic
@@ -117,15 +119,17 @@ exports.generateImage = async (req, res) => {
           }
 
           // Add aspect ratio guidance to prompt
-          if (aspectRatio === '16:9') {
-            enhancedPrompt += ' Create this as a wide landscape format image.';
-          } else if (aspectRatio === '9:16') {
-            enhancedPrompt += ' Create this as a tall portrait format image.';
+          if (aspectRatio === "16:9") {
+            enhancedPrompt += " Create this as a wide landscape format image.";
+          } else if (aspectRatio === "9:16") {
+            enhancedPrompt += " Create this as a tall portrait format image.";
           } else {
-            enhancedPrompt += ' Create this as a square format image.';
+            enhancedPrompt += " Create this as a square format image.";
           }
 
-          logger.info(`Generating image with Gemini 2.0 Flash: ${enhancedPrompt}`);
+          logger.info(
+            `Generating image with Gemini 2.0 Flash: ${enhancedPrompt}`
+          );
 
           // Generate image using Gemini 2.0 Flash with native image generation
           const response = await imageGenAI.models.generateContent({
@@ -137,11 +141,20 @@ exports.generateImage = async (req, res) => {
           });
 
           // Process the response
-          if (response.candidates && response.candidates[0] && response.candidates[0].content.parts) {
+          if (
+            response.candidates &&
+            response.candidates[0] &&
+            response.candidates[0].content.parts
+          ) {
             for (const part of response.candidates[0].content.parts) {
               if (part.inlineData && part.inlineData.data) {
                 // Create uploads directory if it doesn't exist
-                const uploadsDir = path.join(__dirname, '..', 'uploads', 'images');
+                const uploadsDir = path.join(
+                  __dirname,
+                  "..",
+                  "uploads",
+                  "images"
+                );
                 if (!fs.existsSync(uploadsDir)) {
                   fs.mkdirSync(uploadsDir, { recursive: true });
                 }
@@ -150,7 +163,7 @@ exports.generateImage = async (req, res) => {
                 const timestamp = Date.now();
                 const fileName = `gemini-${timestamp}.png`;
                 const filePath = path.join(uploadsDir, fileName);
-                
+
                 const imageData = part.inlineData.data;
                 const buffer = Buffer.from(imageData, "base64");
                 fs.writeFileSync(filePath, buffer);
@@ -163,16 +176,23 @@ exports.generateImage = async (req, res) => {
                 // Upload to Cloudinary
                 let cloudinaryUrl = null;
                 try {
-                  const cloudinaryResult = await uploadImageToCloudinary(buffer, fileName);
+                  const cloudinaryResult = await uploadImageToCloudinary(
+                    buffer,
+                    fileName
+                  );
                   cloudinaryUrl = cloudinaryResult.secure_url;
                   logger.info(`Image uploaded to Cloudinary: ${cloudinaryUrl}`);
                 } catch (cloudinaryError) {
-                  logger.warn(`Cloudinary upload failed, using local URL: ${cloudinaryError.message}`);
+                  logger.warn(
+                    `Cloudinary upload failed, using local URL: ${cloudinaryError.message}`
+                  );
                 }
 
                 // Return Cloudinary URL if available, otherwise local URL
-                const imageUrl = cloudinaryUrl || `http://localhost:4000/uploads/images/${fileName}`;
-                
+                const imageUrl =
+                  cloudinaryUrl ||
+                  `http://localhost:3000/uploads/images/${fileName}`;
+
                 logger.info(`Gemini image saved successfully: ${imageUrl}`);
                 return { imageUrl, localPath: filePath, cloudinaryUrl };
               }
@@ -180,35 +200,51 @@ exports.generateImage = async (req, res) => {
           }
 
           throw new Error("No image data found in response");
-
         } catch (error) {
-          logger.error('Gemini 2.0 Flash image generation failed:', error);
-          
+          logger.error("Gemini 2.0 Flash image generation failed:", error);
+
           // Fallback to placeholder
-          const dimensions = aspectRatio === '16:9' ? '512x288' : 
-                            aspectRatio === '9:16' ? '288x512' :
-                            aspectRatio === '4:3' ? '512x384' :
-                            aspectRatio === '3:4' ? '384x512' : '512x512';
-          
-          const colors = style === 'cartoon' ? '4F46E5/FFFFFF' : 
-                        style === 'artistic' ? 'F59E0B/FFFFFF' : 
-                        style === 'abstract' ? '10B981/FFFFFF' : '6366F1/FFFFFF';
-          
-          return `https://via.placeholder.com/${dimensions}/${colors}?text=${encodeURIComponent(prompt.substring(0, 30))}`;
+          const dimensions =
+            aspectRatio === "16:9"
+              ? "512x288"
+              : aspectRatio === "9:16"
+              ? "288x512"
+              : aspectRatio === "4:3"
+              ? "512x384"
+              : aspectRatio === "3:4"
+              ? "384x512"
+              : "512x512";
+
+          const colors =
+            style === "cartoon"
+              ? "4F46E5/FFFFFF"
+              : style === "artistic"
+              ? "F59E0B/FFFFFF"
+              : style === "abstract"
+              ? "10B981/FFFFFF"
+              : "6366F1/FFFFFF";
+
+          return `https://via.placeholder.com/${dimensions}/${colors}?text=${encodeURIComponent(
+            prompt.substring(0, 30)
+          )}`;
         }
       };
 
       // Generate the image URL
       let imageUrl;
       let cloudinaryUrl = null;
-      
+
       if (req.body.cloudinaryUrl) {
         // Use provided Cloudinary URL
         imageUrl = req.body.cloudinaryUrl;
         cloudinaryUrl = req.body.cloudinaryUrl;
       } else {
         // Generate real AI image with Gemini 2.0 Flash
-        const imageResult = await generateGeminiImage(prompt, style, aspectRatio);
+        const imageResult = await generateGeminiImage(
+          prompt,
+          style,
+          aspectRatio
+        );
         imageUrl = imageResult.imageUrl;
         cloudinaryUrl = imageResult.cloudinaryUrl;
       }
@@ -217,10 +253,23 @@ exports.generateImage = async (req, res) => {
 
       // Skip database operations for demo mode
       if (!company.isDemo) {
-        // Deduct credits from company (only for real companies)
-        await Company.findByIdAndUpdate(company._id, {
-          $inc: { credits: -CREDIT_COSTS.image_generation },
-        });
+        // Get fresh company data and deduct credits properly
+        const freshCompany = await Company.findById(company._id);
+        if (!freshCompany) {
+          throw new Error("Company not found");
+        }
+
+        // Use the deductCredits method instead of direct MongoDB operation
+        await freshCompany.deductCredits(
+          CREDIT_COSTS.image_generation,
+          "image_gen",
+          "AI image generation"
+        );
+
+        // Update usage statistics
+        freshCompany.usage.imagesGenerated =
+          (freshCompany.usage.imagesGenerated || 0) + 1;
+        await freshCompany.save();
 
         // Save image generation record (only for real companies)
         imageRecord = new ImageGen({
@@ -245,6 +294,7 @@ exports.generateImage = async (req, res) => {
         logger.info(`Image generated successfully for company ${company._id}`, {
           imageId: imageRecord._id,
           creditsUsed: CREDIT_COSTS.image_generation,
+          remainingCredits: freshCompany.credits.currentCredits,
         });
       } else {
         // Demo mode - just log the action
@@ -265,10 +315,11 @@ exports.generateImage = async (req, res) => {
           style,
           aspectRatio,
           creditsUsed: CREDIT_COSTS.image_generation,
-          remainingCredits: company.credits - CREDIT_COSTS.image_generation,
+          remainingCredits: company.isDemo
+            ? company.credits.currentCredits
+            : (await Company.findById(company._id)).credits.currentCredits,
         },
       });
-
     } catch (aiError) {
       logger.error("AI image generation failed", {
         error: aiError.message,
@@ -279,10 +330,12 @@ exports.generateImage = async (req, res) => {
       res.status(500).json({
         success: false,
         message: "Failed to generate image with AI service",
-        error: process.env.NODE_ENV === "development" ? aiError.message : "Internal server error",
+        error:
+          process.env.NODE_ENV === "development"
+            ? aiError.message
+            : "Internal server error",
       });
     }
-
   } catch (error) {
     logger.error("Image generation controller error", {
       error: error.message,
@@ -292,7 +345,10 @@ exports.generateImage = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Internal server error during image generation",
-      error: process.env.NODE_ENV === "development" ? error.message : "Something went wrong",
+      error:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : "Something went wrong",
     });
   }
 };
@@ -309,22 +365,24 @@ exports.getImageHistory = async (req, res) => {
     if (company.isDemo) {
       const mockImages = [
         {
-          _id: 'demo-1',
-          prompt: 'A beautiful sunset over mountains',
-          style: 'realistic',
-          aspectRatio: '16:9',
+          _id: "demo-1",
+          prompt: "A beautiful sunset over mountains",
+          style: "realistic",
+          aspectRatio: "16:9",
           imageUrl: `https://via.placeholder.com/512x288/F59E0B/FFFFFF?text=Beautiful+Sunset+Mountains`,
-          imageDescription: 'A stunning realistic depiction of a sunset over majestic mountains with warm golden light cascading across the peaks and valleys.',
+          imageDescription:
+            "A stunning realistic depiction of a sunset over majestic mountains with warm golden light cascading across the peaks and valleys.",
           creditsUsed: 3,
           generatedAt: new Date(),
         },
         {
-          _id: 'demo-2',
-          prompt: 'Modern office workspace',
-          style: 'photographic',
-          aspectRatio: '4:3',
+          _id: "demo-2",
+          prompt: "Modern office workspace",
+          style: "photographic",
+          aspectRatio: "4:3",
           imageUrl: `https://via.placeholder.com/512x384/10B981/FFFFFF?text=Modern+Office+Workspace`,
-          imageDescription: 'A clean, modern office workspace with natural lighting, ergonomic furniture, and contemporary design elements.',
+          imageDescription:
+            "A clean, modern office workspace with natural lighting, ergonomic furniture, and contemporary design elements.",
           creditsUsed: 3,
           generatedAt: new Date(Date.now() - 3600000), // 1 hour ago
         },
@@ -353,7 +411,9 @@ exports.getImageHistory = async (req, res) => {
       .limit(limit)
       .select("-__v");
 
-    const totalImages = await ImageGen.countDocuments({ companyId: company._id });
+    const totalImages = await ImageGen.countDocuments({
+      companyId: company._id,
+    });
     const totalPages = Math.ceil(totalImages / limit);
 
     res.json({
@@ -370,7 +430,6 @@ exports.getImageHistory = async (req, res) => {
         },
       },
     });
-
   } catch (error) {
     logger.error("Get image history error", {
       error: error.message,
@@ -380,7 +439,10 @@ exports.getImageHistory = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to retrieve image history",
-      error: process.env.NODE_ENV === "development" ? error.message : "Something went wrong",
+      error:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : "Something went wrong",
     });
   }
 };
