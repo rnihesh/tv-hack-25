@@ -87,7 +87,7 @@ const Dashboard = () => {
                     Business Type
                   </span>
                   <p className="font-semibold text-gray-900 dark:text-white capitalize mt-1">
-                    {user?.businessType?.replace("_", " ") || "Not specified"}
+                    {user?.company?.businessType?.replace("_", " ") || "Not specified"}
                   </p>
                 </div>
                 <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
@@ -95,7 +95,7 @@ const Dashboard = () => {
                     Communication Style
                   </span>
                   <p className="font-semibold text-gray-900 dark:text-white capitalize mt-1">
-                    {user?.preferences?.communicationTone || "Professional"}
+                    {user?.company?.preferences?.communicationTone || "Professional"}
                   </p>
                 </div>
                 <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
@@ -103,7 +103,7 @@ const Dashboard = () => {
                     Industry
                   </span>
                   <p className="font-semibold text-gray-900 dark:text-white capitalize mt-1">
-                    {user?.industry || "Not specified"}
+                    {user?.company?.industry || "Not specified"}
                   </p>
                 </div>
                 <div className="md:col-span-3 bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
@@ -111,7 +111,7 @@ const Dashboard = () => {
                     Target Audience
                   </span>
                   <p className="font-semibold text-gray-900 dark:text-white mt-1">
-                    {user?.targetAudience || "Not specified"}
+                    {user?.company?.targetAudience || "Not specified"}
                   </p>
                 </div>
               </div>
