@@ -14,7 +14,8 @@ import ChatbotPage from "./chatbot/ChatbotPage";
 import ChatInterface from "./chatbot/ChatInterface";
 import ThemeToggle from "./utils/ThemeToggle";
 import CommunityChat from "./community/CommunityChat";
-import MailingDashboard from './mailer/MailingDashboard'
+import MailingDashboard from './mailer/MailingDashboard';
+import SubscriptionPage from './components/SubscriptionPage';
 
 
 // Protected Route Component
@@ -121,6 +122,14 @@ function AppContent() {
         } 
       />
 
+      <Route 
+        path="/subscription" 
+        element={
+          <ProtectedRoute>
+            <SubscriptionPage />
+          </ProtectedRoute>
+        } 
+      />
 
       {/* Default redirect */}
       <Route path="/" element={<Navigate to="/dashboard" replace />} />

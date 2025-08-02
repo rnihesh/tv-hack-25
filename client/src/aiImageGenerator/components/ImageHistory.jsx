@@ -21,9 +21,15 @@ const ImageHistory = ({
     if (imageUrl && imageUrl.includes("cloudinary.com")) {
       return imageUrl;
     }
-    // Convert absolute localhost URL to proxy URL for local images
-    if (imageUrl && imageUrl.startsWith("http://localhost:3000")) {
-      return imageUrl.replace("http://localhost:3000", "");
+    // Convert absolute server URLs to proxy URL for local images
+    if (imageUrl) {
+      const localUrls = ['http://localhost:3000', 'https://phoenix.onrender.com'];
+      
+      for (const url of localUrls) {
+        if (imageUrl.startsWith(url)) {
+          return imageUrl.replace(url, "");
+        }
+      }
     }
     return imageUrl;
   };

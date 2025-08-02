@@ -15,9 +15,13 @@ const ImagePreview = ({ image, onDownload, onClose }) => {
 
       // Convert absolute localhost URL to proxy URL for local images
       let finalUrl = image.imageUrl;
-      if (finalUrl.startsWith("http://localhost:3000")) {
-        finalUrl = finalUrl.replace("http://localhost:3000", "");
-      }
+      const localUrls = ['http://localhost:3000', 'https://phoenix.onrender.com'];
+      
+      localUrls.forEach(url => {
+        if (finalUrl.startsWith(url)) {
+          finalUrl = finalUrl.replace(url, "");
+        }
+      });
 
       // Add timestamp to prevent caching issues for local images only
       if (!finalUrl.includes("cloudinary.com")) {
