@@ -13,12 +13,6 @@ import ImageGenerator from "./aiImageGenerator/ImageGenerator";
 import ChatbotPage from "./chatbot/ChatbotPage";
 import ChatInterface from "./chatbot/ChatInterface";
 import ThemeToggle from "./utils/ThemeToggle";
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import { AuthProvider, useAuth } from './contexts/AuthContext'
-import AuthWrapper from './components/auth/AuthWrapper'
-import Dashboard from './components/Dashboard'
-import WebsiteGenerator from './website-generator/WebsiteGenerator'
-import ImageGenerator from './aiImageGenerator/ImageGenerator'
 import CommunityChat from "./community/CommunityChat";
 import MailingDashboard from './mailer/MailingDashboard'
 
