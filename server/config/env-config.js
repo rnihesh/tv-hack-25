@@ -14,7 +14,7 @@ if (!process.env.DBURL && !process.env.MONGO_URI) {
 
 module.exports = {
   // Server Configuration
-  port: process.env.PORT || 4000,
+  port: process.env.PORT || 3000,
   nodeEnv: process.env.NODE_ENV || "development",
 
   // Database Configuration
