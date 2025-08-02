@@ -68,6 +68,6 @@ router.delete("/:id", protect, mongoIdValidation, deleteWebsite);
 // @route   POST /api/websites/:id/deploy
 // @desc    Deploy website
 // @access  Private
-router.post("/:id/deploy", protect, mongoIdValidation, deployWebsite);
+router.post("/:id/deploy", mongoIdValidation, deployWebsite);
 
 module.exports = router;

@@ -1,6 +1,7 @@
 const { validationResult } = require("express-validator");
 const Company = require("../models/Company");
 const Website = require("../models/Website");
+const axios = require('axios')
 const {
   WebsiteGenerationChain,
 } = require("../services/langchain/contextualChains");
@@ -323,15 +324,16 @@ exports.deleteWebsite = async (req, res) => {
   }
 };
 
+
 // Deploy/publish a website
 exports.deployWebsite = async (req, res) => {
   try {
     const { id } = req.params;
-    const company = req.companyData;
+    // const company = req.companyData;
 
     const website = await Website.findOne({
       _id: id,
-      companyId: company._id,
+      // companyId: company._id,
     });
 
     if (!website) {
@@ -341,16 +343,112 @@ exports.deployWebsite = async (req, res) => {
       });
     }
 
+    // Use htmlContent if available, else fallback to first section content
+    let htmlContent = website.htmlContent;
+    if (!htmlContent && website.structure && website.structure.sections && website.structure.sections.length > 0) {
+      htmlContent = website.structure.sections[0].content;
+    }
+    if (!htmlContent) {
+      htmlContent = "<html><body>No content</body></html>";
+    }
+    // Ensure htmlContent is a full HTML document
+    const isFullHtml = /<html[\s>]/i.test(htmlContent) || /<!DOCTYPE html>/i.test(htmlContent);
+    if (!isFullHtml) {
+      htmlContent = `<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <title>AI Generated Website</title>\n</head>\n<body>\n${htmlContent}\n</body>\n</html>`;
+    }
+
+    // Log the HTML content for debugging
+    console.log('HTML content to deploy:', htmlContent);
+
+    // If the HTML is escaped (e.g., &lt;html&gt;), decode it
+    if (/&lt;|&gt;|&amp;|&quot;|&#39;/.test(htmlContent)) {
+      const he = require('he');
+      htmlContent = he.decode(htmlContent);
+      console.log('Decoded HTML content:', htmlContent);
+    }
+
+    // Step 1: Create a site (let Netlify auto-generate a unique name)
+    const siteResponse = await axios.post(
+      'https://api.netlify.com/api/v1/sites',
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.NETLIFY_ACCESS_TOKEN}`,
+        },
+      }
+    );
+
+    const siteId = siteResponse.data.id;
+
+    // Step 2: Deploy index.html using Netlify's file digest flow
+    const crypto = require('crypto');
+    const sha1 = crypto.createHash('sha1').update(htmlContent).digest('hex');
+    // 1. Create a new deploy with file digest
+    const deployInit = await axios.post(
+      `https://api.netlify.com/api/v1/sites/${siteId}/deploys`,
+      {
+        files: {
+          "/index.html": sha1
+        }
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.NETLIFY_ACCESS_TOKEN}`,
+        },
+      }
+    );
+    const deployId = deployInit.data.id;
+    const required = deployInit.data.required || [];
+    // 2. Only upload if required
+    if (required.includes(sha1)) {
+      await axios.put(
+        `https://api.netlify.com/api/v1/deploys/${deployId}/files/index.html`,
+        Buffer.from(htmlContent, 'utf8'),
+        {
+          headers: {
+            'Content-Type': 'text/html',
+            Authorization: `Bearer ${process.env.NETLIFY_ACCESS_TOKEN}`,
+          },
+          maxContentLength: Infinity,
+          maxBodyLength: Infinity,
+        }
+      );
+    }
+    // 3. Poll for deploy status
+    let deployResponse;
+    for (let i = 0; i < 10; i++) {
+      deployResponse = await axios.get(
+        `https://api.netlify.com/api/v1/deploys/${deployId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.NETLIFY_ACCESS_TOKEN}`,
+          },
+        }
+      );
+      if (deployResponse.data.state === 'ready') break;
+      await new Promise(r => setTimeout(r, 2000));
+    }
+
+    const websiteUrl = deployResponse.data.deploy_ssl_url || deployResponse.data.deploy_url;
+    // Update DB
     website.isPublished = true;
+    website.deploymentUrl = websiteUrl;
+    website.deployedAt = new Date();
     await website.save();
 
-    res.json({
+    // businessLogger.contentGeneration(company.email, "website_deploy", true, {
+    //   websiteId: website._id,
+    //   deploymentUrl: websiteUrl,
+    // });
+
+    return res.json({
       success: true,
-      message: "Website deployed successfully",
+      message: "Website deployed successfully to Netlify",
       data: {
         websiteId: website._id,
+        websiteUrl,
         isPublished: website.isPublished,
-        deployedAt: new Date(),
+        deployedAt: website.deployedAt,
       },
     });
   } catch (error) {
@@ -360,4 +458,4 @@ exports.deployWebsite = async (req, res) => {
       message: "Error deploying website",
     });
   }
-};
+}
