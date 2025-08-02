@@ -329,17 +329,24 @@ exports.deleteWebsite = async (req, res) => {
 exports.deployWebsite = async (req, res) => {
   try {
     const { id } = req.params;
-    // const company = req.companyData;
 
     const website = await Website.findOne({
       _id: id,
-      // companyId: company._id,
     });
 
     if (!website) {
       return res.status(404).json({
         success: false,
         message: "Website not found",
+      });
+    }
+
+    // Fetch company details using website's companyId
+    const company = await Company.findById(website.companyId);
+    if (!company) {
+      return res.status(404).json({
+        success: false,
+        message: "Company not found",
       });
     }
 
@@ -366,19 +373,40 @@ exports.deployWebsite = async (req, res) => {
       htmlContent = he.decode(htmlContent);
       console.log('Decoded HTML content:', htmlContent);
     }
-
-    // Step 1: Create a site (let Netlify auto-generate a unique name)
-    const siteResponse = await axios.post(
-      'https://api.netlify.com/api/v1/sites',
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.NETLIFY_ACCESS_TOKEN}`,
-        },
+    console.log("company",company)
+    // Step 1: Create a site with company name, retry if name is taken
+    let siteName = (company.name || company.companyName) ? 
+      (company.name || company.companyName).toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-') : 
+      `website-${website._id}`;
+    let siteResponse, siteId;
+    try {
+      siteResponse = await axios.post(
+        'https://api.netlify.com/api/v1/sites',
+        { name: siteName },
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.NETLIFY_ACCESS_TOKEN}`,
+          },
+        }
+      );
+      siteId = siteResponse.data.id;
+    } catch (err) {
+      // If 422 (name taken), retry with no name (let Netlify auto-generate)
+      if (err.response && err.response.status === 422) {
+        siteResponse = await axios.post(
+          'https://api.netlify.com/api/v1/sites',
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${process.env.NETLIFY_ACCESS_TOKEN}`,
+            },
+          }
+        );
+        siteId = siteResponse.data.id;
+      } else {
+        throw err;
       }
-    );
-
-    const siteId = siteResponse.data.id;
+    }
 
     // Step 2: Deploy index.html using Netlify's file digest flow
     const crypto = require('crypto');
@@ -436,10 +464,10 @@ exports.deployWebsite = async (req, res) => {
     website.deployedAt = new Date();
     await website.save();
 
-    // businessLogger.contentGeneration(company.email, "website_deploy", true, {
-    //   websiteId: website._id,
-    //   deploymentUrl: websiteUrl,
-    // });
+    businessLogger.contentGeneration(company.email, "website_deploy", true, {
+      websiteId: website._id,
+      deploymentUrl: websiteUrl,
+    });
 
     return res.json({
       success: true,
@@ -459,3 +487,4 @@ exports.deployWebsite = async (req, res) => {
     });
   }
 }
+

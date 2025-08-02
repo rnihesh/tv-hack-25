@@ -4,7 +4,8 @@ const authMiddleware = require('../middlewares/authMiddleware');
 const {
   processMessage,
   getConversationHistory,
-  clearConversationHistory
+  clearConversationHistory,
+  processFeedbackQuery
 } = require('../controllers/chatbotController');
 
 const router = express.Router();
@@ -57,5 +58,25 @@ router.delete('/history/:sessionId', [
     .isLength({ min: 1, max: 100 })
     .withMessage('Invalid session ID')
 ], demoAuth, clearConversationHistory);
+
+/**
+ * @route POST /api/chatbot/feedback
+ * @desc Process feedback-related queries using the feedback analyzer
+ * @access Private
+ */
+router.post('/feedback', [
+  body('message')
+    .trim()
+    .notEmpty()
+    .withMessage('Message is required')
+    .isLength({ min: 1, max: 1000 })
+    .withMessage('Message must be between 1 and 1000 characters'),
+  body('sessionId')
+    .optional()
+    .isString()
+    .withMessage('Session ID must be a string')
+    .isLength({ max: 100 })
+    .withMessage('Session ID too long')
+], demoAuth, processFeedbackQuery);
 
 module.exports = router;
