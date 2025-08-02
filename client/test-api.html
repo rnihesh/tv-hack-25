@@ -19,8 +19,9 @@
         };
 
         try {
+          const API_BASE_URL = import.meta.env?.VITE_API_URL || 'https://phoenix.onrender.com/api';
           const response = await fetch(
-            "http://localhost:3000/api/websites/generate",
+            `${API_BASE_URL}/websites/generate`,
             {
               method: "POST",
               headers: {

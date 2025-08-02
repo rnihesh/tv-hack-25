@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://phoenix.onrender.com/api';
 
 // Dummy token for testing (will be replaced with real auth)
 const DUMMY_TOKEN = "dummy-jwt-token-for-testing";

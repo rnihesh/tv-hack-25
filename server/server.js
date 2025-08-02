@@ -44,6 +44,7 @@ const feedbackRoutes = require("./routes/feedbackRoutes");
 const emailRoutes = require("./routes/emailRoutes");
 const imageGenRoutes = require("./routes/imageGenRoutes");
 const communityRoutes = require("./routes/communityRoutes");
+const subscriptionRoutes = require("./routes/subscriptionRoutes");
 
 const app = express();
 
@@ -71,7 +72,7 @@ app.use(
 
 // CORS Configuration
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:5174'],
+  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:5174', 'https://phoenix.vercel.app', 'https://phoenix.onrender.com'],
   credentials: true
 }));
 app.set("trust proxy", true);
@@ -148,7 +149,10 @@ app.get("/api/status", (req, res) => {
 // Test image endpoint for debugging
 app.get("/api/test-image", async (req, res) => {
   try {
-    const testResponse = await fetch('http://localhost:3000/api/images/generate', {
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? `https://phoenix.onrender.com` 
+      : `http://localhost:3000`;
+    const testResponse = await fetch(`${baseUrl}/api/images/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -183,17 +187,9 @@ app.use("/api/feedback", feedbackRoutes);
 app.use("/api/email", emailRoutes);
 app.use("/api/images", imageGenRoutes);
 app.use("/api/community", communityRoutes);
+app.use("/api/subscription", subscriptionRoutes);
 
-// Stripe webhook endpoint (before JSON parsing middleware)
-app.post(
-  "/webhook/stripe",
-  express.raw({ type: "application/json" }),
-  (req, res) => {
-    // Stripe webhook handler will be implemented in payment controller
-    console.log("Stripe webhook received");
-    res.status(200).send("OK");
-  }
-);
+// Note: Razorpay webhook is handled in subscription routes with proper signature verification
 
 // 404 handler for API routes
 app.use("/api/*", (req, res) => {

@@ -265,6 +265,37 @@ const Dashboard = () => {
                   </svg>
                 </div>
               </button>
+
+              <button
+                onClick={() => (window.location.href = "/subscription")}
+                className="group bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-xl border-2 border-yellow-200 dark:border-yellow-600 p-8 hover:border-yellow-300 dark:hover:border-yellow-500 transition-all duration-300 text-left shadow-lg"
+              >
+                <div className="flex items-center space-x-4 mb-4">
+                  <div className="bg-gradient-to-br from-yellow-100 to-orange-100 dark:from-yellow-900/50 dark:to-orange-900/50 rounded-lg p-3 group-hover:scale-110 transition-transform duration-300">
+                    <span className="text-3xl">💳</span>
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                    Buy Credits
+                  </h3>
+                </div>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  Purchase AI credits to power your business tools. Choose from 3 affordable plans.
+                </p>
+                <div className="flex items-center text-yellow-600 dark:text-yellow-400 font-semibold">
+                  View plans
+                  <svg
+                    className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+              </button>
             </div>
 
             {/* Quick Stats */}

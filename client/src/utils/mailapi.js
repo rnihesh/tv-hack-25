@@ -250,7 +250,7 @@ Happy shopping!`
 
 // General API configuration
 export const API_CONFIG = {
-  baseURL: 'http://localhost:3000/api', // Update this when backend is ready
+  baseURL: import.meta.env.VITE_API_URL || 'https://phoenix.onrender.com/api',
   timeout: 10000,
   retries: 3
 };

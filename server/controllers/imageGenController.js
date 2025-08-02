@@ -188,10 +188,13 @@ exports.generateImage = async (req, res) => {
                   );
                 }
 
-                // Return Cloudinary URL if available, otherwise local URL
+                // Return Cloudinary URL if available, otherwise production URL
+                const baseUrl = process.env.NODE_ENV === 'production' 
+                  ? `https://phoenix.onrender.com` 
+                  : `http://localhost:3000`;
                 const imageUrl =
                   cloudinaryUrl ||
-                  `http://localhost:3000/uploads/images/${fileName}`;
+                  `${baseUrl}/uploads/images/${fileName}`;
 
                 logger.info(`Gemini image saved successfully: ${imageUrl}`);
                 return { imageUrl, localPath: filePath, cloudinaryUrl };

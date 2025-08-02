@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Base URL for your backend API
 const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+  import.meta.env.VITE_API_URL || "https://phoenix.onrender.com/api";
 
 // Create axios instance with default config
 const api = axios.create({

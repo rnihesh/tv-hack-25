@@ -52,8 +52,9 @@ const ChatInterface = () => {
     setIsLoading(true);
 
     try {
+      const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://phoenix.onrender.com/api';
       const response = await fetch(
-        "http://localhost:3000/api/chatbot/message",
+        `${API_BASE_URL}/chatbot/message`,
         {
           method: "POST",
           headers: {

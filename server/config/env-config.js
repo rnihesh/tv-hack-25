@@ -41,10 +41,10 @@ module.exports = {
   googleClientSecret: process.env.GOOGLE_CLIENT_SECRET,
   googleRefreshToken: process.env.GOOGLE_REFRESH_TOKEN,
 
-  // Stripe Configuration
-  stripeSecretKey: process.env.STRIPE_SECRET_KEY,
-  stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
-  stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
+  // Razorpay Configuration
+  razorpayKeyId: process.env.RAZORPAY_KEY_ID,
+  razorpayKeySecret: process.env.RAZORPAY_KEY_SECRET,
+  razorpayWebhookSecret: process.env.RAZORPAY_WEBHOOK_SECRET,
 
   // Vector Database Configuration
   chromaUrl: process.env.CHROMA_URL || "http://localhost:8000",
@@ -60,7 +60,7 @@ module.exports = {
 
   // Security
   bcryptSaltRounds: parseInt(process.env.BCRYPT_SALT_ROUNDS) || 12,
-  corsOrigin: process.env.CORS_ORIGIN || "http://localhost:5173",
+  corsOrigin: process.env.CORS_ORIGIN || "https://phoenix.vercel.app",
 
   // Credit System
   dailyCreditResetHour: parseInt(process.env.DAILY_CREDIT_RESET_HOUR) || 0, // 00:00 UTC
