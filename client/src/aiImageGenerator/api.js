@@ -1,39 +1,37 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://phoenix.onrender.com/api';
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "https://phoenix.onrender.com/api";
 
 // Create axios instance with default config
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
-// For demo mode, we don't need auth tokens since backend handles demo auth
-// In production, uncomment the request interceptor below
-
 // Request interceptor to add auth token
-// api.interceptors.request.use(
-//   (config) => {
-//     const token = localStorage.getItem('token');
-//     if (token) {
-//       config.headers.Authorization = `Bearer ${token}`;
-//     }
-//     return config;
-//   },
-//   (error) => {
-//     return Promise.reject(error);
-//   }
-// );
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 // Response interceptor for error handling
 api.interceptors.response.use(
   (response) => response.data,
   (error) => {
     if (error.response?.status === 401) {
-      // localStorage.removeItem('token');
-      window.location.href = '/login';
+      localStorage.removeItem("authToken");
+      window.location.href = "/login";
     }
     return Promise.reject(error);
   }
@@ -43,7 +41,7 @@ export const imageApi = {
   // Generate image with AI
   generateImage: async (imageData) => {
     try {
-      const response = await api.post('/images/generate', imageData);
+      const response = await api.post("/images/generate", imageData);
       return response;
     } catch (error) {
       throw error.response?.data || error;
@@ -54,7 +52,9 @@ export const imageApi = {
   getImageHistory: async (params = {}) => {
     try {
       const { page = 1, limit = 10 } = params;
-      const response = await api.get(`/images/history?page=${page}&limit=${limit}`);
+      const response = await api.get(
+        `/images/history?page=${page}&limit=${limit}`
+      );
       return response;
     } catch (error) {
       throw error.response?.data || error;

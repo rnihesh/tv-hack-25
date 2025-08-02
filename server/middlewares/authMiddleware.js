@@ -24,36 +24,6 @@ const protect = async (req, res, next) => {
       });
     }
 
-    // Development bypass for dummy token
-    if (token === 'dummy-jwt-token-for-testing' && process.env.NODE_ENV === 'development') {
-      // Find the first active company for testing
-      const company = await Company.findOne({ isActive: true });
-      
-      if (!company) {
-        return res.status(401).json({
-          success: false,
-          message: "No test company found for development",
-        });
-      }
-
-      req.company = {
-        id: company._id,
-        email: company.email,
-        companyName: company.companyName,
-        subscription: company.subscription,
-      };
-
-      // Also set req.user for controller compatibility
-      req.user = {
-        companyId: company._id,
-        email: company.email,
-        companyName: company.companyName,
-        subscription: company.subscription,
-      };
-
-      return next();
-    }
-
     // Verify token
     const decoded = jwt.verify(token, config.jwtSecret);
 
@@ -136,7 +106,9 @@ const checkSubscription = (requiredPlans = []) => {
       if (!requiredPlans.includes(company.subscription.plan)) {
         return res.status(403).json({
           success: false,
-          message: `Access denied. Required subscription plan: ${requiredPlans.join(" or ")}`,
+          message: `Access denied. Required subscription plan: ${requiredPlans.join(
+            " or "
+          )}`,
           currentPlan: company.subscription.plan,
         });
       }

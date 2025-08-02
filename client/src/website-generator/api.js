@@ -1,7 +1,5 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://phoenix.onrender.com/api';
-
-// Dummy token for testing (will be replaced with real auth)
-const DUMMY_TOKEN = "dummy-jwt-token-for-testing";
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "https://phoenix.onrender.com/api";
 
 class WebsiteAPI {
   constructor() {
@@ -10,10 +8,14 @@ class WebsiteAPI {
 
   async request(endpoint, options = {}) {
     const url = `${this.baseURL}${endpoint}`;
+
+    // Get token from localStorage for authentication
+    const token = localStorage.getItem("authToken");
+
     const config = {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${DUMMY_TOKEN}`,
+        ...(token && { Authorization: `Bearer ${token}` }),
         ...options.headers,
       },
       ...options,
