@@ -20,10 +20,6 @@ const EmailComposer = ({
         "Please provide a description of what you want to send";
     }
 
-    if (!subject.trim()) {
-      newErrors.subject = "Email subject is required";
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -40,12 +36,17 @@ const EmailComposer = ({
 
       // Handle the API response structure from /email/enhance
       let enhancedMessage = description; // fallback
-      let enhancedSubject = subject; // fallback
+      let enhancedSubject = subject || "Email Subject"; // provide better fallback
 
       if (response.success && response.data) {
         enhancedMessage = response.data.enhancedMessage || description;
-        enhancedSubject = response.data.subject || subject;
+        enhancedSubject = response.data.subject || enhancedSubject;
       }
+
+      console.log("Enhanced email data:", {
+        enhancedMessage: enhancedMessage.substring(0, 100) + "...",
+        enhancedSubject,
+      });
 
       onDataUpdate({
         description,
@@ -62,7 +63,7 @@ const EmailComposer = ({
 
       onDataUpdate({
         description,
-        subject,
+        subject: subject || "Email Subject",
         enhancedMessage: fallbackMessage,
       });
 
@@ -86,7 +87,7 @@ const EmailComposer = ({
 
     onDataUpdate({
       description,
-      subject,
+      subject: subject || "Email Subject",
       enhancedMessage: description, // Use original description as fallback
     });
 
@@ -134,7 +135,7 @@ const EmailComposer = ({
 
       <div className="space-y-6">
         {/* Email Subject */}
-        <div>
+        {/* <div>
           <label
             htmlFor="subject"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
@@ -158,7 +159,7 @@ const EmailComposer = ({
               {errors.subject}
             </p>
           )}
-        </div>
+        </div> */}
 
         {/* Email Description */}
         <div>

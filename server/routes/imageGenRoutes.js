@@ -7,8 +7,7 @@ const {
   getImageHistory,
 } = require("../controllers/imageGenController");
 
-const { protect } = require("../middlewares/authMiddleware");
-const demoAuth = require("../middlewares/demoAuth");
+const { protect, checkCredits } = require("../middlewares/authMiddleware");
 
 // Image generation validation rules
 const imageGenerationRules = [
@@ -19,25 +18,24 @@ const imageGenerationRules = [
   body("style")
     .optional()
     .isIn(["realistic", "artistic", "cartoon", "abstract", "photographic"])
-    .withMessage("Style must be one of: realistic, artistic, cartoon, abstract, photographic"),
+    .withMessage(
+      "Style must be one of: realistic, artistic, cartoon, abstract, photographic"
+    ),
   body("aspectRatio")
     .optional()
     .isIn(["1:1", "16:9", "9:16", "4:3", "3:4"])
     .withMessage("Aspect ratio must be one of: 1:1, 16:9, 9:16, 4:3, 3:4"),
 ];
 
-// Routes (using demo auth for testing)
+// Routes (using proper authentication)
 router.post(
   "/generate",
-  demoAuth,
+  protect,
+  checkCredits(3),
   imageGenerationRules,
   generateImage
 );
 
-router.get(
-  "/history",
-  demoAuth,
-  getImageHistory
-);
+router.get("/history", protect, getImageHistory);
 
 module.exports = router;

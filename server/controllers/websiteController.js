@@ -1,7 +1,7 @@
 const { validationResult } = require("express-validator");
 const Company = require("../models/Company");
 const Website = require("../models/Website");
-const axios = require('axios')
+const axios = require("axios");
 const {
   WebsiteGenerationChain,
 } = require("../services/langchain/contextualChains");
@@ -15,11 +15,11 @@ const CREDIT_COSTS = {
 // Generate website with AI
 exports.generateWebsite = async (req, res) => {
   try {
-    console.log('=== Website Generation Request ===');
-    console.log('Request body:', req.body);
-    console.log('Company data:', req.companyData ? 'Present' : 'Missing');
-    console.log('CREDIT_COSTS:', CREDIT_COSTS);
-    
+    console.log("=== Website Generation Request ===");
+    console.log("Request body:", req.body);
+    console.log("Company data:", req.companyData ? "Present" : "Missing");
+    console.log("CREDIT_COSTS:", CREDIT_COSTS);
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
@@ -29,19 +29,25 @@ exports.generateWebsite = async (req, res) => {
       });
     }
 
-    const { prompt, templateType = "business", style, colorScheme, sections } = req.body;
+    const {
+      prompt,
+      templateType = "business",
+      style,
+      colorScheme,
+      sections,
+    } = req.body;
     const company = req.companyData;
 
     if (!company) {
-      console.error('Company data is missing from request');
+      console.error("Company data is missing from request");
       return res.status(401).json({
         success: false,
         message: "Company data not found",
       });
     }
 
-    console.log('Company ID:', company._id);
-    console.log('Generation prompt:', prompt);
+    console.log("Company ID:", company._id);
+    console.log("Generation prompt:", prompt);
 
     // Generate website using AI
     const websiteChain = new WebsiteGenerationChain();
@@ -71,9 +77,9 @@ exports.generateWebsite = async (req, res) => {
               model: result.modelUsed,
               tokensUsed: result.metrics.tokenUsage.total,
               contextUsed: result.contextUsed,
-            }
-          }
-        ]
+            },
+          },
+        ],
       },
       generationPrompt: prompt,
       aiModel: result.modelUsed,
@@ -84,8 +90,8 @@ exports.generateWebsite = async (req, res) => {
 
     // Deduct credits and update usage
     if (!CREDIT_COSTS) {
-      console.error('CREDIT_COSTS is undefined!');
-      throw new Error('CREDIT_COSTS configuration is missing');
+      console.error("CREDIT_COSTS is undefined!");
+      throw new Error("CREDIT_COSTS configuration is missing");
     }
     const requiredCredits = CREDIT_COSTS.website_generation || 5; // fallback to 5 credits
     await company.deductCredits(
@@ -93,7 +99,8 @@ exports.generateWebsite = async (req, res) => {
       "website_gen",
       "Website generation"
     );
-    company.usage.websitesGenerated = (company.usage.websitesGenerated || 0) + 1;
+    company.usage.websitesGenerated =
+      (company.usage.websitesGenerated || 0) + 1;
     await company.save();
 
     // Log business activity
@@ -146,10 +153,25 @@ exports.generateWebsite = async (req, res) => {
 // Get all websites for the authenticated company
 exports.getMyWebsites = async (req, res) => {
   try {
-    const company = req.companyData;
-    const websites = await Website.find({ companyId: company._id })
+    // Use req.company (from protect middleware) or req.companyData (from checkCredits middleware)
+    const company = req.companyData || req.company;
+
+    if (!company) {
+      console.error("No company data found in request");
+      return res.status(401).json({
+        success: false,
+        message: "Company data not found in request",
+      });
+    }
+
+    console.log("Getting websites for company:", company._id || company.id);
+
+    const companyId = company._id || company.id;
+    const websites = await Website.find({ companyId: companyId })
       .sort({ createdAt: -1 })
       .select("-structure.sections.content"); // Exclude large content field for listing
+
+    console.log(`Found ${websites.length} websites for company ${companyId}`);
 
     res.json({
       success: true,
@@ -168,11 +190,19 @@ exports.getMyWebsites = async (req, res) => {
 exports.getWebsite = async (req, res) => {
   try {
     const { id } = req.params;
-    const company = req.companyData;
+    const company = req.companyData || req.company;
 
+    if (!company) {
+      return res.status(401).json({
+        success: false,
+        message: "Company data not found in request",
+      });
+    }
+
+    const companyId = company._id || company.id;
     const website = await Website.findOne({
       _id: id,
-      companyId: company._id,
+      companyId: companyId,
     });
 
     if (!website) {
@@ -199,11 +229,19 @@ exports.getWebsite = async (req, res) => {
 exports.getGenerationStatus = async (req, res) => {
   try {
     const { id } = req.params;
-    const company = req.companyData;
+    const company = req.companyData || req.company;
 
+    if (!company) {
+      return res.status(401).json({
+        success: false,
+        message: "Company data not found in request",
+      });
+    }
+
+    const companyId = company._id || company.id;
     const website = await Website.findOne({
       _id: id,
-      companyId: company._id,
+      companyId: companyId,
     }).select("isPublished createdAt");
 
     if (!website) {
@@ -232,12 +270,19 @@ exports.getGenerationStatus = async (req, res) => {
 // Get company profile for website generation
 exports.getCompanyProfile = async (req, res) => {
   try {
-    const company = req.companyData;
+    const company = req.companyData || req.company;
+
+    if (!company) {
+      return res.status(401).json({
+        success: false,
+        message: "Company data not found in request",
+      });
+    }
 
     res.json({
       success: true,
       data: {
-        name: company.name,
+        name: company.name || company.companyName,
         businessType: company.businessType,
         description: company.description,
         preferences: company.preferences,
@@ -257,12 +302,20 @@ exports.getCompanyProfile = async (req, res) => {
 exports.updateWebsite = async (req, res) => {
   try {
     const { id } = req.params;
-    const company = req.companyData;
+    const company = req.companyData || req.company;
     const updates = req.body;
 
+    if (!company) {
+      return res.status(401).json({
+        success: false,
+        message: "Company data not found in request",
+      });
+    }
+
+    const companyId = company._id || company.id;
     const website = await Website.findOne({
       _id: id,
-      companyId: company._id,
+      companyId: companyId,
     });
 
     if (!website) {
@@ -274,8 +327,10 @@ exports.updateWebsite = async (req, res) => {
 
     // Update allowed fields
     if (updates.templateName) website.templateName = updates.templateName;
-    if (updates.isPublished !== undefined) website.isPublished = updates.isPublished;
-    if (updates.structure) website.structure = { ...website.structure, ...updates.structure };
+    if (updates.isPublished !== undefined)
+      website.isPublished = updates.isPublished;
+    if (updates.structure)
+      website.structure = { ...website.structure, ...updates.structure };
 
     await website.save();
 
@@ -297,11 +352,19 @@ exports.updateWebsite = async (req, res) => {
 exports.deleteWebsite = async (req, res) => {
   try {
     const { id } = req.params;
-    const company = req.companyData;
+    const company = req.companyData || req.company;
 
+    if (!company) {
+      return res.status(401).json({
+        success: false,
+        message: "Company data not found in request",
+      });
+    }
+
+    const companyId = company._id || company.id;
     const website = await Website.findOneAndDelete({
       _id: id,
-      companyId: company._id,
+      companyId: companyId,
     });
 
     if (!website) {
@@ -323,7 +386,6 @@ exports.deleteWebsite = async (req, res) => {
     });
   }
 };
-
 
 // Deploy/publish a website
 exports.deployWebsite = async (req, res) => {
@@ -352,36 +414,46 @@ exports.deployWebsite = async (req, res) => {
 
     // Use htmlContent if available, else fallback to first section content
     let htmlContent = website.htmlContent;
-    if (!htmlContent && website.structure && website.structure.sections && website.structure.sections.length > 0) {
+    if (
+      !htmlContent &&
+      website.structure &&
+      website.structure.sections &&
+      website.structure.sections.length > 0
+    ) {
       htmlContent = website.structure.sections[0].content;
     }
     if (!htmlContent) {
       htmlContent = "<html><body>No content</body></html>";
     }
     // Ensure htmlContent is a full HTML document
-    const isFullHtml = /<html[\s>]/i.test(htmlContent) || /<!DOCTYPE html>/i.test(htmlContent);
+    const isFullHtml =
+      /<html[\s>]/i.test(htmlContent) || /<!DOCTYPE html>/i.test(htmlContent);
     if (!isFullHtml) {
       htmlContent = `<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <title>AI Generated Website</title>\n</head>\n<body>\n${htmlContent}\n</body>\n</html>`;
     }
 
     // Log the HTML content for debugging
-    console.log('HTML content to deploy:', htmlContent);
+    console.log("HTML content to deploy:", htmlContent);
 
     // If the HTML is escaped (e.g., &lt;html&gt;), decode it
     if (/&lt;|&gt;|&amp;|&quot;|&#39;/.test(htmlContent)) {
-      const he = require('he');
+      const he = require("he");
       htmlContent = he.decode(htmlContent);
-      console.log('Decoded HTML content:', htmlContent);
+      console.log("Decoded HTML content:", htmlContent);
     }
-    console.log("company",company)
+    console.log("company", company);
     // Step 1: Create a site with company name, retry if name is taken
-    let siteName = (company.name || company.companyName) ? 
-      (company.name || company.companyName).toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-') : 
-      `website-${website._id}`;
+    let siteName =
+      company.name || company.companyName
+        ? (company.name || company.companyName)
+            .toLowerCase()
+            .replace(/[^a-z0-9-]/g, "-")
+            .replace(/-+/g, "-")
+        : `website-${website._id}`;
     let siteResponse, siteId;
     try {
       siteResponse = await axios.post(
-        'https://api.netlify.com/api/v1/sites',
+        "https://api.netlify.com/api/v1/sites",
         { name: siteName },
         {
           headers: {
@@ -394,7 +466,7 @@ exports.deployWebsite = async (req, res) => {
       // If 422 (name taken), retry with no name (let Netlify auto-generate)
       if (err.response && err.response.status === 422) {
         siteResponse = await axios.post(
-          'https://api.netlify.com/api/v1/sites',
+          "https://api.netlify.com/api/v1/sites",
           {},
           {
             headers: {
@@ -409,15 +481,15 @@ exports.deployWebsite = async (req, res) => {
     }
 
     // Step 2: Deploy index.html using Netlify's file digest flow
-    const crypto = require('crypto');
-    const sha1 = crypto.createHash('sha1').update(htmlContent).digest('hex');
+    const crypto = require("crypto");
+    const sha1 = crypto.createHash("sha1").update(htmlContent).digest("hex");
     // 1. Create a new deploy with file digest
     const deployInit = await axios.post(
       `https://api.netlify.com/api/v1/sites/${siteId}/deploys`,
       {
         files: {
-          "/index.html": sha1
-        }
+          "/index.html": sha1,
+        },
       },
       {
         headers: {
@@ -431,10 +503,10 @@ exports.deployWebsite = async (req, res) => {
     if (required.includes(sha1)) {
       await axios.put(
         `https://api.netlify.com/api/v1/deploys/${deployId}/files/index.html`,
-        Buffer.from(htmlContent, 'utf8'),
+        Buffer.from(htmlContent, "utf8"),
         {
           headers: {
-            'Content-Type': 'text/html',
+            "Content-Type": "text/html",
             Authorization: `Bearer ${process.env.NETLIFY_ACCESS_TOKEN}`,
           },
           maxContentLength: Infinity,
@@ -453,11 +525,12 @@ exports.deployWebsite = async (req, res) => {
           },
         }
       );
-      if (deployResponse.data.state === 'ready') break;
-      await new Promise(r => setTimeout(r, 2000));
+      if (deployResponse.data.state === "ready") break;
+      await new Promise((r) => setTimeout(r, 2000));
     }
 
-    const websiteUrl = deployResponse.data.deploy_ssl_url || deployResponse.data.deploy_url;
+    const websiteUrl =
+      deployResponse.data.deploy_ssl_url || deployResponse.data.deploy_url;
     // Update DB
     website.isPublished = true;
     website.deploymentUrl = websiteUrl;
@@ -486,5 +559,4 @@ exports.deployWebsite = async (req, res) => {
       message: "Error deploying website",
     });
   }
-}
-
+};

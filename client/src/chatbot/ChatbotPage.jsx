@@ -3,6 +3,7 @@ import { useAuth } from "../contexts/AuthContext";
 import AppNavigation from "../components/AppNavigation";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { authAPI } from "../utils/api";
 
 // Custom component for rendering markdown messages
 const MessageContent = ({ message, isBot }) => {
@@ -147,7 +148,8 @@ const ChatbotPage = () => {
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId, setSessionId] = useState("");
-  const { token } = useAuth();
+  const token = authAPI.getToken();
+  console.log("chatbot token : ", token);
 
   // Generate session ID on component mount
   useEffect(() => {

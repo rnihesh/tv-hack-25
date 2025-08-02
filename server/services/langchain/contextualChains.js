@@ -71,7 +71,9 @@ Response:`);
       // Check if models are available
       const availableModels = modelManager.getAvailableModels();
       if (availableModels.length === 0) {
-        throw new Error("No AI models are currently available. Please check your model configuration.");
+        throw new Error(
+          "No AI models are currently available. Please check your model configuration."
+        );
       }
 
       // Get the best working model for this task (with health checking)
@@ -80,7 +82,9 @@ Response:`);
       } else {
         try {
           // Use the enhanced method that tests model health
-          selectedModel = await modelManager.getBestWorkingModelForTask(this.contextType);
+          selectedModel = await modelManager.getBestWorkingModelForTask(
+            this.contextType
+          );
         } catch (error) {
           // Fallback to the basic selection if health checking fails
           selectedModel = modelManager.getBestModelForTask(this.contextType);
@@ -104,10 +108,14 @@ Response:`);
 
       // Log if fallback was used
       if (response.fallbackUsed) {
-        logger.info(`Fallback used: ${response.originalModelRequested} -> ${response.modelUsed}`);
+        logger.info(
+          `Fallback used: ${response.originalModelRequested} -> ${response.modelUsed}`
+        );
       }
       if (response.emergencyFallbackUsed) {
-        logger.warn(`Emergency fallback used: ${response.originalModelRequested} -> ${response.modelUsed}`);
+        logger.warn(
+          `Emergency fallback used: ${response.originalModelRequested} -> ${response.modelUsed}`
+        );
       }
 
       // Update context with this interaction
@@ -196,7 +204,9 @@ class WebsiteGenerationChain extends ContextAwareChain {
     } = options;
 
     // Create a unique session ID for this website generation
-    const sessionId = `website_gen_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+    const sessionId = `website_gen_${Date.now()}_${Math.random()
+      .toString(36)
+      .substring(2, 15)}`;
 
     const websitePrompt = `Generate a complete, professional website based on the following requirements:
 
@@ -248,10 +258,14 @@ Generate clean, semantic HTML5 with embedded CSS and JavaScript. Make it product
         timestamp: new Date().toISOString(),
         importance: 8,
       });
-      
-      logger.info(`Stored website generation request in context for company ${companyId}`);
+
+      logger.info(
+        `Stored website generation request in context for company ${companyId}`
+      );
     } catch (contextError) {
-      logger.warn(`Failed to store context, but continuing with generation: ${contextError.message}`);
+      logger.warn(
+        `Failed to store context, but continuing with generation: ${contextError.message}`
+      );
     }
 
     const result = await this.invoke(companyId, websitePrompt, {
@@ -263,10 +277,13 @@ Generate clean, semantic HTML5 with embedded CSS and JavaScript. Make it product
 
     // Clean up the HTML content by removing any markdown formatting
     let htmlContent = result.content;
-    htmlContent = htmlContent.replace(/```html\s*|```/g, '').trim();
-    
+    htmlContent = htmlContent.replace(/```html\s*|```/g, "").trim();
+
     // If the content doesn't start with <!DOCTYPE or <html>, it might be wrapped incorrectly
-    if (!htmlContent.toLowerCase().startsWith('<!doctype') && !htmlContent.toLowerCase().startsWith('<html')) {
+    if (
+      !htmlContent.toLowerCase().startsWith("<!doctype") &&
+      !htmlContent.toLowerCase().startsWith("<html")
+    ) {
       // Try to extract HTML from the response
       const htmlMatch = htmlContent.match(/<!DOCTYPE[\s\S]*<\/html>/i);
       if (htmlMatch) {
@@ -276,24 +293,34 @@ Generate clean, semantic HTML5 with embedded CSS and JavaScript. Make it product
 
     // Store the successful website generation in context for future reference
     try {
-      const generationSummary = `Successfully generated a ${templateType} website with ${style} style and ${colorScheme} color scheme. Website includes sections: ${sections.join(", ")}. Generated HTML is ${htmlContent.length} characters long.`;
-      
-      await vectorContextService.addDocumentToContext(companyId, generationSummary, {
-        source: "website_generation_result",
-        templateType,
-        style,
-        colorScheme,
-        sections: sections.join(", "),
-        htmlLength: htmlContent.length,
-        modelUsed: result.modelUsed,
-        timestamp: new Date().toISOString(),
-        importance: 9,
-        sessionId, // Include session ID for tracking
-      });
-      
-      logger.info(`Stored website generation result in context for company ${companyId}`);
+      const generationSummary = `Successfully generated a ${templateType} website with ${style} style and ${colorScheme} color scheme. Website includes sections: ${sections.join(
+        ", "
+      )}. Generated HTML is ${htmlContent.length} characters long.`;
+
+      await vectorContextService.addDocumentToContext(
+        companyId,
+        generationSummary,
+        {
+          source: "website_generation_result",
+          templateType,
+          style,
+          colorScheme,
+          sections: sections.join(", "),
+          htmlLength: htmlContent.length,
+          modelUsed: result.modelUsed,
+          timestamp: new Date().toISOString(),
+          importance: 9,
+          sessionId, // Include session ID for tracking
+        }
+      );
+
+      logger.info(
+        `Stored website generation result in context for company ${companyId}`
+      );
     } catch (contextError) {
-      logger.warn(`Failed to store generation result in context: ${contextError.message}`);
+      logger.warn(
+        `Failed to store generation result in context: ${contextError.message}`
+      );
     }
 
     return {
@@ -342,13 +369,15 @@ Create a compelling ${emailType} email that:
 
 Consider the company's products/services, customer base, and business goals when crafting the email.
 
-Provide the response in JSON format with the following structure:
+IMPORTANT: Return ONLY a valid JSON object with this exact structure:
 {
   "subject": "Email subject line",
-  "body": "Email body content",
+  "body": "Email body content with proper line breaks using \\n for new lines",
   "tone": "actual tone used",
   "callToAction": "the call to action used"
-}`;
+}
+
+Make sure the JSON is valid and properly formatted. Use \\n for line breaks in the body text. Do not include any markdown formatting, code blocks, or explanations. Just the raw JSON object.`;
 
     const result = await this.invoke(this.companyId, prompt, {
       basePrompt,
@@ -358,15 +387,71 @@ Provide the response in JSON format with the following structure:
     // Try to parse JSON response, fallback to structured object
     let emailContent;
     try {
-      emailContent = JSON.parse(result.content);
+      // Clean the response content before parsing
+      let cleanContent = result.content.trim();
+
+      // Remove markdown code blocks if present
+      const codeBlockMatch = cleanContent.match(
+        /```(?:json)?\s*([\s\S]*?)\s*```/
+      );
+      if (codeBlockMatch) {
+        cleanContent = codeBlockMatch[1].trim();
+      }
+
+      // Try to parse as JSON
+      emailContent = JSON.parse(cleanContent);
+
+      // Validate required fields
+      if (!emailContent.subject || !emailContent.body) {
+        throw new Error("Missing required fields in JSON response");
+      }
     } catch (e) {
-      // Fallback if not valid JSON
-      emailContent = {
-        subject: `${emailType} - ${campaignGoal}`,
-        body: result.content,
-        tone: tone,
-        callToAction: callToAction,
-      };
+      console.warn(
+        "Failed to parse AI response as JSON, trying alternative parsing:",
+        e.message
+      );
+
+      // Try to extract subject and body from the malformed JSON-like text
+      try {
+        const subjectMatch =
+          result.content.match(/"subject":\s*"([^"]*)"/) ||
+          result.content.match(/'subject':\s*'([^']*)'/) ||
+          result.content.match(/subject:\s*"([^"]*)"/) ||
+          result.content.match(/subject:\s*'([^']*)'/) ||
+          result.content.match(/subject:\s*([^\n,}]*)/);
+
+        const bodyMatch =
+          result.content.match(/"body":\s*"([\s\S]*?)"(?:\s*,|\s*})/) ||
+          result.content.match(/'body':\s*'([\s\S]*?)'(?:\s*,|\s*})/) ||
+          result.content.match(/body:\s*"([\s\S]*?)"(?:\s*,|\s*})/) ||
+          result.content.match(/body:\s*'([\s\S]*?)'(?:\s*,|\s*})/);
+
+        if (subjectMatch && bodyMatch) {
+          emailContent = {
+            subject: subjectMatch[1].trim(),
+            body: bodyMatch[1].replace(/\\n/g, "\n").trim(),
+            tone: tone,
+            callToAction: callToAction,
+          };
+          console.log("Successfully extracted content using regex parsing");
+        } else {
+          throw new Error("Could not extract subject and body from response");
+        }
+      } catch (regexError) {
+        console.warn(
+          "Regex parsing also failed, using complete fallback:",
+          regexError.message
+        );
+        // Complete fallback if both parsing methods fail
+        emailContent = {
+          subject: `${
+            emailType.charAt(0).toUpperCase() + emailType.slice(1)
+          } - ${campaignGoal}`,
+          body: result.content,
+          tone: tone,
+          callToAction: callToAction,
+        };
+      }
     }
 
     return {
@@ -437,7 +522,12 @@ Provide the response in JSON format with the following structure:
           subject: `${campaignType} Campaign - Email ${i}`,
           body: `Email ${i} content: ${result.content.substring(0, 200)}...`,
           position: i,
-          purpose: i === 1 ? "Introduction" : i === sequenceLength ? "Conversion" : "Nurturing",
+          purpose:
+            i === 1
+              ? "Introduction"
+              : i === sequenceLength
+              ? "Conversion"
+              : "Nurturing",
         });
       }
       campaignData = {
@@ -448,7 +538,8 @@ Provide the response in JSON format with the following structure:
 
     return {
       emailSequence: campaignData.emailSequence || [],
-      campaignStrategy: campaignData.campaignStrategy || "Email campaign strategy",
+      campaignStrategy:
+        campaignData.campaignStrategy || "Email campaign strategy",
       modelUsed: result.modelUsed || "gemini-2.5-flash",
       metrics: result.metrics || { tokenUsage: { total: 0 }, duration: 0 },
       contextUsed: result.contextUsed || false,

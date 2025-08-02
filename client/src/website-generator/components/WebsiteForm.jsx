@@ -440,7 +440,7 @@ const WebsiteForm = ({ onSubmit, loading, userCredits }) => {
           </h3>
 
           {/* Site Name */}
-          <div>
+          {/* <div>
             <label
               htmlFor="siteName"
               className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
@@ -459,7 +459,7 @@ const WebsiteForm = ({ onSubmit, loading, userCredits }) => {
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
               Used for deployment URL. Leave empty for auto-generated name.
             </p>
-          </div>
+          </div> */}
 
           {/* Auto Deploy */}
           <div className="flex items-center gap-3">
@@ -467,6 +467,7 @@ const WebsiteForm = ({ onSubmit, loading, userCredits }) => {
               type="checkbox"
               id="autoDeploy"
               name="autoDeploy"
+              disabled
               checked={formData.autoDeploy}
               onChange={(e) =>
                 setFormData((prev) => ({
@@ -478,7 +479,7 @@ const WebsiteForm = ({ onSubmit, loading, userCredits }) => {
             />
             <label
               htmlFor="autoDeploy"
-              className="text-sm font-medium text-gray-700 dark:text-gray-300"
+              className="text-sm font-medium text-gray-700 dark:text-gray-300 disabled"
             >
               Auto-deploy to Netlify (+2 credits)
             </label>

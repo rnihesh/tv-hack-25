@@ -5,11 +5,33 @@
   </head>
   <body>
     <h1>API Test</h1>
+    <p>
+      <strong>Note:</strong> You need to login first and get a valid token to
+      test APIs.
+    </p>
+    <div>
+      <label for="tokenInput">Auth Token:</label>
+      <input
+        type="text"
+        id="tokenInput"
+        placeholder="Enter your auth token"
+        style="width: 300px"
+      />
+    </div>
+    <br />
     <button onclick="testWebsiteGeneration()">Test Website Generation</button>
     <div id="result"></div>
 
     <script>
       async function testWebsiteGeneration() {
+        const token = document.getElementById("tokenInput").value;
+
+        if (!token) {
+          document.getElementById("result").innerHTML =
+            "<div style='color: red;'>Error: Please enter a valid auth token first</div>";
+          return;
+        }
+
         const payload = {
           prompt: "Create a simple business website for a technology company",
           templateType: "business",
@@ -26,7 +48,7 @@
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
-                Authorization: "Bearer dummy-jwt-token-for-testing",
+                Authorization: `Bearer ${token}`,
               },
               body: JSON.stringify(payload),
             }
