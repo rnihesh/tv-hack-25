@@ -3,6 +3,9 @@ import { useState } from "react";
 const EmailPreview = ({ emailData, onBack, onNext, onEdit }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
+  // Debug logging
+  console.log("EmailPreview received emailData:", emailData);
+
   // Safety check for emailData
   if (!emailData) {
     return (
@@ -101,14 +104,22 @@ const EmailPreview = ({ emailData, onBack, onNext, onEdit }) => {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-blue-600 dark:bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
-                  Y
+                  {JSON.parse(localStorage.getItem("userData"))
+                    ?.company?.companyName?.charAt(0)
+                    ?.toUpperCase()}
                 </div>
                 <div>
                   <p className="font-medium text-gray-900 dark:text-white">
-                    Your Company
+                    {
+                      JSON.parse(localStorage.getItem("userData"))?.company
+                        ?.companyName
+                    }
                   </p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    noreply@yourcompany.com
+                    {
+                      JSON.parse(localStorage.getItem("userData"))?.company
+                        ?.email
+                    }
                   </p>
                 </div>
               </div>

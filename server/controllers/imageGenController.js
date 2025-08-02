@@ -47,22 +47,20 @@ exports.generateImage = async (req, res) => {
     const { prompt, style = "realistic", aspectRatio = "1:1" } = req.body;
     const company = req.companyData || req.company;
 
+    // Ensure company data is available
+    if (!company) {
+      return res.status(401).json({
+        success: false,
+        message: "Company authentication required",
+      });
+    }
+
     // Check if Gemini AI is available
     if (!genAI || !config.geminiApiKey) {
       return res.status(503).json({
         success: false,
         message: "AI image generation service is currently unavailable",
         error: "Gemini API not configured",
-      });
-    }
-
-    // Check if company has enough credits
-    if (company.credits.currentCredits < CREDIT_COSTS.image_generation) {
-      return res.status(402).json({
-        success: false,
-        message: `Insufficient credits. Need ${CREDIT_COSTS.image_generation} credits for image generation`,
-        creditsRequired: CREDIT_COSTS.image_generation,
-        creditsAvailable: company.credits.currentCredits,
       });
     }
 
@@ -189,12 +187,12 @@ exports.generateImage = async (req, res) => {
                 }
 
                 // Return Cloudinary URL if available, otherwise production URL
-                const baseUrl = process.env.NODE_ENV === 'production' 
-                  ? `https://phoenix.onrender.com` 
-                  : `http://localhost:3000`;
+                const baseUrl =
+                  process.env.NODE_ENV === "production"
+                    ? `https://phoenix.onrender.com`
+                    : `http://localhost:3000`;
                 const imageUrl =
-                  cloudinaryUrl ||
-                  `${baseUrl}/uploads/images/${fileName}`;
+                  cloudinaryUrl || `${baseUrl}/uploads/images/${fileName}`;
 
                 logger.info(`Gemini image saved successfully: ${imageUrl}`);
                 return { imageUrl, localPath: filePath, cloudinaryUrl };

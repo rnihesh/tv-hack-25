@@ -55,7 +55,7 @@ router.post(
   protect,
   [
     body("description").notEmpty().withMessage("Email description is required"),
-    body("subject").notEmpty().withMessage("Email subject is required"),
+    // body("subject").notEmpty().withMessage("Email subject is required"),
   ],
   enhanceEmail
 );

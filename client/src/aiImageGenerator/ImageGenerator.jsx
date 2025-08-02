@@ -265,7 +265,7 @@ const ImageGenerator = () => {
           </div>
         )}
 
-        {activeTab === "history" && (
+        {/* {activeTab === "history" && (
           <ImageHistory
             images={images}
             loading={loadingHistory}
@@ -273,7 +273,7 @@ const ImageGenerator = () => {
             pagination={pagination}
             onImageSelect={handleImageSelect}
           />
-        )}
+        )} */}
 
         {activeTab === "preview" && (
           <div className="max-w-4xl mx-auto">
@@ -322,7 +322,7 @@ const ImageGenerator = () => {
       </main>
 
       {/* Theme Toggle */}
-      <ThemeToggle />
+      {/* <ThemeToggle /> */}
 
       {/* Toast Notifications */}
       <Toast

@@ -8,7 +8,8 @@ const ChatInterface = () => {
   const [sessionId, setSessionId] = useState("");
   const [isMinimized, setIsMinimized] = useState(true);
   const messagesEndRef = useRef(null);
-  const { token } = useAuth();
+  const token = localStorage.getItem("authToken");
+  console.log("token from small bot ?: ", token);
 
   // Generate session ID on component mount
   useEffect(() => {

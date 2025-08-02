@@ -46,7 +46,7 @@ const generateEmail = async (req, res) => {
       tone,
       callToAction,
     } = req.body;
-    
+
     // Company data is populated by checkCredits middleware
     const company = req.companyData;
 
@@ -166,7 +166,7 @@ const generateEmailCampaign = async (req, res) => {
       productService,
       tone,
     } = req.body;
-    
+
     // Company data is populated by checkCredits middleware
     const company = req.companyData;
 
@@ -189,7 +189,9 @@ const generateEmailCampaign = async (req, res) => {
         const generatedContent = new GeneratedContent({
           companyId: company._id,
           contentType: "email_campaign",
-          prompt: `${campaignType} campaign email ${index + 1} for ${targetAudience}`,
+          prompt: `${campaignType} campaign email ${
+            index + 1
+          } for ${targetAudience}`,
           generatedContent: {
             emailContent,
             campaignInfo: {
@@ -295,19 +297,19 @@ const addEmails = async (req, res) => {
       const results = [];
       fs.createReadStream(req.file.path)
         .pipe(csv({ headers: false }))
-        .on('data', (data) => {
+        .on("data", (data) => {
           // Get the first column value (assuming email is in first column)
           const email = Object.values(data)[0];
-          if (email && email.includes('@')) {
+          if (email && email.includes("@")) {
             results.push(email.trim().toLowerCase());
           }
         })
-        .on('end', async () => {
+        .on("end", async () => {
           // Clean up uploaded file
           fs.unlinkSync(req.file.path);
-          
+
           // Filter out duplicates and invalid emails
-          const validEmails = results.filter(email => {
+          const validEmails = results.filter((email) => {
             const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
             return emailRegex.test(email) && !company.emailList.includes(email);
           });
@@ -326,12 +328,12 @@ const addEmails = async (req, res) => {
             },
           });
         })
-        .on('error', (error) => {
+        .on("error", (error) => {
           // Clean up uploaded file on error
           if (fs.existsSync(req.file.path)) {
             fs.unlinkSync(req.file.path);
           }
-          
+
           res.status(400).json({
             success: false,
             message: "Error processing CSV file",
@@ -341,9 +343,11 @@ const addEmails = async (req, res) => {
     }
     // Handle manual email input
     else if (req.body.emails) {
-      const emailArray = Array.isArray(req.body.emails) ? req.body.emails : [req.body.emails];
-      
-      const validEmails = emailArray.filter(email => {
+      const emailArray = Array.isArray(req.body.emails)
+        ? req.body.emails
+        : [req.body.emails];
+
+      const validEmails = emailArray.filter((email) => {
         const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
         return emailRegex.test(email) && !company.emailList.includes(email);
       });
@@ -371,7 +375,10 @@ const addEmails = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error adding emails",
-      error: process.env.NODE_ENV === "development" ? error.message : "Internal server error",
+      error:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : "Internal server error",
     });
   }
 };
@@ -381,7 +388,7 @@ const addEmails = async (req, res) => {
 // @access  Private
 const getEmails = async (req, res) => {
   try {
-    const company = await Company.findById(req.company.id).select('emailList');
+    const company = await Company.findById(req.company.id).select("emailList");
     if (!company) {
       return res.status(404).json({
         success: false,
@@ -401,7 +408,10 @@ const getEmails = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error retrieving emails",
-      error: process.env.NODE_ENV === "development" ? error.message : "Internal server error",
+      error:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : "Internal server error",
     });
   }
 };
@@ -426,21 +436,26 @@ const updateEmails = async (req, res) => {
       const results = [];
       fs.createReadStream(req.file.path)
         .pipe(csv({ headers: false }))
-        .on('data', (data) => {
+        .on("data", (data) => {
           const email = Object.values(data)[0];
-          if (email && email.includes('@')) {
+          if (email && email.includes("@")) {
             results.push(email.trim().toLowerCase());
           }
         })
-        .on('end', async () => {
+        .on("end", async () => {
           // Clean up uploaded file
           fs.unlinkSync(req.file.path);
-          
+
           // Filter valid emails and remove duplicates
-          const validEmails = [...new Set(results.filter(email => {
-            const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
-            return emailRegex.test(email);
-          }))];
+          const validEmails = [
+            ...new Set(
+              results.filter((email) => {
+                const emailRegex =
+                  /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+                return emailRegex.test(email);
+              })
+            ),
+          ];
 
           // Replace company's email list
           company.emailList = validEmails;
@@ -455,12 +470,12 @@ const updateEmails = async (req, res) => {
             },
           });
         })
-        .on('error', (error) => {
+        .on("error", (error) => {
           // Clean up uploaded file on error
           if (fs.existsSync(req.file.path)) {
             fs.unlinkSync(req.file.path);
           }
-          
+
           res.status(400).json({
             success: false,
             message: "Error processing CSV file",
@@ -470,12 +485,18 @@ const updateEmails = async (req, res) => {
     }
     // Handle manual email input
     else if (req.body.emails) {
-      const emailArray = Array.isArray(req.body.emails) ? req.body.emails : [req.body.emails];
-      
-      const validEmails = [...new Set(emailArray.filter(email => {
-        const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
-        return emailRegex.test(email);
-      }))];
+      const emailArray = Array.isArray(req.body.emails)
+        ? req.body.emails
+        : [req.body.emails];
+
+      const validEmails = [
+        ...new Set(
+          emailArray.filter((email) => {
+            const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+            return emailRegex.test(email);
+          })
+        ),
+      ];
 
       company.emailList = validEmails;
       await company.save();
@@ -499,7 +520,10 @@ const updateEmails = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error updating emails",
-      error: process.env.NODE_ENV === "development" ? error.message : "Internal server error",
+      error:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : "Internal server error",
     });
   }
 };
@@ -510,7 +534,7 @@ const updateEmails = async (req, res) => {
 const sendEmail = async (req, res) => {
   try {
     const { subject, message, recipients, htmlContent } = req.body;
-    
+
     if (!subject || !message || !recipients || !Array.isArray(recipients)) {
       return res.status(400).json({
         success: false,
@@ -520,12 +544,16 @@ const sendEmail = async (req, res) => {
 
     // Get company data
     const company = await Company.findById(req.company.id);
-    
+
     try {
       // Send emails using Gmail OAuth2 service
       const results = await sendMarketingEmail(
         subject,
-        htmlContent || `<div style="font-family: Arial, sans-serif; line-height: 1.6;">${message.replace(/\n/g, '<br>')}</div>`,
+        htmlContent ||
+          `<div style="font-family: Arial, sans-serif; line-height: 1.6;">${message.replace(
+            /\n/g,
+            "<br>"
+          )}</div>`,
         message,
         recipients,
         company
@@ -549,7 +577,6 @@ const sendEmail = async (req, res) => {
           totalRecipients: recipients.length,
         },
       });
-
     } catch (emailError) {
       // If email service fails, still log the attempt but don't update usage
       businessLogger.contentGeneration(company.email, "email_send", false, {
@@ -561,16 +588,15 @@ const sendEmail = async (req, res) => {
       res.status(500).json({
         success: false,
         message: "Failed to send emails",
-        error: emailError ,
+        error: emailError,
       });
     }
-
   } catch (error) {
     console.error("Send email error:", error);
     res.status(500).json({
       success: false,
       message: "Error processing email request",
-      error: error ,
+      error: error,
     });
   }
 };
@@ -581,11 +607,18 @@ const sendEmail = async (req, res) => {
 const scheduleEmail = async (req, res) => {
   try {
     const { subject, message, recipients, scheduledFor } = req.body;
-    
-    if (!subject || !message || !recipients || !Array.isArray(recipients) || !scheduledFor) {
+
+    if (
+      !subject ||
+      !message ||
+      !recipients ||
+      !Array.isArray(recipients) ||
+      !scheduledFor
+    ) {
       return res.status(400).json({
         success: false,
-        message: "Subject, message, recipients array, and scheduledFor are required",
+        message:
+          "Subject, message, recipients array, and scheduledFor are required",
       });
     }
 
@@ -600,7 +633,7 @@ const scheduleEmail = async (req, res) => {
 
     // Here you would integrate with your email scheduling service
     // For now, we'll simulate the scheduling process
-    
+
     const results = {
       scheduled: recipients.length,
       campaignId: `scheduled_${Date.now()}`,
@@ -625,7 +658,10 @@ const scheduleEmail = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error scheduling email",
-      error: process.env.NODE_ENV === "development" ? error.message : "Internal server error",
+      error:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : "Internal server error",
     });
   }
 };
@@ -636,11 +672,11 @@ const scheduleEmail = async (req, res) => {
 const enhanceEmail = async (req, res) => {
   try {
     const { description, subject } = req.body;
-    
-    if (!description || !subject) {
+
+    if (!description) {
       return res.status(400).json({
         success: false,
-        message: "Description and subject are required",
+        message: "Description is required",
       });
     }
 
@@ -665,41 +701,64 @@ const enhanceEmail = async (req, res) => {
       callToAction: "Learn more",
     });
 
+    console.log("AI Chain Result:", JSON.stringify(result, null, 2));
+
     // Parse the AI response to extract proper content
     let enhancedContent = description;
-    let enhancedSubject = subject;
+    let enhancedSubject = subject || "Email Subject"; // Provide fallback if subject is empty
 
-    if (result?.emailContent?.body) {
-      try {
-        // Check if the body contains JSON wrapped in markdown
-        const bodyContent = result.emailContent.body;
-        
-        // Extract JSON from markdown code blocks if present
-        const jsonMatch = bodyContent.match(/```json\s*([\s\S]*?)\s*```/);
-        
-        if (jsonMatch) {
-          // Parse the extracted JSON
-          const parsedContent = JSON.parse(jsonMatch[1]);
-          enhancedContent = parsedContent.body || description;
-          enhancedSubject = parsedContent.subject || subject;
-        } else {
-          // Try to parse the entire body as JSON
-          try {
-            const parsedContent = JSON.parse(bodyContent);
-            enhancedContent = parsedContent.body || description;
-            enhancedSubject = parsedContent.subject || subject;
-          } catch {
-            // If not JSON, use the content as is
-            enhancedContent = bodyContent;
-            enhancedSubject = result.emailContent.subject || subject;
-          }
+    if (result?.emailContent) {
+      console.log(
+        "EmailContent found:",
+        JSON.stringify(result.emailContent, null, 2)
+      );
+
+      // The emailContent should already be properly structured from the chain
+      enhancedContent = result.emailContent.body || description;
+      enhancedSubject = result.emailContent.subject || enhancedSubject;
+
+      // Additional check: if the body contains JSON-like structure, try to extract it
+      if (
+        typeof enhancedContent === "string" &&
+        enhancedContent.trim().startsWith("{")
+      ) {
+        try {
+          const parsedContent = JSON.parse(enhancedContent);
+          enhancedContent = parsedContent.body || enhancedContent;
+          enhancedSubject = parsedContent.subject || enhancedSubject;
+          console.log("Successfully parsed nested JSON content");
+        } catch (parseError) {
+          console.warn(
+            "Failed to parse JSON content, using as-is:",
+            parseError.message
+          );
         }
-      } catch (parseError) {
-        console.warn("Failed to parse AI response, using fallback:", parseError.message);
-        enhancedContent = result.emailContent.body;
-        enhancedSubject = result.emailContent.subject || subject;
       }
+
+      // Additional check: if the subject contains JSON-like structure, try to extract it
+      if (
+        typeof enhancedSubject === "string" &&
+        enhancedSubject.trim().startsWith("{")
+      ) {
+        try {
+          const parsedSubject = JSON.parse(enhancedSubject);
+          enhancedSubject = parsedSubject.subject || enhancedSubject;
+          console.log("Successfully parsed nested JSON subject");
+        } catch (parseError) {
+          console.warn(
+            "Failed to parse JSON subject, using as-is:",
+            parseError.message
+          );
+        }
+      }
+    } else {
+      console.log("No emailContent found in result, using fallback values");
     }
+
+    console.log("Final enhanced content:", {
+      enhancedContent: enhancedContent.substring(0, 100) + "...",
+      enhancedSubject,
+    });
 
     res.status(200).json({
       success: true,
@@ -711,8 +770,8 @@ const enhanceEmail = async (req, res) => {
           "Consider adding a clear call-to-action button",
           "Personalize with customer names using merge tags",
           "Test different subject lines for better open rates",
-          "Include social media links in the footer"
-        ]
+          "Include social media links in the footer",
+        ],
       },
     });
   } catch (error) {
@@ -720,7 +779,10 @@ const enhanceEmail = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error enhancing email content",
-      error: process.env.NODE_ENV === "development" ? error.message : "Internal server error",
+      error:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : "Internal server error",
     });
   }
 };
@@ -731,7 +793,7 @@ const enhanceEmail = async (req, res) => {
 const sendVerificationEmail = async (req, res) => {
   try {
     const { userEmail, userName, userId } = req.body;
-    
+
     if (!userEmail) {
       return res.status(400).json({
         success: false,
@@ -741,10 +803,10 @@ const sendVerificationEmail = async (req, res) => {
 
     // Get company data
     const company = await Company.findById(req.company.id);
-    
+
     // Generate verification code
     const verifyCode = generateVerifyCode();
-    
+
     // Create user object for email template
     const user = {
       email: userEmail,
@@ -755,15 +817,20 @@ const sendVerificationEmail = async (req, res) => {
     try {
       // Send verification email
       const result = await sendVerifyEmail(user, verifyCode, company);
-      
+
       if (result.success) {
         // You would typically save the verification code to your database here
         // along with expiry time for the user
-        
-        businessLogger.contentGeneration(company.email, "verification_email_send", true, {
-          recipientEmail: userEmail,
-          verificationCode: verifyCode, // Note: In production, don't log the actual code
-        });
+
+        businessLogger.contentGeneration(
+          company.email,
+          "verification_email_send",
+          true,
+          {
+            recipientEmail: userEmail,
+            verificationCode: verifyCode, // Note: In production, don't log the actual code
+          }
+        );
 
         res.status(200).json({
           success: true,
@@ -781,26 +848,35 @@ const sendVerificationEmail = async (req, res) => {
           error: result.error,
         });
       }
-
     } catch (emailError) {
-      businessLogger.contentGeneration(company.email, "verification_email_send", false, {
-        recipientEmail: userEmail,
-        error: emailError.message,
-      });
+      businessLogger.contentGeneration(
+        company.email,
+        "verification_email_send",
+        false,
+        {
+          recipientEmail: userEmail,
+          error: emailError.message,
+        }
+      );
 
       res.status(500).json({
         success: false,
         message: "Failed to send verification email",
-        error: process.env.NODE_ENV === "development" ? emailError.message : "Email service error",
+        error:
+          process.env.NODE_ENV === "development"
+            ? emailError.message
+            : "Email service error",
       });
     }
-
   } catch (error) {
     console.error("Send verification email error:", error);
     res.status(500).json({
       success: false,
       message: "Error processing verification email request",
-      error: process.env.NODE_ENV === "development" ? error.message : "Internal server error",
+      error:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : "Internal server error",
     });
   }
 };
@@ -811,7 +887,7 @@ const sendVerificationEmail = async (req, res) => {
 const testEmailConfig = async (req, res) => {
   try {
     const company = await Company.findById(req.company.id);
-    
+
     // Send a test email to the company's own email
     const testResult = await sendSingleEmail(
       company.email,
@@ -819,7 +895,7 @@ const testEmailConfig = async (req, res) => {
       `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <h2 style="color: #e85f5c;">Email Configuration Test</h2>
-          <p>Hello ${company.companyName || 'there'},</p>
+          <p>Hello ${company.companyName || "there"},</p>
           <p>This is a test email to verify that your email configuration is working correctly.</p>
           <p>If you're reading this, your Gmail OAuth2 setup is successful!</p>
           <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
@@ -831,7 +907,13 @@ const testEmailConfig = async (req, res) => {
           <p>Best regards,<br>TechnoVista AI Toolkit Team</p>
         </div>
       `,
-      `Email Configuration Test\n\nHello ${company.companyName || 'there'},\n\nThis is a test email to verify that your email configuration is working correctly.\n\nIf you're reading this, your Gmail OAuth2 setup is successful!\n\nTest Details:\nCompany: ${company.companyName}\nEmail: ${company.email}\nTimestamp: ${new Date().toISOString()}\n\nBest regards,\nTechnoVista AI Toolkit Team`,
+      `Email Configuration Test\n\nHello ${
+        company.companyName || "there"
+      },\n\nThis is a test email to verify that your email configuration is working correctly.\n\nIf you're reading this, your Gmail OAuth2 setup is successful!\n\nTest Details:\nCompany: ${
+        company.companyName
+      }\nEmail: ${
+        company.email
+      }\nTimestamp: ${new Date().toISOString()}\n\nBest regards,\nTechnoVista AI Toolkit Team`,
       company
     );
 
@@ -848,19 +930,26 @@ const testEmailConfig = async (req, res) => {
         recipient: company.email,
       },
     });
-
   } catch (error) {
     console.error("Test email error:", error);
-    
+
     const company = await Company.findById(req.company.id);
-    businessLogger.contentGeneration(company.email, "email_config_test", false, {
-      error: error.message,
-    });
+    businessLogger.contentGeneration(
+      company.email,
+      "email_config_test",
+      false,
+      {
+        error: error.message,
+      }
+    );
 
     res.status(500).json({
       success: false,
       message: "Failed to send test email",
-      error: process.env.NODE_ENV === "development" ? error.message : "Email configuration error",
+      error:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : "Email configuration error",
       troubleshooting: [
         "Check your Gmail OAuth2 credentials in environment variables",
         "Ensure Gmail API is enabled in Google Cloud Console",

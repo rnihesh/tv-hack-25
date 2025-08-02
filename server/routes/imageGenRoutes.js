@@ -7,7 +7,7 @@ const {
   getImageHistory,
 } = require("../controllers/imageGenController");
 
-const { protect } = require("../middlewares/authMiddleware");
+const { protect, checkCredits } = require("../middlewares/authMiddleware");
 
 // Image generation validation rules
 const imageGenerationRules = [
@@ -28,7 +28,13 @@ const imageGenerationRules = [
 ];
 
 // Routes (using proper authentication)
-router.post("/generate", protect, imageGenerationRules, generateImage);
+router.post(
+  "/generate",
+  protect,
+  checkCredits(3),
+  imageGenerationRules,
+  generateImage
+);
 
 router.get("/history", protect, getImageHistory);
 

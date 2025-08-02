@@ -81,18 +81,51 @@ const WebsiteGenerator = () => {
   }
 
   useEffect(() => {
-    // Load existing websites when component mounts
-    loadWebsites();
-  }, []);
+    // Load existing websites when component mounts and when user is authenticated
+    if (isAuthenticated && !authLoading && displayUser?._id) {
+      loadWebsites();
+    }
+  }, [isAuthenticated, authLoading, displayUser?._id]);
 
   const loadWebsites = async () => {
+    if (!displayUser?._id) {
+      console.log("No company ID available for loading websites");
+      return;
+    }
+
     try {
+      setLoading(true);
+      console.log("Loading websites for company:", displayUser._id);
+      
+      // Check if userData exists in localStorage
+      const userData = localStorage.getItem('userData');
+      console.log("UserData from localStorage:", userData);
+      
+      if (userData) {
+        const parsedUserData = JSON.parse(userData);
+        console.log("Parsed userData:", parsedUserData);
+        console.log("Company ID from userData:", parsedUserData.company?._id);
+      }
+      
       const response = await api.getMyWebsites();
+      console.log("Websites API response:", response);
+      
       if (response.success) {
-        setWebsites(response.data);
+        // Handle both array response and paginated response
+        const websitesData = Array.isArray(response.data) ? response.data : response.data.websites || [];
+        setWebsites(websitesData);
+        console.log("Loaded websites:", websitesData);
+        console.log("Number of websites loaded:", websitesData.length);
+      } else {
+        console.error("Failed to load websites:", response.message);
+        showToast(response.message || "Failed to load websites", "error");
       }
     } catch (error) {
       console.error("Load websites error:", error);
+      const message = error.response?.data?.message || error.message || "Failed to load websites";
+      showToast(message, "error");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -178,7 +211,7 @@ const WebsiteGenerator = () => {
       } else {
         setDeployResult({
           success: false,
-          message: response.message || "Unknown error",
+          message: response.message || "Deployment failed",
         });
       }
     } catch (error) {
@@ -193,8 +226,20 @@ const WebsiteGenerator = () => {
     }
   };
 
+  const handleSelectWebsite = (website) => {
+    setSelectedWebsite(website);
+    setActiveTab("preview");
+    setCurrentStep("preview");
+  };
+
+  const handleEditWebsite = (website) => {
+    setSelectedWebsite(website);
+    setCurrentStep("create");
+    setActiveTab("generate");
+  };
+
   const handleDeleteWebsite = async (websiteId) => {
-    if (!window.confirm("Are you sure you want to delete this website?")) {
+    if (!window.confirm("Are you sure you want to delete this website? This action cannot be undone.")) {
       return;
     }
 
@@ -204,25 +249,21 @@ const WebsiteGenerator = () => {
 
       if (response.success) {
         showToast("Website deleted successfully!", "success");
-        loadWebsites();
+        setWebsites(prev => prev.filter(w => w._id !== websiteId));
+        
+        // Clear selected website if it was deleted
         if (selectedWebsite?._id === websiteId) {
           setSelectedWebsite(null);
-          setCurrentStep("home");
+          setActiveTab("manage");
         }
       }
     } catch (error) {
-      const message =
-        error.response?.data?.message || "Failed to delete website";
+      const message = error.response?.data?.message || "Failed to delete website";
       showToast(message, "error");
       console.error("Delete website error:", error);
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleSelectWebsite = (website) => {
-    setSelectedWebsite(website);
-    setCurrentStep("deploy");
   };
 
   const showToast = (message, type = "success") => {
@@ -335,8 +376,308 @@ const WebsiteGenerator = () => {
         <main className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-8 relative shadow-sm">
           {loading && <LoadingSpinner />}
 
+          {/* Generate Website Tab */}
+          
+
+          {/* My Websites Tab */}
+          {activeTab === "manage" && (
+            <div className={`${fadeIn} space-y-6`}>
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-200">
+                    My Websites
+                  </h2>
+                  <p className="text-gray-600 dark:text-gray-400 mt-2">
+                    Manage your AI-generated websites and deploy them to the internet
+                  </p>
+                  {/* Debug info */}
+                  <div className="mt-2 text-xs text-gray-500">
+                    Company ID: {displayUser?._id || "Not found"} | 
+                    Websites Count: {websites.length} | 
+                    Loading: {loading ? "Yes" : "No"} |
+                    Token: {localStorage.getItem("authToken") ? "Present" : "Missing"}
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={loadWebsites}
+                    disabled={loading}
+                    className="bg-gray-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-700 transition-colors flex items-center gap-2 disabled:opacity-50"
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                      />
+                    </svg>
+                    Refresh
+                  </button>
+                  <button
+                    onClick={() => {
+                      setActiveTab("generate");
+                      setCurrentStep("create");
+                    }}
+                    className="bg-gradient-to-r from-green-500 to-blue-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center gap-2"
+                  >
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                      />
+                    </svg>
+                    Create New Website
+                  </button>
+                </div>
+              </div>
+
+              {/* Websites Grid */}
+              {loading ? (
+                <div className="text-center py-16">
+                  <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 animate-spin">
+                    <svg
+                      className="w-8 h-8 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                      />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-600 mb-4">
+                    Loading your websites...
+                  </h3>
+                  <p className="text-gray-500">
+                    Please wait while we fetch your websites from the server.
+                  </p>
+                </div>
+              ) : websites.length === 0 ? (
+                <div className="text-center py-16">
+                  <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <svg
+                      className="w-12 h-12 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                      />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-600 mb-4">
+                    No websites found
+                  </h3>
+                  <p className="text-gray-500 mb-8">
+                    You haven't created any websites yet. Start by generating your first AI-powered website!
+                  </p>
+                  <button
+                    onClick={() => {
+                      setActiveTab("generate");
+                      setCurrentStep("create");
+                    }}
+                    className="bg-gradient-to-r from-green-500 to-blue-600 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
+                  >
+                    ✨ Create Your First Website
+                  </button>
+                </div>
+              ) : (
+                <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6">
+                  {websites.map((website, index) => (
+                    <div
+                      key={website._id}
+                      className={`bg-white dark:bg-gray-700 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 border border-gray-200 dark:border-gray-600 ${slideUp}`}
+                      style={{ animationDelay: `${index * 0.1}s` }}
+                    >
+                      {/* Website Header */}
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-gray-800 dark:text-gray-200 text-lg truncate mb-1">
+                            {website.templateName || "Untitled Website"}
+                          </h4>
+                          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                            <span className="capitalize">{website.industry || "General"}</span>
+                            {website.aiGenerated && (
+                              <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                                AI Generated
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-medium ${
+                            website.isPublished
+                              ? "bg-green-100 text-green-800"
+                              : "bg-yellow-100 text-yellow-800"
+                          }`}
+                        >
+                          {website.isPublished ? "🌐 Published" : "📝 Draft"}
+                        </span>
+                      </div>
+
+                      {/* Website Details */}
+                      <div className="space-y-3 mb-6">
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                          <span className="font-medium">Created:</span>{" "}
+                          {new Date(website.createdAt).toLocaleDateString()}
+                        </div>
+                        {website.generationPrompt && (
+                          <div className="text-sm text-gray-600 dark:text-gray-400">
+                            <span className="font-medium">Prompt:</span>{" "}
+                            <span className="italic">
+                              {website.generationPrompt.length > 60
+                                ? website.generationPrompt.substring(0, 60) + "..."
+                                : website.generationPrompt}
+                            </span>
+                          </div>
+                        )}
+                        {website.structure?.styling && (
+                          <div className="flex gap-2 text-xs">
+                            {website.structure.styling.colorScheme?.primary && (
+                              <span
+                                className="w-4 h-4 rounded-full border border-gray-300"
+                                style={{ backgroundColor: website.structure.styling.colorScheme.primary }}
+                                title={`Primary: ${website.structure.styling.colorScheme.primary}`}
+                              ></span>
+                            )}
+                            <span className="text-gray-500">
+                              {website.customizations?.style || "Modern"} Style
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Website Actions */}
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => {
+                            setSelectedWebsite(website);
+                            setActiveTab("preview");
+                          }}
+                          className="flex-1 bg-blue-600 text-white px-3 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm"
+                        >
+                          👁️ Preview
+                        </button>
+                        <button
+                          onClick={() => handleEditWebsite(website)}
+                          className="flex-1 bg-gray-600 text-white px-3 py-2 rounded-lg font-medium hover:bg-gray-700 transition-colors text-sm"
+                        >
+                          ✏️ Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteWebsite(website._id)}
+                          className="bg-red-600 text-white px-3 py-2 rounded-lg font-medium hover:bg-red-700 transition-colors text-sm"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+
+                      {/* Published Website Link */}
+                      {website.isPublished && website.publishedUrl && (
+                        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+                          <a
+                            href={`https://${website.publishedUrl}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium text-sm flex items-center gap-1"
+                          >
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                              />
+                            </svg>
+                            View Live Website
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Summary Statistics */}
+              {websites.length > 0 && (
+                <div className="bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-700 dark:to-gray-600 rounded-xl p-6 mt-8">
+                  <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
+                    Website Statistics
+                  </h3>
+                  <div className="grid md:grid-cols-4 gap-4 text-center">
+                    <div>
+                      <div className="text-2xl font-bold text-blue-600">
+                        {websites.length}
+                      </div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">
+                        Total Websites
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-green-600">
+                        {websites.filter(w => w.isPublished).length}
+                      </div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">
+                        Published
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-yellow-600">
+                        {websites.filter(w => !w.isPublished).length}
+                      </div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">
+                        Drafts
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-purple-600">
+                        {websites.filter(w => w.aiGenerated).length}
+                      </div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">
+                        AI Generated
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Preview Tab */}
+          {activeTab === "preview" && selectedWebsite && (
+            <div className={`${fadeIn}`}>
+              <WebsiteViewer website={selectedWebsite} />
+            </div>
+          )}
+
           {/* Home Screen - Two Main Actions */}
-          {currentStep === "home" && (
+          {currentStep === "home" && activeTab === "generate" && (
             <div className={`${fadeIn} space-y-8`}>
               <div className="grid md:grid-cols-2 gap-8">
                 {/* Create Website Card */}

@@ -6,11 +6,63 @@ class WebsiteAPI {
     this.baseURL = `${API_BASE_URL}/websites`;
   }
 
+  // Get authentication token from localStorage
+  getAuthToken() {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      console.warn("No auth token found in localStorage");
+      return null;
+    }
+    return token;
+  }
+
+  // Check if user is authenticated
+  isAuthenticated() {
+    const token = this.getAuthToken();
+    return !!token;
+  }
+
+  // Set auth token (useful for login)
+  setAuthToken(token) {
+    if (token) {
+      localStorage.setItem("authToken", token);
+      console.log("Auth token set successfully");
+    } else {
+      console.warn("Attempted to set empty token");
+    }
+  }
+
+  // Clear auth token (useful for logout)
+  clearAuthToken() {
+    localStorage.removeItem("authToken");
+    console.log("Auth token cleared");
+  }
+
+  // Validate token by making a test request
+  async validateToken() {
+    try {
+      const token = this.getAuthToken();
+      if (!token) return false;
+
+      // Make a simple request to check if token is valid
+      const response = await fetch(`${API_BASE_URL}/auth/validate`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      return response.ok;
+    } catch (error) {
+      console.error("Token validation failed:", error);
+      return false;
+    }
+  }
+
   async request(endpoint, options = {}) {
     const url = `${this.baseURL}${endpoint}`;
 
     // Get token from localStorage for authentication
-    const token = localStorage.getItem("authToken");
+    const token = this.getAuthToken();
 
     const config = {
       headers: {
@@ -26,6 +78,16 @@ class WebsiteAPI {
       const data = await response.json();
 
       if (!response.ok) {
+        // Handle authentication errors
+        if (response.status === 401) {
+          console.error(
+            "Authentication failed - token may be invalid or expired"
+          );
+          // Optionally clear invalid token
+          localStorage.removeItem("authToken");
+          throw new Error("Authentication failed. Please log in again.");
+        }
+
         throw new Error(
           data.message || `HTTP error! status: ${response.status}`
         );
@@ -34,12 +96,21 @@ class WebsiteAPI {
       return data;
     } catch (error) {
       console.error("API request failed:", error);
+      console.error("Request URL:", url);
+      console.error("Request config:", config);
       throw error;
     }
   }
 
   // Generate new website
   async generateWebsite(formData) {
+    // Check authentication before making request
+    if (!this.isAuthenticated()) {
+      throw new Error(
+        "Authentication required. Please log in to generate websites."
+      );
+    }
+
     // Transform frontend form data to backend expected format
     const payload = {
       prompt:
@@ -52,6 +123,12 @@ class WebsiteAPI {
       sections: formData.sections || [],
     };
 
+    console.log(
+      "Generating website with token:",
+      this.getAuthToken() ? "Present" : "Missing"
+    );
+    console.log("Generation payload:", payload);
+
     return this.request("/generate", {
       method: "POST",
       body: JSON.stringify(payload),
@@ -60,6 +137,13 @@ class WebsiteAPI {
 
   // Get user's websites with pagination
   async getMyWebsites(params = {}) {
+    // Check authentication before making request
+    if (!this.isAuthenticated()) {
+      throw new Error(
+        "Authentication required. Please log in to view your websites."
+      );
+    }
+
     const queryParams = new URLSearchParams({
       page: params.page || 1,
       limit: params.limit || 10,
@@ -67,16 +151,34 @@ class WebsiteAPI {
       sortOrder: params.sortOrder || "desc",
     });
 
+    console.log(
+      "Fetching websites with token:",
+      this.getAuthToken() ? "Present" : "Missing"
+    );
+    console.log("Request URL:", `${this.baseURL}/my-websites?${queryParams}`);
+
     return this.request(`/my-websites?${queryParams}`);
   }
 
   // Get specific website by ID
   async getWebsite(websiteId) {
+    if (!this.isAuthenticated()) {
+      throw new Error(
+        "Authentication required. Please log in to view website details."
+      );
+    }
+
     return this.request(`/${websiteId}`);
   }
 
   // Update website
   async updateWebsite(websiteId, updateData) {
+    if (!this.isAuthenticated()) {
+      throw new Error(
+        "Authentication required. Please log in to update websites."
+      );
+    }
+
     return this.request(`/${websiteId}`, {
       method: "PUT",
       body: JSON.stringify(updateData),
@@ -85,6 +187,12 @@ class WebsiteAPI {
 
   // Delete website
   async deleteWebsite(websiteId) {
+    if (!this.isAuthenticated()) {
+      throw new Error(
+        "Authentication required. Please log in to delete websites."
+      );
+    }
+
     return this.request(`/${websiteId}`, {
       method: "DELETE",
     });
@@ -92,6 +200,12 @@ class WebsiteAPI {
 
   // Deploy website to Netlify
   async deployWebsite(websiteId, deployData = {}) {
+    if (!this.isAuthenticated()) {
+      throw new Error(
+        "Authentication required. Please log in to deploy websites."
+      );
+    }
+
     return this.request(`/${websiteId}/deploy`, {
       method: "POST",
       body: JSON.stringify(deployData),
