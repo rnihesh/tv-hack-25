@@ -5,6 +5,8 @@ import AuthWrapper from './components/auth/AuthWrapper'
 import Dashboard from './components/Dashboard'
 import WebsiteGenerator from './website-generator/WebsiteGenerator'
 import ImageGenerator from './aiImageGenerator/ImageGenerator'
+import CommunityChat from "./community/CommunityChat";
+
 import ChatbotPage from './chatbot/ChatbotPage'
 import ChatInterface from './chatbot/ChatInterface'
 import ThemeToggle from './utils/ThemeToggle'
@@ -102,6 +104,16 @@ function AppContent() {
             <MailingDashboard />
         } 
       />
+
+      <Route 
+        path="/community" 
+        element={
+          <ProtectedRoute>
+            <CommunityChat />
+          </ProtectedRoute>
+        } 
+      />
+
 
       {/* Default redirect */}
       <Route path="/" element={<Navigate to="/dashboard" replace />} />

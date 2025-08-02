@@ -43,6 +43,7 @@ const chatbotRoutes = require("./routes/chatbotRoutes");
 const feedbackRoutes = require("./routes/feedbackRoutes");
 const emailRoutes = require("./routes/emailRoutes");
 const imageGenRoutes = require("./routes/imageGenRoutes");
+const communityRoutes = require("./routes/communityRoutes");
 
 const app = express();
 
@@ -181,6 +182,7 @@ app.use("/api/chatbot", chatbotRoutes);
 app.use("/api/feedback", feedbackRoutes);
 app.use("/api/email", emailRoutes);
 app.use("/api/images", imageGenRoutes);
+app.use("/api/community", communityRoutes);
 
 // Stripe webhook endpoint (before JSON parsing middleware)
 app.post(

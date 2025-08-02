@@ -43,6 +43,14 @@ const protect = async (req, res, next) => {
         subscription: company.subscription,
       };
 
+      // Also set req.user for controller compatibility
+      req.user = {
+        companyId: company._id,
+        email: company.email,
+        companyName: company.companyName,
+        subscription: company.subscription,
+      };
+
       return next();
     }
 
@@ -68,6 +76,14 @@ const protect = async (req, res, next) => {
 
     req.company = {
       id: company._id,
+      email: company.email,
+      companyName: company.companyName,
+      subscription: company.subscription,
+    };
+
+    // Also set req.user for controller compatibility
+    req.user = {
+      companyId: company._id,
       email: company.email,
       companyName: company.companyName,
       subscription: company.subscription,
