@@ -6,6 +6,7 @@ import WebsiteViewer from "./components/WebsiteViewer";
 import { useRef } from "react";
 import LoadingSpinner from "./components/LoadingSpinner";
 import Toast from "./components/Toast";
+import AppNavigation from "../components/AppNavigation";
 
 const WebsiteGenerator = () => {
   const [activeTab, setActiveTab] = useState("generate");
@@ -143,10 +144,14 @@ const WebsiteGenerator = () => {
         setDeployResult({ success: true, url: response.data.websiteUrl });
         loadWebsites();
       } else {
-        setDeployResult({ success: false, message: response.message || "Unknown error" });
+        setDeployResult({
+          success: false,
+          message: response.message || "Unknown error",
+        });
       }
     } catch (error) {
-      const message = error.response?.data?.message || "Failed to deploy website";
+      const message =
+        error.response?.data?.message || "Failed to deploy website";
       showToast(message, "error");
       setDeployResult({ success: false, message });
       console.error("Deploy website error:", error);
@@ -215,62 +220,86 @@ const WebsiteGenerator = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+      <AppNavigation />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <header className="text-center mb-8 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl p-8 shadow-lg">
-          <h1 className="text-4xl font-bold mb-2">AI Website Generator</h1>
-          <p className="text-xl opacity-90 mb-4">
-            Generate professional websites with AI assistance
-          </p>
-          <div className="flex justify-center gap-8 text-sm">
-            <span className="bg-white bg-opacity-20 px-3 py-1 rounded-full">
-              Company: {dummyUser.companyName}
-            </span>
-            <span className="bg-white bg-opacity-20 px-3 py-1 rounded-full">
-              Credits: {dummyUser.credits}
-            </span>
+        <header className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-8 mb-8 shadow-sm">
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full mb-4">
+              <svg
+                className="w-8 h-8 text-blue-600 dark:text-blue-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9"
+                />
+              </svg>
+            </div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              AI Website Generator
+            </h1>
+            <p className="text-gray-600 dark:text-gray-300 mb-6">
+              Generate professional websites with AI assistance in seconds
+            </p>
+            <div className="flex justify-center gap-6 text-sm">
+              <div className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600">
+                <span className="font-medium">Company:</span>{" "}
+                {dummyUser.companyName}
+              </div>
+              <div className="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-4 py-2 rounded-lg border border-blue-200 dark:border-blue-800">
+                <span className="font-medium">Credits:</span>{" "}
+                {dummyUser.credits.toLocaleString()}
+              </div>
+            </div>
           </div>
         </header>
 
         {/* Tab Navigation */}
-        <nav className="flex bg-white rounded-lg p-1 mb-8 shadow-md">
-          <button
-            className={`flex-1 py-3 px-6 rounded-md font-medium transition-all ${
-              activeTab === "generate"
-                ? "bg-blue-500 text-white shadow-md"
-                : "text-gray-600 hover:bg-gray-50"
-            }`}
-            onClick={() => setActiveTab("generate")}
-          >
-            Generate Website
-          </button>
-          <button
-            className={`flex-1 py-3 px-6 rounded-md font-medium transition-all ${
-              activeTab === "manage"
-                ? "bg-blue-500 text-white shadow-md"
-                : "text-gray-600 hover:bg-gray-50"
-            }`}
-            onClick={() => setActiveTab("manage")}
-          >
-            My Websites
-          </button>
-          {selectedWebsite && (
+        <nav className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-1 mb-8 shadow-sm">
+          <div className="flex">
             <button
-              className={`flex-1 py-3 px-6 rounded-md font-medium transition-all ${
-                activeTab === "preview"
-                  ? "bg-blue-500 text-white shadow-md"
-                  : "text-gray-600 hover:bg-gray-50"
+              className={`flex-1 py-3 px-6 rounded-lg font-medium transition-all ${
+                activeTab === "generate"
+                  ? "bg-blue-600 dark:bg-blue-600 text-white shadow-sm"
+                  : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
               }`}
-              onClick={() => setActiveTab("preview")}
+              onClick={() => setActiveTab("generate")}
             >
-              Preview
+              Generate Website
             </button>
-          )}
+            <button
+              className={`flex-1 py-3 px-6 rounded-lg font-medium transition-all ${
+                activeTab === "manage"
+                  ? "bg-blue-600 dark:bg-blue-600 text-white shadow-sm"
+                  : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+              }`}
+              onClick={() => setActiveTab("manage")}
+            >
+              My Websites
+            </button>
+            {selectedWebsite && (
+              <button
+                className={`flex-1 py-3 px-6 rounded-lg font-medium transition-all ${
+                  activeTab === "preview"
+                    ? "bg-blue-600 dark:bg-blue-600 text-white shadow-sm"
+                    : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                }`}
+                onClick={() => setActiveTab("preview")}
+              >
+                Preview
+              </button>
+            )}
+          </div>
         </nav>
 
         {/* Main Content */}
-        <main className="bg-white rounded-xl shadow-lg p-8 relative">
+        <main className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-8 relative shadow-sm">
           {loading && <LoadingSpinner />}
 
           {activeTab === "generate" && (
@@ -302,44 +331,144 @@ const WebsiteGenerator = () => {
               {/* Deploy UI */}
               {!selectedWebsite.isDeployed && (
                 <div className="mt-8 flex flex-col items-center">
-                  <div className="mb-2 flex gap-2 items-center">
+                  <div className="mb-4 flex flex-col gap-3">
                     <input
                       type="text"
-                      className="border rounded px-2 py-1"
-                      placeholder="Optional site name"
+                      className="border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                      placeholder="Optional site name (e.g., my-awesome-site)"
                       value={siteName}
-                      onChange={e => setSiteName(e.target.value)}
+                      onChange={(e) => setSiteName(e.target.value)}
                       disabled={deploying}
-                      style={{ minWidth: 180 }}
                     />
                     <button
-                      className="bg-blue-600 text-white px-6 py-2 rounded font-semibold shadow hover:bg-blue-700 disabled:opacity-60"
-                      onClick={() => handleDeployWebsite(selectedWebsite._id, siteName)}
+                      className="bg-blue-600 dark:bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-700 disabled:bg-gray-400 dark:disabled:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold shadow-sm transition-colors disabled:cursor-not-allowed"
+                      onClick={() =>
+                        handleDeployWebsite(selectedWebsite._id, siteName)
+                      }
                       disabled={deploying}
                     >
-                      {deploying ? "Deploying..." : "Deploy Website"}
+                      {deploying ? (
+                        <div className="flex items-center gap-2">
+                          <svg
+                            className="animate-spin h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                          </svg>
+                          Deploying...
+                        </div>
+                      ) : (
+                        "Deploy Website"
+                      )}
                     </button>
                   </div>
                   {deploying && (
-                    <div className="text-sm text-gray-500 mt-2">Deploying... <span>{deployTimer}s</span></div>
+                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 text-center">
+                      <div className="flex items-center justify-center gap-2 text-blue-700 dark:text-blue-300">
+                        <svg
+                          className="animate-spin h-5 w-5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                        <span className="font-medium">
+                          Deploying your website... {deployTimer}s
+                        </span>
+                      </div>
+                    </div>
                   )}
                   {deployResult && deployResult.success && (
-                    <div className="mt-4 text-green-600 font-semibold">
-                      Deployed! &nbsp;
-                      <a href={deployResult.url} target="_blank" rel="noopener noreferrer" className="underline text-blue-700">View Site</a>
+                    <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 text-center">
+                      <div className="text-green-700 dark:text-green-300 font-semibold mb-2">
+                        🎉 Website deployed successfully!
+                      </div>
+                      <a
+                        href={deployResult.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 bg-green-600 dark:bg-green-600 hover:bg-green-700 dark:hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                          />
+                        </svg>
+                        View Live Site
+                      </a>
                     </div>
                   )}
                   {deployResult && !deployResult.success && (
-                    <div className="mt-4 text-red-600 font-semibold">
-                      {deployResult.message}
+                    <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 text-center">
+                      <div className="text-red-700 dark:text-red-300 font-semibold mb-2">
+                        ❌ Deployment failed
+                      </div>
+                      <p className="text-red-600 dark:text-red-400">
+                        {deployResult.message}
+                      </p>
                     </div>
                   )}
                 </div>
               )}
               {selectedWebsite.isDeployed && selectedWebsite.deploymentUrl && (
-                <div className="mt-8 text-green-700 font-semibold text-center">
-                  Already Deployed: &nbsp;
-                  <a href={selectedWebsite.deploymentUrl} target="_blank" rel="noopener noreferrer" className="underline text-blue-700">View Site</a>
+                <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 text-center">
+                  <div className="text-green-700 dark:text-green-300 font-semibold mb-2">
+                    ✅ Website is live
+                  </div>
+                  <a
+                    href={selectedWebsite.deploymentUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 bg-green-600 dark:bg-green-600 hover:bg-green-700 dark:hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                      />
+                    </svg>
+                    View Live Site
+                  </a>
                 </div>
               )}
             </div>

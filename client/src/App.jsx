@@ -1,14 +1,19 @@
-import './App.css'
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import { AuthProvider, useAuth } from './contexts/AuthContext'
-import AuthWrapper from './components/auth/AuthWrapper'
-import Dashboard from './components/Dashboard'
-import WebsiteGenerator from './website-generator/WebsiteGenerator'
-import ImageGenerator from './aiImageGenerator/ImageGenerator'
-import ChatbotPage from './chatbot/ChatbotPage'
-import ChatInterface from './chatbot/ChatInterface'
-import ThemeToggle from './utils/ThemeToggle'
-import MailingDashboard from './mailer/MailingDashboard'
+import "./App.css";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import AuthWrapper from "./components/auth/AuthWrapper";
+import Dashboard from "./components/Dashboard";
+import WebsiteGenerator from "./website-generator/WebsiteGenerator";
+import ImageGenerator from "./aiImageGenerator/ImageGenerator";
+import ChatbotPage from "./chatbot/ChatbotPage";
+import ChatInterface from "./chatbot/ChatInterface";
+import ThemeToggle from "./utils/ThemeToggle";
+import MailingDashboard from "./mailer/MailingDashboard";
 
 // Protected Route Component
 function ProtectedRoute({ children }) {
@@ -50,62 +55,64 @@ function AppContent() {
   return (
     <Routes>
       {/* Public Routes */}
-      <Route 
-        path="/auth" 
+      <Route
+        path="/auth"
         element={
           <PublicRoute>
             <AuthWrapper />
           </PublicRoute>
-        } 
+        }
       />
-      
+
       {/* Protected Routes */}
-      <Route 
-        path="/dashboard" 
+      <Route
+        path="/dashboard"
         element={
           <ProtectedRoute>
             <Dashboard />
           </ProtectedRoute>
-        } 
+        }
       />
-      
-      <Route 
-        path="/website-generator" 
+
+      <Route
+        path="/website-generator"
         element={
           <ProtectedRoute>
             <WebsiteGenerator />
           </ProtectedRoute>
-        } 
+        }
       />
-      
-      <Route 
-        path="/image-generator" 
+
+      <Route
+        path="/image-generator"
         element={
           <ProtectedRoute>
             <ImageGenerator />
           </ProtectedRoute>
-        } 
+        }
       />
-      
-      <Route 
-        path="/chatbot" 
+
+      <Route
+        path="/chatbot"
         element={
           <ProtectedRoute>
             <ChatbotPage />
           </ProtectedRoute>
-        } 
+        }
       />
 
-      <Route 
-        path="/mailer" 
+      <Route
+        path="/mailer"
         element={
+          <ProtectedRoute>
             <MailingDashboard />
-        } 
+          </ProtectedRoute>
+        }
       />
 
       {/* Default redirect */}
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      
+
       {/* Catch-all redirect */}
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>

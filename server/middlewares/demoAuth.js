@@ -8,8 +8,8 @@ const demoAuth = (req, res, next) => {
   req.company = {
     id: demoObjectId,
     _id: demoObjectId,
-    email: "demo@example.com",
-    companyName: "Demo Company",
+    email: "ritheeshreddyandem@gmail.com",
+    companyName: "Ritheesh Company",
     credits: {
       currentCredits: 100,
       totalCreditsUsed: 0,
