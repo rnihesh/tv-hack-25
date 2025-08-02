@@ -71,10 +71,7 @@ app.use(
 );
 
 // CORS Configuration
-app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:5174', 'https://phoenix.vercel.app', 'https://phoenix.onrender.com'],
-  credentials: true
-}));
+app.use(cors());
 app.set("trust proxy", true);
 // Rate Limiting
 // const limiter = rateLimit({
