@@ -101,7 +101,7 @@ function AppContent() {
       <Route 
         path="/mailer" 
         element={
-            <MailingDashboard />
+            <MailingDashboard/>
         } 
       />
 
