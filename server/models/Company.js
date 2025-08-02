@@ -238,6 +238,7 @@ const companySchema = new mongoose.Schema(
               "image_gen",
               "chatbot",
               "vector_search",
+              "feedback_analysis",
               "daily_bonus",
               "subscription_bonus",
             ],
