@@ -467,7 +467,7 @@ startServer();
 console.log('Environment check:');
 console.log('- NODE_ENV:', process.env.NODE_ENV);
 console.log('- MongoDB URI configured:', !!process.env.DBURL || !!process.env.MONGO_URI);
-console.log('- Port:', process.env.PORT || 4000);
+console.log('- Port:', process.env.PORT || 3000);
 
 // Only show MongoDB connection string format (not actual credentials)
 const dbUrlCheck = process.env.DBURL || process.env.MONGO_URI || '';
