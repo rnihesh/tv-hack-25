@@ -19,7 +19,9 @@ module.exports = {
 
   // Database Configuration
   mongoUri:
-    process.env.DBURL || process.env.MONGO_URI || "mongodb://localhost:27017/ai-business-toolkit",
+    process.env.DBURL ||
+    process.env.MONGO_URI ||
+    "mongodb://localhost:27017/ai-business-toolkit",
 
   // JWT Configuration
   jwtSecret:
@@ -60,7 +62,7 @@ module.exports = {
 
   // Security
   bcryptSaltRounds: parseInt(process.env.BCRYPT_SALT_ROUNDS) || 12,
-  corsOrigin: process.env.CORS_ORIGIN || "https://phoenix.vercel.app",
+  corsOrigin: process.env.CORS_ORIGIN || "https://phoenix-sol.vercel.app",
 
   // Credit System
   dailyCreditResetHour: parseInt(process.env.DAILY_CREDIT_RESET_HOUR) || 0, // 00:00 UTC

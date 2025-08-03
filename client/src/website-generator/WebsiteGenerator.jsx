@@ -1105,7 +1105,7 @@ const WebsiteGenerator = () => {
                     </h3>
 
                     <div className="flex flex-col items-center space-y-6">
-                      <div className="w-full max-w-md">
+                      {/* <div className="w-full max-w-md">
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Site Name (Optional)
                         </label>
@@ -1120,7 +1120,7 @@ const WebsiteGenerator = () => {
                         <p className="text-xs text-gray-500 mt-1">
                           Leave empty for auto-generated name
                         </p>
-                      </div>
+                      </div> */}
 
                       <button
                         className={`px-8 py-4 rounded-xl font-semibold text-lg shadow-lg transition-all transform ${

@@ -247,31 +247,11 @@ Create a complete, professional HTML website that:
 
 Generate clean, semantic HTML5 with embedded CSS and JavaScript. Make it production-ready.`;
 
-    // Store the website generation request in context first
-    try {
-      await vectorContextService.addDocumentToContext(companyId, prompt, {
-        source: "website_generation_request",
-        templateType,
-        style,
-        colorScheme,
-        sections: sections.join(", "),
-        timestamp: new Date().toISOString(),
-        importance: 8,
-      });
-
-      logger.info(
-        `Stored website generation request in context for company ${companyId}`
-      );
-    } catch (contextError) {
-      logger.warn(
-        `Failed to store context, but continuing with generation: ${contextError.message}`
-      );
-    }
-
+    // Generate website without storing intermediate context
     const result = await this.invoke(companyId, websitePrompt, {
       basePrompt,
       sessionId, // Pass the session ID to enable context saving
-      saveContext: true, // Explicitly enable context saving
+      saveContext: false, // Disable automatic context saving to reduce noise
       ...invokeOptions,
     });
 
@@ -291,36 +271,38 @@ Generate clean, semantic HTML5 with embedded CSS and JavaScript. Make it product
       }
     }
 
-    // Store the successful website generation in context for future reference
-    try {
-      const generationSummary = `Successfully generated a ${templateType} website with ${style} style and ${colorScheme} color scheme. Website includes sections: ${sections.join(
-        ", "
-      )}. Generated HTML is ${htmlContent.length} characters long.`;
+    // Store only successful results for future reference (not every generation)
+    if (htmlContent.length > 1000) {
+      // Only store substantial content
+      try {
+        const generationSummary = `Successfully generated a ${templateType} website with ${style} style and ${colorScheme} color scheme. Website includes sections: ${sections.join(
+          ", "
+        )}.`;
 
-      await vectorContextService.addDocumentToContext(
-        companyId,
-        generationSummary,
-        {
-          source: "website_generation_result",
-          templateType,
-          style,
-          colorScheme,
-          sections: sections.join(", "),
-          htmlLength: htmlContent.length,
-          modelUsed: result.modelUsed,
-          timestamp: new Date().toISOString(),
-          importance: 9,
-          sessionId, // Include session ID for tracking
-        }
-      );
+        await vectorContextService.addDocumentToContext(
+          companyId,
+          generationSummary,
+          {
+            source: "website_generation_success",
+            templateType,
+            style,
+            colorScheme,
+            sections: sections.join(", "),
+            modelUsed: result.modelUsed,
+            timestamp: new Date().toISOString(),
+            importance: 6, // Lower importance to reduce clutter
+            sessionId,
+          }
+        );
 
-      logger.info(
-        `Stored website generation result in context for company ${companyId}`
-      );
-    } catch (contextError) {
-      logger.warn(
-        `Failed to store generation result in context: ${contextError.message}`
-      );
+        logger.info(
+          `Stored successful website generation summary for company ${companyId}`
+        );
+      } catch (contextError) {
+        logger.warn(
+          `Failed to store generation result in context: ${contextError.message}`
+        );
+      }
     }
 
     return {

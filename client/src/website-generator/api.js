@@ -1,5 +1,5 @@
 const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "https://phoenix.onrender.com/api";
+  import.meta.env.VITE_API_URL || "https://phoenix-sol.onrender.com/api";
 
 class WebsiteAPI {
   constructor() {
