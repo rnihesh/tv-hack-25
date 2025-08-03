@@ -469,7 +469,6 @@ SubscriptionPlanSchema.index({ isActive: 1 });
 SubscriptionPlanSchema.index({ order: 1 });
 
 PaymentSchema.index({ companyId: 1, status: 1 });
-PaymentSchema.index({ subscriptionId: 1 });
 PaymentSchema.index({ createdAt: -1 });
 
 CreditPackageSchema.index({ isActive: 1 });

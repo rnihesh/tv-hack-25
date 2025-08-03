@@ -74,18 +74,9 @@ const registerCompany = async (req, res) => {
     // Create vector store for the company
     try {
       await VectorStore.createForCompany(company._id, company.businessType);
-      
-      // Seed initial context with company information
-      const { vectorContextService } = require("../services/langchain/vectorContext");
-      await vectorContextService.seedCompanyContext(company._id, {
-        companyName,
-        businessType,
-        businessDescription,
-        targetAudience,
-        preferences
-      });
-      
-      logger.info(`Seeded initial context for company: ${company._id}`);
+      logger.info(`Created vector store for company: ${company._id}`);
+
+      // Context will be seeded lazily on first use to avoid duplicates
     } catch (vectorError) {
       logger.error("Failed to create vector store for company:", vectorError);
       // Don't fail registration if vector store creation fails
@@ -109,7 +100,10 @@ const registerCompany = async (req, res) => {
 
     logger.info(`New company registered: ${company.email}`);
   } catch (error) {
-    logger.error("Registration error", { error: error.message, stack: error.stack });
+    logger.error("Registration error", {
+      error: error.message,
+      stack: error.stack,
+    });
     res.status(500).json({
       success: false,
       message: "Server error during registration",
@@ -340,8 +334,9 @@ const changePassword = async (req, res) => {
     }
 
     // Verify current password
-    const isCurrentPasswordValid =
-      await company.comparePassword(currentPassword);
+    const isCurrentPasswordValid = await company.comparePassword(
+      currentPassword
+    );
     if (!isCurrentPasswordValid) {
       return res.status(400).json({
         success: false,

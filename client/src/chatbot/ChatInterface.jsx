@@ -53,21 +53,19 @@ const ChatInterface = () => {
     setIsLoading(true);
 
     try {
-      const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://phoenix.onrender.com/api';
-      const response = await fetch(
-        `${API_BASE_URL}/chatbot/message`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            message: inputMessage,
-            sessionId: sessionId,
-          }),
-        }
-      );
+      const API_BASE_URL =
+        import.meta.env.VITE_API_URL || "https://phoenix-sol.onrender.com/api";
+      const response = await fetch(`${API_BASE_URL}/chatbot/message`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          message: inputMessage,
+          sessionId: sessionId,
+        }),
+      });
 
       const data = await response.json();
 

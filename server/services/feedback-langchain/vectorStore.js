@@ -34,9 +34,10 @@ class FeedbackVectorStore {
               model: "mxbai-embed-large",
             });
 
-            // Test embeddings
-            await this.embeddings.embedQuery("test");
-            logger.info("Feedback vector store initialized with Ollama embeddings");
+            // Skip test embeddings to save API calls
+            logger.info(
+              "Feedback vector store initialized with Ollama embeddings"
+            );
             embeddingsInitialized = true;
           }
         } catch (ollamaError) {
@@ -52,9 +53,10 @@ class FeedbackVectorStore {
             model: "text-embedding-004",
           });
 
-          // Test embeddings
-          await this.embeddings.embedQuery("test");
-          logger.info("Feedback vector store initialized with Google embeddings");
+          // Skip test embeddings to save API calls
+          logger.info(
+            "Feedback vector store initialized with Google embeddings"
+          );
           embeddingsInitialized = true;
         } catch (geminiError) {
           logger.error(`Google embeddings failed: ${geminiError.message}`);
@@ -89,31 +91,38 @@ class FeedbackVectorStore {
     }
 
     try {
-      const feedbackId = feedback.id || `feedback_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      
+      const feedbackId =
+        feedback.id ||
+        `feedback_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
       // Create document content
       const content = `
 Feedback: ${feedback.text}
-Sentiment: ${feedback.sentiment || 'unknown'}
-Source: ${feedback.source || 'unknown'}
+Sentiment: ${feedback.sentiment || "unknown"}
+Source: ${feedback.source || "unknown"}
 Date: ${feedback.date || new Date().toISOString()}
-Location: ${feedback.location || 'unknown'}
-Confidence: ${feedback.confidence || 'unknown'}
-User: ${feedback.userId || 'anonymous'}
+Location: ${feedback.location || "unknown"}
+Confidence: ${feedback.confidence || "unknown"}
+User: ${feedback.userId || "anonymous"}
       `.trim();
 
       // Split text if needed
-      const docs = await this.textSplitter.createDocuments([content], [{
-        feedbackId,
-        originalText: feedback.text,
-        sentiment: feedback.sentiment,
-        source: feedback.source,
-        date: feedback.date,
-        location: feedback.location,
-        confidence: feedback.confidence,
-        userId: feedback.userId,
-        type: 'feedback'
-      }]);
+      const docs = await this.textSplitter.createDocuments(
+        [content],
+        [
+          {
+            feedbackId,
+            originalText: feedback.text,
+            sentiment: feedback.sentiment,
+            source: feedback.source,
+            date: feedback.date,
+            location: feedback.location,
+            confidence: feedback.confidence,
+            userId: feedback.userId,
+            type: "feedback",
+          },
+        ]
+      );
 
       // Add to vector store
       await this.vectorStore.addDocuments(docs);
@@ -139,14 +148,13 @@ User: ${feedback.userId || 'anonymous'}
     }
 
     try {
-      const {
-        limit = 5,
-        filter = {},
-        similarityThreshold = 0.6
-      } = options;
+      const { limit = 5, filter = {}, similarityThreshold = 0.6 } = options;
 
       // Search for similar feedback
-      const results = await this.vectorStore.similaritySearchWithScore(query, limit);
+      const results = await this.vectorStore.similaritySearchWithScore(
+        query,
+        limit
+      );
 
       // Filter results by similarity threshold and any additional filters
       const filteredResults = results
@@ -155,15 +163,15 @@ User: ${feedback.userId || 'anonymous'}
           content: doc.pageContent,
           metadata: doc.metadata,
           similarity: score,
-          feedbackId: doc.metadata.feedbackId
+          feedbackId: doc.metadata.feedbackId,
         }));
 
       // Apply additional filters if provided
       let finalResults = filteredResults;
       if (Object.keys(filter).length > 0) {
-        finalResults = filteredResults.filter(result => {
-          return Object.entries(filter).every(([key, value]) => 
-            result.metadata[key] === value
+        finalResults = filteredResults.filter((result) => {
+          return Object.entries(filter).every(
+            ([key, value]) => result.metadata[key] === value
           );
         });
       }
@@ -185,24 +193,24 @@ User: ${feedback.userId || 'anonymous'}
 
   async getFeedbackByFilter(filter) {
     const allFeedback = Array.from(this.feedbackIndex.values());
-    return allFeedback.filter(feedback => {
-      return Object.entries(filter).every(([key, value]) => 
-        feedback[key] === value
+    return allFeedback.filter((feedback) => {
+      return Object.entries(filter).every(
+        ([key, value]) => feedback[key] === value
       );
     });
   }
 
   async getStats() {
     const allFeedback = Array.from(this.feedbackIndex.values());
-    
+
     const sentimentCounts = allFeedback.reduce((acc, feedback) => {
-      const sentiment = feedback.sentiment || 'unknown';
+      const sentiment = feedback.sentiment || "unknown";
       acc[sentiment] = (acc[sentiment] || 0) + 1;
       return acc;
     }, {});
 
     const sourceCounts = allFeedback.reduce((acc, feedback) => {
-      const source = feedback.source || 'unknown';
+      const source = feedback.source || "unknown";
       acc[source] = (acc[source] || 0) + 1;
       return acc;
     }, {});
@@ -212,9 +220,23 @@ User: ${feedback.userId || 'anonymous'}
       sentimentDistribution: sentimentCounts,
       sourceDistribution: sourceCounts,
       dateRange: {
-        earliest: allFeedback.length > 0 ? Math.min(...allFeedback.map(f => new Date(f.date || f.addedAt).getTime())) : null,
-        latest: allFeedback.length > 0 ? Math.max(...allFeedback.map(f => new Date(f.date || f.addedAt).getTime())) : null
-      }
+        earliest:
+          allFeedback.length > 0
+            ? Math.min(
+                ...allFeedback.map((f) =>
+                  new Date(f.date || f.addedAt).getTime()
+                )
+              )
+            : null,
+        latest:
+          allFeedback.length > 0
+            ? Math.max(
+                ...allFeedback.map((f) =>
+                  new Date(f.date || f.addedAt).getTime()
+                )
+              )
+            : null,
+      },
     };
   }
 

@@ -1,21 +1,21 @@
 // TEMPORARY: Force development mode for debugging
-if (process.env.DEBUG_SERVER === 'true') {
+if (process.env.DEBUG_SERVER === "true") {
   console.log("⚠️ RUNNING IN DEBUG MODE - BYPASSING SERVICE CHECKS");
-  process.env.NODE_ENV = 'development';
-  process.env.ALLOW_NO_DB = 'true';
-  process.env.ALLOW_NO_CHROMA = 'true';
-  process.env.ALLOW_NO_SERVICES = 'true';
+  process.env.NODE_ENV = "development";
+  process.env.ALLOW_NO_DB = "true";
+  process.env.ALLOW_NO_CHROMA = "true";
+  process.env.ALLOW_NO_SERVICES = "true";
 }
 
 // Move existing error handlers to the top
-process.on('uncaughtException', (err) => {
-  console.error('CRITICAL - Uncaught Exception:');
+process.on("uncaughtException", (err) => {
+  console.error("CRITICAL - Uncaught Exception:");
   console.error(err);
   process.exit(1);
 });
 
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('CRITICAL - Unhandled Promise Rejection:');
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("CRITICAL - Unhandled Promise Rejection:");
   console.error(reason);
   process.exit(1);
 });
@@ -62,7 +62,16 @@ app.use(
         defaultSrc: ["'self'"],
         styleSrc: ["'self'", "'unsafe-inline'"],
         scriptSrc: ["'self'"],
-        imgSrc: ["'self'", "data:", "https:", "http:", "http://localhost:*", "*.placeholder.com", "*.unsplash.com", "*.picsum.photos"],
+        imgSrc: [
+          "'self'",
+          "data:",
+          "https:",
+          "http:",
+          "http://localhost:*",
+          "*.placeholder.com",
+          "*.unsplash.com",
+          "*.picsum.photos",
+        ],
         connectSrc: ["'self'", "http://localhost:*"],
       },
     },
@@ -71,7 +80,12 @@ app.use(
 );
 
 // CORS Configuration
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173", // No wildcard allowed with credentials
+    credentials: true,
+  })
+);
 app.set("trust proxy", true);
 // Rate Limiting
 // const limiter = rateLimit({
@@ -90,7 +104,7 @@ app.set("trust proxy", true);
 // Body parsing middleware
 app.use(
   express.json({
-    limit: "10mb",
+    limit: "30mb",
     verify: (req, res, buf) => {
       req.rawBody = buf;
     },
@@ -100,12 +114,19 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(cookieParser());
 
 // Static file serving for uploaded images
-app.use('/uploads', (req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  next();
-}, express.static(path.join(__dirname, 'uploads')));
+app.use(
+  "/uploads",
+  (req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "GET");
+    res.header(
+      "Access-Control-Allow-Headers",
+      "Origin, X-Requested-With, Content-Type, Accept"
+    );
+    next();
+  },
+  express.static(path.join(__dirname, "uploads"))
+);
 
 // Compression middleware
 app.use(compression());
@@ -146,30 +167,31 @@ app.get("/api/status", (req, res) => {
 // Test image endpoint for debugging
 app.get("/api/test-image", async (req, res) => {
   try {
-    const baseUrl = process.env.NODE_ENV === 'production' 
-      ? `https://phoenix.onrender.com` 
-      : `http://localhost:3000`;
+    const baseUrl =
+      process.env.NODE_ENV === "production"
+        ? `https://phoenix-sol.onrender.com`
+        : `http://localhost:3000`;
     const testResponse = await fetch(`${baseUrl}/api/images/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        prompt: 'test image',
-        style: 'realistic',
-        aspectRatio: '1:1'
-      })
+        prompt: "test image",
+        style: "realistic",
+        aspectRatio: "1:1",
+      }),
     });
-    
+
     const data = await testResponse.json();
     res.json({
       success: true,
       message: "Test image generation endpoint working",
-      data: data
+      data: data,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: "Test image generation failed",
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -181,6 +203,7 @@ app.use("/api/marketing", marketingRoutes);
 app.use("/api/media", mediaRoutes);
 app.use("/api/chatbot", chatbotRoutes);
 app.use("/api/feedback", feedbackRoutes);
+app.use("/api/csv-feedback", require("./routes/csvFeedbackRoutes"));
 app.use("/api/email", emailRoutes);
 app.use("/api/images", imageGenRoutes);
 app.use("/api/community", communityRoutes);
@@ -253,27 +276,32 @@ const startServer = async () => {
     // Connect to MongoDB with enhanced error handling
     try {
       console.log("🔍 Step 1: Attempting database connection...");
-      logger.info('Attempting database connection...');
+      logger.info("Attempting database connection...");
       await connectDB();
       console.log("🔍 Database connection successful");
-      logger.info('MongoDB connected successfully');
+      logger.info("MongoDB connected successfully");
     } catch (dbError) {
       // Direct console output for critical errors
-      console.error('MongoDB Connection Error:', dbError.message);
+      console.error("MongoDB Connection Error:", dbError.message);
       console.error(dbError.stack);
-      
-      logger.error('MongoDB Connection Error:', {
+
+      logger.error("MongoDB Connection Error:", {
         message: dbError.message,
         stack: dbError.stack,
         code: dbError.code,
-        name: dbError.name
+        name: dbError.name,
       });
-      
+
       // Only continue without DB in development with flag
-      if (process.env.NODE_ENV === 'development' && process.env.ALLOW_NO_DB === 'true') {
-        logger.warn('Starting server without MongoDB connection (ALLOW_NO_DB=true)');
+      if (
+        process.env.NODE_ENV === "development" &&
+        process.env.ALLOW_NO_DB === "true"
+      ) {
+        logger.warn(
+          "Starting server without MongoDB connection (ALLOW_NO_DB=true)"
+        );
       } else {
-        logger.error('Server startup failed due to database connection error');
+        logger.error("Server startup failed due to database connection error");
         process.exit(1);
       }
     }
@@ -284,8 +312,13 @@ const startServer = async () => {
       await checkRequiredServices();
     } catch (serviceError) {
       console.error("Service check failed:", serviceError.message);
-      if (process.env.NODE_ENV === 'development' && process.env.ALLOW_NO_SERVICES === 'true') {
-        console.warn("Continuing despite service check failure (ALLOW_NO_SERVICES=true)");
+      if (
+        process.env.NODE_ENV === "development" &&
+        process.env.ALLOW_NO_SERVICES === "true"
+      ) {
+        console.warn(
+          "Continuing despite service check failure (ALLOW_NO_SERVICES=true)"
+        );
       } else {
         throw serviceError;
       }
@@ -296,7 +329,10 @@ const startServer = async () => {
       console.log("🔍 Step 2.5: Initializing vector context...");
       await initializeVectorContext();
     } catch (contextError) {
-      console.error("Vector context initialization failed:", contextError.message);
+      console.error(
+        "Vector context initialization failed:",
+        contextError.message
+      );
       logger.warn("Vector context initialization failed, but continuing...");
     }
 
@@ -310,7 +346,13 @@ const startServer = async () => {
 🚀 AI Business Toolkit Server is running!
 📡 Port: ${PORT}
 🌍 Environment: ${config.nodeEnv}
-🗄️  Database: ${config.mongoUri ? (config.mongoUri.includes("localhost") ? "Local MongoDB" : "MongoDB Atlas") : "NONE - Running without database"}
+🗄️  Database: ${
+        config.mongoUri
+          ? config.mongoUri.includes("localhost")
+            ? "Local MongoDB"
+            : "MongoDB Atlas"
+          : "NONE - Running without database"
+      }
 ⚡ Features: Website Gen, Email Marketing, Image Gen, Chatbot, Analytics
 🤖 AI Models: ${config.geminiApiKey ? "Gemini" : "Disabled"}, Ollama
 📊 Vector Store: Chroma
@@ -319,13 +361,13 @@ const startServer = async () => {
     });
 
     console.log("🔍 Step 5: Registering server error handlers");
-    server.on('error', (err) => {
-      console.error('Server Error:', err); // Direct console output for visibility
-      if (err.code === 'EADDRINUSE') {
+    server.on("error", (err) => {
+      console.error("Server Error:", err); // Direct console output for visibility
+      if (err.code === "EADDRINUSE") {
         logger.error(`Port ${PORT} is already in use`);
         process.exit(1);
       } else {
-        logger.error('Server error:', err);
+        logger.error("Server error:", err);
         process.exit(1);
       }
     });
@@ -334,11 +376,11 @@ const startServer = async () => {
     return server;
   } catch (error) {
     // Force console output for critical errors
-    console.error('SERVER STARTUP CRITICAL ERROR:', error);
-    logger.error('Failed to start server:', {
+    console.error("SERVER STARTUP CRITICAL ERROR:", error);
+    logger.error("Failed to start server:", {
       message: error.message,
       stack: error.stack,
-      name: error.name
+      name: error.name,
     });
     process.exit(1);
   }
@@ -349,22 +391,32 @@ const startServer = async () => {
 const initializeVectorContext = async () => {
   try {
     console.log("🧠 Initializing vector context for all companies...");
-    
-    const { vectorContextService } = require('./services/langchain/vectorContext');
-    const { memoryVectorStore } = require('./services/langchain/memoryVectorStore');
-    const Company = require('./models/Company');
-    
+
+    const {
+      vectorContextService,
+    } = require("./services/langchain/vectorContext");
+    const {
+      memoryVectorStore,
+    } = require("./services/langchain/memoryVectorStore");
+    const Company = require("./models/Company");
+
     // Clear any existing contaminated context to ensure clean slate
-    console.log("🧹 Clearing any existing vector collections to prevent contamination...");
+    console.log(
+      "🧹 Clearing any existing vector collections to prevent contamination..."
+    );
     memoryVectorStore.collections.clear();
-    
+
     // Initialize the vector context service
     await vectorContextService.initialize();
-    
+
     // Get all companies
-    const companies = await Company.find({}).select('companyName businessType businessDescription targetAudience preferences aiContextProfile');
-    console.log(`📋 Found ${companies.length} companies to initialize context for`);
-    
+    const companies = await Company.find({}).select(
+      "companyName businessType businessDescription targetAudience preferences aiContextProfile"
+    );
+    console.log(
+      `📋 Found ${companies.length} companies to initialize context for`
+    );
+
     let successCount = 0;
     for (const company of companies) {
       try {
@@ -372,33 +424,49 @@ const initializeVectorContext = async () => {
         const contextData = {
           companyName: company.companyName,
           businessType: company.businessType,
-          businessDescription: company.businessDescription || `${company.companyName} is a ${company.businessType} business`,
-          targetAudience: company.targetAudience || `Customers interested in ${company.businessType} services`,
+          businessDescription:
+            company.businessDescription ||
+            `${company.companyName} is a ${company.businessType} business`,
+          targetAudience:
+            company.targetAudience ||
+            `Customers interested in ${company.businessType} services`,
           preferences: company.preferences || {},
           keyMessages: company.aiContextProfile?.keyMessages || [],
           productServices: company.aiContextProfile?.productServices || [],
           businessPersonality: company.aiContextProfile?.businessPersonality,
-          brandVoice: company.aiContextProfile?.brandVoice
+          brandVoice: company.aiContextProfile?.brandVoice,
         };
-        
+
         await vectorContextService.seedCompanyContext(company._id, contextData);
-        
+
         // Verify context isolation
-        const verification = await vectorContextService.getCompanyContext(company._id);
+        const verification = await vectorContextService.getCompanyContext(
+          company._id
+        );
         if (verification.companyInfo.name !== company.companyName) {
-          console.warn(`⚠️  Context verification failed for ${company.companyName} - expected "${company.companyName}" but got "${verification.companyInfo.name}"`);
+          console.warn(
+            `⚠️  Context verification failed for ${company.companyName} - expected "${company.companyName}" but got "${verification.companyInfo.name}"`
+          );
         }
-        
+
         successCount++;
       } catch (error) {
-        console.warn(`⚠️  Failed to initialize context for ${company.companyName}:`, error.message);
+        console.warn(
+          `⚠️  Failed to initialize context for ${company.companyName}:`,
+          error.message
+        );
       }
     }
-    
-    console.log(`✅ Successfully initialized vector context for ${successCount}/${companies.length} companies`);
-    console.log(`📊 Memory store now has ${memoryVectorStore.collections.size} isolated company collections`);
-    logger.info(`Vector context initialized for ${successCount}/${companies.length} companies with proper isolation`);
-    
+
+    console.log(
+      `✅ Successfully initialized vector context for ${successCount}/${companies.length} companies`
+    );
+    console.log(
+      `📊 Memory store now has ${memoryVectorStore.collections.size} isolated company collections`
+    );
+    logger.info(
+      `Vector context initialized for ${successCount}/${companies.length} companies with proper isolation`
+    );
   } catch (error) {
     console.error("❌ Vector context initialization error:", error.message);
     throw error;
@@ -407,48 +475,61 @@ const initializeVectorContext = async () => {
 
 const checkRequiredServices = async () => {
   console.log("🔍 Checking required services...");
-  
+
   // For emergency debugging, bypass all service checks
-  if (process.env.BYPASS_ALL_CHECKS === 'true') {
-    console.log("🔍 WARNING: All service checks bypassed by BYPASS_ALL_CHECKS flag");
+  if (process.env.BYPASS_ALL_CHECKS === "true") {
+    console.log(
+      "🔍 WARNING: All service checks bypassed by BYPASS_ALL_CHECKS flag"
+    );
     return true;
   }
-  
+
   // Check LangChain service availability
   try {
     console.log("🔍 Checking LangChain services...");
-    const { modelManager } = require('./services/langchain/models');
-    
+    const { modelManager } = require("./services/langchain/models");
+
     const availableModels = modelManager.getAvailableModels();
     if (availableModels.length === 0) {
       throw new Error("No LangChain models available");
     }
-    
+
     console.log("✅ LangChain services check passed");
   } catch (error) {
     console.error("❌ LangChain services check failed:", error.message);
-    if (process.env.ALLOW_NO_SERVICES === 'true') {
-      console.warn("⚠️ Continuing without LangChain services (ALLOW_NO_SERVICES=true)");
+    if (process.env.ALLOW_NO_SERVICES === "true") {
+      console.warn(
+        "⚠️ Continuing without LangChain services (ALLOW_NO_SERVICES=true)"
+      );
     } else {
-      throw new Error(`LangChain services required but not available: ${error.message}`);
+      throw new Error(
+        `LangChain services required but not available: ${error.message}`
+      );
     }
   }
-  
+
   // Initialize the memory vector service
   try {
     console.log("🔍 Initializing memory vector service...");
-    const { vectorContextService } = require("./services/langchain/vectorContext");
+    const {
+      vectorContextService,
+    } = require("./services/langchain/vectorContext");
     await vectorContextService.initialize();
     console.log("✅ Memory vector service initialized successfully");
   } catch (error) {
-    console.error("❌ Memory vector service initialization failed:", error.message);
-    if (process.env.NODE_ENV === 'development') {
+    console.error(
+      "❌ Memory vector service initialization failed:",
+      error.message
+    );
+    if (process.env.NODE_ENV === "development") {
       console.warn("⚠️ Continuing without vector service in development mode");
     } else {
-      throw new Error(`Vector service required but initialization failed: ${error.message}`);
+      throw new Error(
+        `Vector service required but initialization failed: ${error.message}`
+      );
     }
   }
-  
+
   console.log("✅ All required service checks completed");
   return true;
 };
@@ -457,29 +538,35 @@ const checkRequiredServices = async () => {
 startServer();
 
 // Environment check:
-console.log('Environment check:');
-console.log('- NODE_ENV:', process.env.NODE_ENV);
-console.log('- MongoDB URI configured:', !!process.env.DBURL || !!process.env.MONGO_URI);
-console.log('- Port:', process.env.PORT || 3000);
+console.log("Environment check:");
+console.log("- NODE_ENV:", process.env.NODE_ENV);
+console.log(
+  "- MongoDB URI configured:",
+  !!process.env.DBURL || !!process.env.MONGO_URI
+);
+console.log("- Port:", process.env.PORT || 3000);
 
 // Only show MongoDB connection string format (not actual credentials)
-const dbUrlCheck = process.env.DBURL || process.env.MONGO_URI || '';
+const dbUrlCheck = process.env.DBURL || process.env.MONGO_URI || "";
 if (dbUrlCheck) {
-  console.log('- MongoDB string format:', 
-    dbUrlCheck.replace(/mongodb(\+srv)?:\/\/([^:]+:)?([^@]+@)?([^/]+)\/(.+)/, 
-    'mongodb$1://user:****@$4/$5')
+  console.log(
+    "- MongoDB string format:",
+    dbUrlCheck.replace(
+      /mongodb(\+srv)?:\/\/([^:]+:)?([^@]+@)?([^/]+)\/(.+)/,
+      "mongodb$1://user:****@$4/$5"
+    )
   );
 }
 
 // Add near the top of your file, before any other code
-process.on('uncaughtException', (err) => {
-  console.error('CRITICAL - Uncaught Exception:');
+process.on("uncaughtException", (err) => {
+  console.error("CRITICAL - Uncaught Exception:");
   console.error(err);
   process.exit(1);
 });
 
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('CRITICAL - Unhandled Promise Rejection:');
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("CRITICAL - Unhandled Promise Rejection:");
   console.error(reason);
   process.exit(1);
 });

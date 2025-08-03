@@ -15,9 +15,12 @@ const ImagePreview = ({ image, onDownload, onClose }) => {
 
       // Convert absolute localhost URL to proxy URL for local images
       let finalUrl = image.imageUrl;
-      const localUrls = ['http://localhost:3000', 'https://phoenix.onrender.com'];
-      
-      localUrls.forEach(url => {
+      const localUrls = [
+        "http://localhost:3000",
+        "https://phoenix-sol.onrender.com",
+      ];
+
+      localUrls.forEach((url) => {
         if (finalUrl.startsWith(url)) {
           finalUrl = finalUrl.replace(url, "");
         }

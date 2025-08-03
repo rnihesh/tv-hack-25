@@ -189,7 +189,7 @@ exports.generateImage = async (req, res) => {
                 // Return Cloudinary URL if available, otherwise production URL
                 const baseUrl =
                   process.env.NODE_ENV === "production"
-                    ? `https://phoenix.onrender.com`
+                    ? `https://phoenix-sol.onrender.com`
                     : `http://localhost:3000`;
                 const imageUrl =
                   cloudinaryUrl || `${baseUrl}/uploads/images/${fileName}`;
