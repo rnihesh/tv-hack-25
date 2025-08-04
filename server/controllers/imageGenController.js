@@ -280,17 +280,26 @@ exports.generateImage = async (req, res) => {
           style,
           aspectRatio,
           imageUrl: cloudinaryUrl || imageUrl, // Prefer Cloudinary URL
+          cloudinaryUrl: cloudinaryUrl, // Store in dedicated field
           imageDescription,
           creditsUsed: CREDIT_COSTS.image_generation,
           generatedAt: new Date(),
           metadata: {
             aiModel: "gemini-2.0-flash-exp",
-            cloudinaryUrl: cloudinaryUrl,
+            cloudinaryUrl: cloudinaryUrl, // Keep for backward compatibility
             localUrl: imageUrl !== cloudinaryUrl ? imageUrl : null,
           },
         });
 
         await imageRecord.save();
+
+        logger.info(`Image generation record saved successfully`, {
+          imageId: imageRecord._id,
+          companyId: company._id,
+          imageUrl: imageRecord.imageUrl,
+          cloudinaryUrl: imageRecord.cloudinaryUrl,
+          prompt: imageRecord.prompt
+        });
 
         logger.info(`Image generated successfully for company ${company._id}`, {
           imageId: imageRecord._id,
@@ -362,6 +371,9 @@ exports.getImageHistory = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
+    // Get the correct company ID
+    const companyId = company._id || company.id;
+
     // Handle demo mode with mock data
     if (company.isDemo) {
       const mockImages = [
@@ -406,21 +418,41 @@ exports.getImageHistory = async (req, res) => {
     }
 
     // Get images for the company (real mode)
-    const images = await ImageGen.find({ companyId: company._id })
+    logger.info(`Loading image history for company ${companyId}`, {
+      page,
+      limit,
+      skip
+    });
+
+    const images = await ImageGen.find({ companyId: companyId })
       .sort({ generatedAt: -1 })
       .skip(skip)
       .limit(limit)
-      .select("-__v");
+      .select('prompt style aspectRatio imageUrl cloudinaryUrl imageDescription creditsUsed generatedAt createdAt')
+      .lean(); // Use lean() for better performance
+
+    logger.info(`Found ${images.length} images for company ${companyId}`, {
+      totalFound: images.length,
+      page,
+      limit
+    });
+
+    // Ensure we always return the best available image URL
+    const processedImages = images.map(image => ({
+      ...image,
+      imageUrl: image.cloudinaryUrl || image.imageUrl, // Prefer Cloudinary URL
+      hasCloudinaryUrl: !!image.cloudinaryUrl
+    }));
 
     const totalImages = await ImageGen.countDocuments({
-      companyId: company._id,
+      companyId: companyId,
     });
     const totalPages = Math.ceil(totalImages / limit);
 
     res.json({
       success: true,
       data: {
-        images,
+        images: processedImages,
         pagination: {
           page,
           limit,
@@ -434,7 +466,7 @@ exports.getImageHistory = async (req, res) => {
   } catch (error) {
     logger.error("Get image history error", {
       error: error.message,
-      companyId: req.companyData?._id || req.company?.id,
+      companyId: req.companyData?.id || req.company?.id,
     });
 
     res.status(500).json({
@@ -444,6 +476,58 @@ exports.getImageHistory = async (req, res) => {
         process.env.NODE_ENV === "development"
           ? error.message
           : "Something went wrong",
+    });
+  }
+};
+
+// Delete generated image
+exports.deleteImage = async (req, res) => {
+  try {
+    const { imageId } = req.params;
+    const company = req.companyData || req.company;
+    const companyId = company._id || company.id;
+
+    if (company.isDemo) {
+      return res.json({
+        success: true,
+        message: "Demo image deleted successfully"
+      });
+    }
+
+    const image = await ImageGen.findOne({
+      _id: imageId,
+      companyId: companyId
+    });
+
+    if (!image) {
+      return res.status(404).json({
+        success: false,
+        message: "Image not found"
+      });
+    }
+
+    await ImageGen.deleteOne({ _id: imageId });
+
+    logger.info(`Image deleted successfully`, {
+      imageId,
+      companyId: companyId
+    });
+
+    res.json({
+      success: true,
+      message: "Image deleted successfully"
+    });
+
+  } catch (error) {
+    logger.error("Delete image error", {
+      error: error.message,
+      imageId: req.params.imageId
+    });
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete image",
+      error: process.env.NODE_ENV === "development" ? error.message : "Something went wrong"
     });
   }
 };

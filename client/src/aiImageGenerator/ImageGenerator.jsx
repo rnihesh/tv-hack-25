@@ -45,22 +45,30 @@ const ImageGenerator = () => {
   const loadImageHistory = async (page = 1) => {
     try {
       setLoadingHistory(true);
+      console.log(`Loading image history for page ${page}...`);
+      
       const response = await imageApi.getImageHistory({
         page,
         limit: pagination.limit,
       });
 
+      console.log("Image history response:", response);
+
       if (response.success) {
+        console.log(`Loaded ${response.data.images.length} images`);
         if (page === 1) {
           setImages(response.data.images);
         } else {
           setImages((prev) => [...prev, ...response.data.images]);
         }
         setPagination(response.data.pagination);
+      } else {
+        console.error("Failed to load history:", response);
+        showToast("Failed to load image history", "error");
       }
     } catch (error) {
-      showToast("Failed to load image history", "error");
       console.error("Load image history error:", error);
+      showToast("Failed to load image history", "error");
     } finally {
       setLoadingHistory(false);
     }
@@ -78,10 +86,21 @@ const ImageGenerator = () => {
         setActiveTab("preview");
         showToast("Image generated successfully!", "success");
 
-        // Update history if we're viewing it
-        if (images.length > 0) {
+        // Always refresh history after successful generation
+        // Reset images first to trigger a fresh load
+        setImages([]);
+        setPagination({
+          page: 1,
+          limit: 9,
+          total: 0,
+          pages: 0,
+          hasNext: false,
+        });
+        
+        // Force refresh history from page 1
+        setTimeout(() => {
           loadImageHistory(1);
-        }
+        }, 1000); // Small delay to ensure DB write is complete
       }
     } catch (error) {
       console.error("Image generation error:", error);
@@ -96,6 +115,25 @@ const ImageGenerator = () => {
   const handleLoadMore = () => {
     if (pagination.hasNext && !loadingHistory) {
       loadImageHistory(pagination.page + 1);
+    }
+  };
+
+  const handleImageDelete = async (imageId) => {
+    try {
+      const response = await imageApi.deleteImage(imageId);
+      if (response.success) {
+        // Remove the deleted image from the list
+        setImages(prevImages => prevImages.filter(img => img._id !== imageId));
+        // Update pagination total
+        setPagination(prev => ({
+          ...prev,
+          total: prev.total - 1
+        }));
+        showToast("Image deleted successfully", "success");
+      }
+    } catch (error) {
+      showToast("Failed to delete image", "error");
+      console.error("Delete image error:", error);
     }
   };
 
@@ -265,15 +303,16 @@ const ImageGenerator = () => {
           </div>
         )}
 
-        {/* {activeTab === "history" && (
+        {activeTab === "history" && (
           <ImageHistory
             images={images}
             loading={loadingHistory}
             onLoadMore={handleLoadMore}
             pagination={pagination}
             onImageSelect={handleImageSelect}
+            onImageDelete={handleImageDelete}
           />
-        )} */}
+        )}
 
         {activeTab === "preview" && (
           <div className="max-w-4xl mx-auto">

@@ -60,6 +60,16 @@ export const imageApi = {
       throw error.response?.data || error;
     }
   },
+
+  // Delete image
+  deleteImage: async (imageId) => {
+    try {
+      const response = await api.delete(`/images/${imageId}`);
+      return response;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
 };
 
 export default imageApi;
