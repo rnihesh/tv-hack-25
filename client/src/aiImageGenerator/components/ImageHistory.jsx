@@ -7,19 +7,33 @@ const ImageHistory = ({
   onLoadMore,
   pagination,
   onImageSelect,
+  onImageDelete,
 }) => {
   const [selectedImage, setSelectedImage] = useState(null);
+  const [deleteMode, setDeleteMode] = useState(false);
 
   const handleImageClick = (image) => {
+    if (deleteMode) return; // Don't select in delete mode
     setSelectedImage(image);
     if (onImageSelect) {
       onImageSelect(image);
     }
   };
 
+  const handleDeleteImage = (imageId, event) => {
+    event.stopPropagation();
+    if (onImageDelete) {
+      onImageDelete(imageId);
+    }
+  };
+
   const getProxyImageUrl = (imageUrl) => {
     // If it's a Cloudinary URL, use it directly
     if (imageUrl && imageUrl.includes("cloudinary.com")) {
+      return imageUrl;
+    }
+    // If it's a placeholder URL, use it directly
+    if (imageUrl && imageUrl.includes("via.placeholder.com")) {
       return imageUrl;
     }
     // Convert absolute server URLs to proxy URL for local images
@@ -87,10 +101,16 @@ const ImageHistory = ({
           <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
             No creations yet
           </h3>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-gray-600 dark:text-gray-300 mb-4">
             Start generating amazing AI images to build your creative
             collection.
           </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="bg-blue-600 dark:bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-all duration-200 font-medium"
+          >
+            Refresh History
+          </button>
         </div>
       </div>
     );
@@ -100,31 +120,58 @@ const ImageHistory = ({
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 transition-colors duration-300">
       {/* Header */}
       <div className="bg-blue-50 dark:bg-blue-900/20 px-8 py-6 border-b border-gray-200 dark:border-gray-700 rounded-t-lg">
-        <div className="flex items-center">
-          <div className="w-10 h-10 bg-blue-100 dark:bg-blue-800 rounded-lg flex items-center justify-center mr-4">
-            <svg
-              className="h-5 w-5 text-blue-600 dark:text-blue-300"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <div className="w-10 h-10 bg-blue-100 dark:bg-blue-800 rounded-lg flex items-center justify-center mr-4">
+              <svg
+                className="h-5 w-5 text-blue-600 dark:text-blue-300"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                Your Gallery
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm">
+                {pagination.total} creation{pagination.total !== 1 ? "s" : ""} in
+                your collection
+              </p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-              Your Gallery
-            </h3>
-            <p className="text-gray-600 dark:text-gray-300 text-sm">
-              {pagination.total} creation{pagination.total !== 1 ? "s" : ""} in
-              your collection
-            </p>
-          </div>
+          
+          {/* Delete Mode Toggle and Refresh */}
+          {images.length > 0 && (
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => window.location.reload()}
+                className="px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/50"
+                title="Refresh history"
+              >
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
+              <button
+                onClick={() => setDeleteMode(!deleteMode)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  deleteMode
+                    ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900/50"
+                    : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                }`}
+              >
+                {deleteMode ? "Done" : "Manage"}
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -134,9 +181,40 @@ const ImageHistory = ({
           {images.map((image) => (
             <div
               key={image._id}
-              className="group cursor-pointer bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden hover:shadow-md hover:scale-[1.02] transition-all duration-200 border border-gray-200 dark:border-gray-600"
+              className={`group cursor-pointer bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden hover:shadow-md hover:scale-[1.02] transition-all duration-200 border border-gray-200 dark:border-gray-600 relative ${
+                deleteMode ? "hover:border-red-400 dark:hover:border-red-500" : ""
+              }`}
               onClick={() => handleImageClick(image)}
             >
+              {/* Delete Button (only in delete mode) */}
+              {deleteMode && (
+                <button
+                  onClick={(e) => handleDeleteImage(image._id, e)}
+                  className="absolute top-2 right-2 z-10 bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-full shadow-lg transition-all duration-200"
+                >
+                  <svg
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
+                  </svg>
+                </button>
+              )}
+
+              {/* Cloudinary Badge */}
+              {image.cloudinaryUrl && (
+                <div className="absolute top-2 left-2 z-10 bg-green-500/90 text-white px-2 py-1 rounded-full text-xs font-medium">
+                  ☁️ Cloud
+                </div>
+              )}
+
               {/* Image Thumbnail */}
               <div className="aspect-square bg-gray-200 dark:bg-gray-600 relative overflow-hidden">
                 <img
@@ -144,30 +222,36 @@ const ImageHistory = ({
                   alt={image.prompt}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   loading="lazy"
+                  onError={(e) => {
+                    // Fallback to placeholder if image fails to load
+                    e.target.src = `https://via.placeholder.com/400x400/6366F1/FFFFFF?text=Image+Not+Found`;
+                  }}
                 />
-                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center">
-                  <div className="bg-white/20 backdrop-blur-sm rounded-full p-3">
-                    <svg
-                      className="h-6 w-6 text-white"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                      />
-                    </svg>
+                {!deleteMode && (
+                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center">
+                    <div className="bg-white/20 backdrop-blur-sm rounded-full p-3">
+                      <svg
+                        className="h-6 w-6 text-white"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                        />
+                      </svg>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* Image Info */}
