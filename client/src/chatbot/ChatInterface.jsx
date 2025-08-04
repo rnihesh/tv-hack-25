@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { getApiBaseUrl } from "../utils/config.js";
 
 const ChatInterface = () => {
   const [messages, setMessages] = useState([]);
@@ -53,8 +54,7 @@ const ChatInterface = () => {
     setIsLoading(true);
 
     try {
-      const API_BASE_URL =
-        import.meta.env.VITE_API_URL || "https://phoenix-sol.onrender.com/api";
+      const API_BASE_URL = getApiBaseUrl();
       const response = await fetch(`${API_BASE_URL}/chatbot/message`, {
         method: "POST",
         headers: {
