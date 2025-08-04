@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { getServerBaseUrl } from "../../utils/config.js";
 
 const ImagePreview = ({ image, onDownload, onClose }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -13,12 +14,10 @@ const ImagePreview = ({ image, onDownload, onClose }) => {
       setImageError(false);
       setImageLoaded(false);
 
-      // Convert absolute localhost URL to proxy URL for local images
+      // Convert absolute server URL to proxy URL for local images
       let finalUrl = image.imageUrl;
-      const localUrls = [
-        "http://localhost:3000",
-        "https://phoenix-sol.onrender.com",
-      ];
+      const serverUrl = getServerBaseUrl();
+      const localUrls = [serverUrl, "https://phoenix-sol.onrender.com"];
 
       localUrls.forEach((url) => {
         if (finalUrl.startsWith(url)) {

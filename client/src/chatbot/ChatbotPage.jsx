@@ -188,7 +188,7 @@ const ChatbotPage = () => {
 
     try {
       const API_BASE_URL =
-        import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+        import.meta.env.VITE_API_URL || "https://phoenix-sol.onrender.com/api";
       const response = await fetch(`${API_BASE_URL}/chatbot/message`, {
         method: "POST",
         headers: {
@@ -249,7 +249,7 @@ const ChatbotPage = () => {
       formData.append("csvFile", file);
 
       const API_BASE_URL =
-        import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+        import.meta.env.VITE_API_URL || "https://phoenix-sol.onrender.com/api";
 
       // Use the new public upload and analyze endpoint
       const response = await fetch(
@@ -477,7 +477,7 @@ const ChatbotPage = () => {
 
     try {
       const API_BASE_URL =
-        import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+        import.meta.env.VITE_API_URL || "https://phoenix-sol.onrender.com/api";
 
       // Call the quick CSV analysis endpoint for presentation
       const response = await fetch(

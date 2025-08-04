@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { getApiBaseUrl, getServerBaseUrl } from "../../utils/config.js";
 
 const ImageHistory = ({
   images,
@@ -23,10 +24,8 @@ const ImageHistory = ({
     }
     // Convert absolute server URLs to proxy URL for local images
     if (imageUrl) {
-      const localUrls = [
-        "http://localhost:3000",
-        "https://phoenix-sol.onrender.com",
-      ];
+      const serverUrl = getServerBaseUrl();
+      const localUrls = [serverUrl, "https://phoenix-sol.onrender.com"];
 
       for (const url of localUrls) {
         if (imageUrl.startsWith(url)) {

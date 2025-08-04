@@ -1,5 +1,6 @@
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "https://phoenix-sol.onrender.com/api";
+import { getApiBaseUrl } from "../utils/config.js";
+
+const API_BASE_URL = getApiBaseUrl();
 
 class WebsiteAPI {
   constructor() {

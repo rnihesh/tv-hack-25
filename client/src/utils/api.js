@@ -1,8 +1,8 @@
 import axios from "axios";
+import { getApiBaseUrl } from "./config.js";
 
-// Base URL for your backend API
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "https://phoenix-sol.onrender.com/api";
+// Base URL for your backend API - automatically switches based on environment
+const API_BASE_URL = getApiBaseUrl();
 
 // Create axios instance with default config
 const api = axios.create({

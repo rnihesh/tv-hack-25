@@ -80,9 +80,36 @@ app.use(
 );
 
 // CORS Configuration
+const allowedOrigins = [
+  "http://localhost:5173", // Vite dev server
+  "http://localhost:4173", // Vite preview server
+  "http://localhost:3000", // Alternative local port
+  "https://tv-hack-25.vercel.app", // Vercel deployment
+  /^https:\/\/.*\.vercel\.app$/, // Any Vercel deployment
+];
+
 app.use(
   cors({
-    origin: "http://localhost:5173", // No wildcard allowed with credentials
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+
+      // Check if origin is in allowed origins
+      const isAllowed = allowedOrigins.some((allowedOrigin) => {
+        if (typeof allowedOrigin === "string") {
+          return origin === allowedOrigin;
+        }
+        // Handle regex patterns
+        return allowedOrigin.test(origin);
+      });
+
+      if (isAllowed) {
+        callback(null, true);
+      } else {
+        console.warn(`CORS blocked origin: ${origin}`);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );

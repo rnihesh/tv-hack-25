@@ -260,8 +260,16 @@ Happy shopping!`,
 
 // General API configuration
 export const API_CONFIG = {
-  baseURL:
-    import.meta.env.VITE_API_URL || "https://phoenix-sol.onrender.com/api",
+  baseURL: (() => {
+    // Dynamically determine API URL based on environment
+    const isProduction =
+      window.location.hostname !== "localhost" &&
+      window.location.hostname !== "127.0.0.1";
+
+    return isProduction
+      ? "https://phoenix-sol.onrender.com/api"
+      : import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+  })(),
   timeout: 10000,
   retries: 3,
 };

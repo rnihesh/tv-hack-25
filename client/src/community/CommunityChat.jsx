@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import ThemeToggle from "../utils/ThemeToggle";
+import { getApiBaseUrl } from "../utils/config.js";
 
 export default function CommunityChat() {
   const [messages, setMessages] = useState([]);
@@ -28,15 +29,13 @@ export default function CommunityChat() {
   const fetchMessages = async () => {
     try {
       const token = localStorage.getItem("authToken");
-      const response = await axios.get(
-        "http://localhost:3000/api/community/messages",
-        {
-          withCredentials: true,
-          headers: {
-            ...(token && { Authorization: `Bearer ${token}` }),
-          },
-        }
-      );
+      const API_BASE_URL = getApiBaseUrl();
+      const response = await axios.get(`${API_BASE_URL}/community/messages`, {
+        withCredentials: true,
+        headers: {
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+      });
 
       // Ensure we always get an array
       let allMessages = [];
@@ -75,8 +74,9 @@ export default function CommunityChat() {
     setError(null);
     try {
       const token = localStorage.getItem("authToken");
+      const API_BASE_URL = getApiBaseUrl();
       await axios.post(
-        "http://localhost:3000/api/community/messages",
+        `${API_BASE_URL}/community/messages`,
         {
           content: newMsg,
           topics: messageTopics,
