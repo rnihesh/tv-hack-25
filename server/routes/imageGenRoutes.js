@@ -5,6 +5,7 @@ const router = express.Router();
 const {
   generateImage,
   getImageHistory,
+  deleteImage,
 } = require("../controllers/imageGenController");
 
 const { protect, checkCredits } = require("../middlewares/authMiddleware");
@@ -37,5 +38,7 @@ router.post(
 );
 
 router.get("/history", protect, getImageHistory);
+
+router.delete("/:imageId", protect, deleteImage);
 
 module.exports = router;
