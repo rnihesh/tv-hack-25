@@ -31,3 +31,15 @@ dist-ssr
 
 
 test-*
+debug*
+add*
+clean*
+fix*
+update*
+remove*
+upgrade*
+setup*
+quick*
+
+/test
+./test
