@@ -37,6 +37,24 @@ class MemoryVectorStore {
   async addDocuments(companyId, documents, metadatas, embeddings, ids) {
     const collection = this.getCollection(companyId);
 
+    // Validate input arrays
+    const MAX_DOCS = 100;
+    if (
+      !Array.isArray(documents) ||
+      !Array.isArray(metadatas) ||
+      !Array.isArray(embeddings) ||
+      !Array.isArray(ids) ||
+      documents.length > MAX_DOCS ||
+      metadatas.length > MAX_DOCS ||
+      embeddings.length > MAX_DOCS ||
+      ids.length > MAX_DOCS
+    ) {
+      logger.warn(
+        `Rejected addDocuments: invalid input arrays or too many documents (max ${MAX_DOCS}) for company ${companyId}`
+      );
+      return { success: false, error: "Invalid input arrays or too many documents" };
+    }
+
     // Check for duplicates by content
     const newDocuments = [];
     const newMetadatas = [];
