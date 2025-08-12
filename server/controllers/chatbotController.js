@@ -7,12 +7,13 @@ const { logger, aiLogger } = require("../utils/logger");
 const {
   feedbackChatbotIntegration,
 } = require("../services/feedback-langchain");
+const { ChatbotChain } = require("../services/langchain/contextualChains");
 
-// Initialize Gemini AI
+// Initialize Gemini AI (fallback)
 const genAI = new GoogleGenerativeAI(config.geminiApiKey);
 
 /**
- * Process chatbot message with company context
+ * Process chatbot message with company context using optimized chain
  */
 const processMessage = async (req, res) => {
   try {
@@ -46,157 +47,89 @@ const processMessage = async (req, res) => {
       });
     }
 
-    logger.info("Processing chatbot message", {
+    logger.info("Processing chatbot message with optimized context", {
       companyId,
       sessionId,
       messageLength: message.length,
     });
 
-    // Get or create AI context for this session
-    let aiContext = await AIContext.findOne({
-      companyId,
-      contextType: "chatbot",
-      sessionId,
-    });
+    const startTime = Date.now();
 
-    if (!aiContext) {
-      aiContext = new AIContext({
+    try {
+      // Use the optimized ChatbotChain
+      const chatbotChain = new ChatbotChain();
+      const result = await chatbotChain.processMessage(
         companyId,
-        contextType: "chatbot",
+        message,
         sessionId,
-        conversationHistory: [],
-        businessContext: {
-          extractedPreferences: {},
-          communicationPatterns: {},
+        {
+          maxTokens: 300, // Limit response length
+          temperature: 0.7, // Balanced creativity
+        }
+      );
+
+      const duration = Date.now() - startTime;
+
+      // Deduct credits after successful generation
+      await company.deductCredits(1, "chatbot", "Chatbot message processing");
+
+      // Update usage tracking
+      company.usage.chatbotQueries += 1;
+      await company.save();
+
+      logger.info("Chatbot response generated successfully with context", {
+        companyId,
+        sessionId,
+        responseLength: result.content.length,
+        modelUsed: result.modelUsed,
+        contextUsed: result.contextUsed,
+        duration: `${duration}ms`,
+      });
+
+      res.json({
+        success: true,
+        data: {
+          response: result.content,
+          sessionId,
+          creditsRemaining: company.credits.currentCredits - 1,
+          modelUsed: result.modelUsed,
+          contextUsed: result.contextUsed,
+          metrics: result.metrics,
+        },
+      });
+    } catch (chainError) {
+      // Fallback to simple Gemini if chain fails
+      logger.warn("ChatbotChain failed, using fallback:", chainError.message);
+
+      const fallbackResponse = await fallbackChatbotResponse(
+        company,
+        message,
+        sessionId
+      );
+
+      const duration = Date.now() - startTime;
+
+      // Deduct credits
+      await company.deductCredits(
+        1,
+        "chatbot",
+        "Chatbot message processing (fallback)"
+      );
+      company.usage.chatbotQueries += 1;
+      await company.save();
+
+      res.json({
+        success: true,
+        data: {
+          response: fallbackResponse,
+          sessionId,
+          creditsRemaining: company.credits.currentCredits - 1,
+          modelUsed: "gemini-2.5-flash-fallback",
+          contextUsed: false,
+          fallbackUsed: true,
         },
       });
     }
-
-    // Build context-aware prompt
-    const businessInfo = company.businessDescription || "A business";
-    const targetAudience = company.targetAudience || "customers";
-    const personality =
-      company.aiContextProfile?.businessPersonality ||
-      "helpful and professional";
-    const brandVoice = company.aiContextProfile?.brandVoice || "professional";
-
-    // Get recent conversation history
-    const recentHistory = aiContext.conversationHistory
-      .slice(-10) // Last 10 messages for context
-      .map((msg) => `${msg.role}: ${msg.content}`)
-      .join("\n");
-
-    const contextualPrompt = `You are an AI business assistant for "${
-      company.companyName || "this company"
-    }".
-
-BUSINESS CONTEXT:
-- Business Description: ${businessInfo}
-- Target Audience: ${targetAudience}
-- Communication Style: ${personality}
-- Brand Voice: ${brandVoice}
-- Services/Products: ${
-      company.aiContextProfile?.productServices?.join(", ") ||
-      "various services"
-    }
-
-RECENT CONVERSATION:
-${recentHistory}
-
-INSTRUCTIONS:
-- Act as a helpful customer service representative for this specific business
-- Use the business context to provide relevant, accurate responses
-- Maintain a ${brandVoice} tone that matches the company's communication style
-- Reference the company's services and target audience when appropriate
-- Be helpful, friendly, and professional
-- If you don't know specific details, suggest contacting the business directly
-- Keep responses concise but informative (max 200 words)
-- Avoid generic responses, no matter how common the query is, and tailor your answers to the specific business context.
-
-User Message: ${message}
-
-Response:`;
-
-    // Call Gemini API
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-
-    // Log AI request
-    aiLogger.request("gemini", "gemini-2.5-flash", contextualPrompt, {
-      companyId,
-      sessionId,
-      promptLength: contextualPrompt.length,
-    });
-
-    const startTime = Date.now();
-    const result = await model.generateContent(contextualPrompt);
-    const response = result.response;
-    const responseText = response.text();
-    const duration = Date.now() - startTime;
-
-    // Log AI response
-    aiLogger.response("gemini", "gemini-2.5-flash", responseText, {
-      companyId,
-      sessionId,
-      duration: `${duration}ms`,
-      responseLength: responseText.length,
-    });
-
-    // Save conversation to context
-    aiContext.conversationHistory.push(
-      {
-        role: "user",
-        content: message,
-        timestamp: new Date(),
-        metadata: {
-          sessionId,
-        },
-      },
-      {
-        role: "assistant",
-        content: responseText,
-        timestamp: new Date(),
-        metadata: {
-          model: "gemini-2.5-flash",
-          sessionId,
-        },
-      }
-    );
-
-    // Update business context with conversation patterns
-    if (!aiContext.businessContext.communicationPatterns) {
-      aiContext.businessContext.communicationPatterns = {};
-    }
-
-    // Track common query types
-    const queryType = categorizeQuery(message);
-    if (queryType) {
-      aiContext.businessContext.communicationPatterns[queryType] =
-        (aiContext.businessContext.communicationPatterns[queryType] || 0) + 1;
-    }
-
-    await aiContext.save();
-
-    // Deduct credits after successful generation
-    await company.deductCredits(1, "chatbot", "Chatbot message processing");
-
-    // Update usage tracking
-    company.usage.chatbotQueries += 1;
-    await company.save();
-
-    logger.info("Chatbot response generated successfully", {
-      companyId,
-      sessionId,
-      responseLength: responseText.length,
-    });
-
-    res.json({
-      success: true,
-      data: {
-        response: responseText,
-        sessionId,
-        creditsRemaining: company.credits.currentCredits - 1,
-      },
-    });
   } catch (error) {
     // Log AI error if it's related to AI processing
     if (

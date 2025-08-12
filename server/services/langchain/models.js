@@ -23,7 +23,10 @@ try {
       this.models = new Map();
       this.modelHealthCache = new Map(); // Cache model health status
       this.lastHealthCheck = new Map(); // Track when models were last checked
+      this.preferredModel = null; // Cache preferred working model
+      this.lastPreferredModelCheck = 0;
       this.healthCheckInterval = 5 * 60 * 1000; // 5 minutes
+      this.preferredModelCacheTime = 10 * 60 * 1000; // 10 minutes
       this.initializeModels();
     }
     initializeModels() {
@@ -252,6 +255,17 @@ try {
         throw new Error("No models available");
       }
 
+      // Use cached preferred model if still valid
+      const now = Date.now();
+      if (
+        this.preferredModel &&
+        availableModels.includes(this.preferredModel) &&
+        now - this.lastPreferredModelCheck < this.preferredModelCacheTime
+      ) {
+        logger.info(`Using cached preferred model: ${this.preferredModel}`);
+        return this.preferredModel;
+      }
+
       // Task-specific model preferences - use Gemini 2.5 Flash for website generation
       const taskPreferences = {
         email_generation: ["ollama-llama3", "gemini-2.5-flash"],
@@ -272,6 +286,10 @@ try {
             try {
               // Try to get the model instance - if Ollama is down, this will fail
               this.getModel(modelName);
+              // Cache this as preferred model
+              this.preferredModel = modelName;
+              this.lastPreferredModelCheck = now;
+              logger.info(`Set preferred model: ${modelName}`);
               return modelName;
             } catch (error) {
               logger.warn(
@@ -282,6 +300,9 @@ try {
             }
           } else {
             // For non-Ollama models (like Gemini), assume they're healthy if initialized
+            this.preferredModel = modelName;
+            this.lastPreferredModelCheck = now;
+            logger.info(`Set preferred model: ${modelName}`);
             return modelName;
           }
         }
@@ -291,7 +312,10 @@ try {
       logger.warn(
         `No preferred models available for task ${taskType}, using fallback`
       );
-      return availableModels[0];
+      const fallbackModel = availableModels[0];
+      this.preferredModel = fallbackModel;
+      this.lastPreferredModelCheck = now;
+      return fallbackModel;
     }
 
     // Enhanced method to get best working model with cached health check

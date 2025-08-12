@@ -436,63 +436,15 @@ const initializeVectorContext = async () => {
     // Initialize the vector context service
     await vectorContextService.initialize();
 
-    // Get all companies
-    const companies = await Company.find({}).select(
-      "companyName businessType businessDescription targetAudience preferences aiContextProfile"
-    );
+    // Context will be seeded lazily when first accessed for better performance
+    // This prevents duplicate seeding and improves startup time
+    const companies = await Company.find({}).select("companyName").limit(10);
     console.log(
-      `📋 Found ${companies.length} companies to initialize context for`
+      `📊 Found ${companies.length} companies - context will be seeded on first use`
     );
-
-    let successCount = 0;
-    for (const company of companies) {
-      try {
-        // Seed context for this company with their ACTUAL data
-        const contextData = {
-          companyName: company.companyName,
-          businessType: company.businessType,
-          businessDescription:
-            company.businessDescription ||
-            `${company.companyName} is a ${company.businessType} business`,
-          targetAudience:
-            company.targetAudience ||
-            `Customers interested in ${company.businessType} services`,
-          preferences: company.preferences || {},
-          keyMessages: company.aiContextProfile?.keyMessages || [],
-          productServices: company.aiContextProfile?.productServices || [],
-          businessPersonality: company.aiContextProfile?.businessPersonality,
-          brandVoice: company.aiContextProfile?.brandVoice,
-        };
-
-        await vectorContextService.seedCompanyContext(company._id, contextData);
-
-        // Verify context isolation
-        const verification = await vectorContextService.getCompanyContext(
-          company._id
-        );
-        if (verification.companyInfo.name !== company.companyName) {
-          console.warn(
-            `⚠️  Context verification failed for ${company.companyName} - expected "${company.companyName}" but got "${verification.companyInfo.name}"`
-          );
-        }
-
-        successCount++;
-      } catch (error) {
-        console.warn(
-          `⚠️  Failed to initialize context for ${company.companyName}:`,
-          error.message
-        );
-      }
-    }
-
-    console.log(
-      `✅ Successfully initialized vector context for ${successCount}/${companies.length} companies`
-    );
-    console.log(
-      `📊 Memory store now has ${memoryVectorStore.collections.size} isolated company collections`
-    );
+    console.log("✅ Vector context service initialized with lazy loading");
     logger.info(
-      `Vector context initialized for ${successCount}/${companies.length} companies with proper isolation`
+      "Vector context service initialized with lazy context seeding for better performance"
     );
   } catch (error) {
     console.error("❌ Vector context initialization error:", error.message);

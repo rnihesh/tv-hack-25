@@ -34,13 +34,6 @@ class ContextAwareChain {
 
 User Query: {user_query}
 
-Please provide a response that:
-1. Takes into account the company's specific context and preferences
-2. Maintains consistency with the company's brand voice and communication tone
-3. References relevant business information when appropriate
-4. Provides actionable and relevant advice
-5. Avoids generic responses, no matter how common the query is, and tailors answers to the specific business context.
-
 Response:`);
 
       return enhancedPrompt.format({
@@ -120,20 +113,28 @@ Response:`);
 
       // Update context with this interaction
       if (saveContext && sessionId) {
-        await vectorContextService.updateContextFromInteraction(
-          companyId,
-          this.contextType,
-          sessionId,
-          userQuery,
-          response.content,
-          {
-            model: response.modelUsed,
-            originalModel: response.originalModelRequested,
-            fallbackUsed: response.fallbackUsed || false,
-            tokenCount: response.metrics.tokenUsage.total,
-            processingTime: response.metrics.duration,
-          }
-        );
+        try {
+          await vectorContextService.updateContextFromInteraction(
+            companyId,
+            this.contextType,
+            sessionId,
+            userQuery,
+            response.content,
+            {
+              model: response.modelUsed,
+              originalModel: response.originalModelRequested,
+              fallbackUsed: response.fallbackUsed || false,
+              tokenCount: response.metrics.tokenUsage.total,
+              processingTime: response.metrics.duration,
+            }
+          );
+        } catch (contextError) {
+          logger.warn(
+            "Failed to update context from interaction:",
+            contextError
+          );
+          // Don't fail the whole request if context update fails
+        }
       }
 
       return {
@@ -537,21 +538,34 @@ class ChatbotChain extends ContextAwareChain {
 
   async processMessage(companyId, userMessage, sessionId, options = {}) {
     const basePrompt = `
-You are a helpful customer service chatbot for this company.
+You are a helpful customer service chatbot for this company. Provide direct, concise, and accurate responses.
 
-Your responses should:
-- Be helpful, friendly, and professional
-- Match the company's communication style
-- Provide accurate information about the company's products/services
-- Handle common customer queries effectively
-- Escalate complex issues when appropriate
-- Maintain context from previous conversation
+Guidelines:
+- Be brief and to the point
+- Use the company's actual name and information from the context
+- Answer questions directly without unnecessary elaboration
+- For simple questions, give simple answers
+- When asked "what am I", respond based on the customer's relationship to the company
+- Stay professional but conversational
+- If you don't know something specific, say so briefly
 
-Always stay in character as a representative of this specific company.`;
+IMPORTANT: 
+- Always use the company's actual name from the context
+- Keep responses concise unless complex explanation is needed
+- Answer the exact question asked
+- Only respond the answer related to the business context, dont provide generic responses
+- Dont provide generic responses, only answer based on the business thing only
+
+Example:
+Q: "What is my company name?" → A: "Your company name is [CompanyName]."
+Q: "What am I?" → A: "You are a user of [CompanyName], a [business type] business."`;
 
     return await this.invoke(companyId, userMessage, {
       basePrompt,
       sessionId,
+      saveContext: true,
+      maxTokens: 150, // Limit response length for conciseness
+      temperature: 0.3, // Lower temperature for more focused, direct responses
       ...options,
     });
   }
@@ -597,25 +611,15 @@ function createChain(contextType) {
   }
 }
 
-// Helper function to initialize company context
-async function initializeCompanyContext(companyId, companyData) {
+// Helper function to verify company context exists (no duplicate seeding)
+async function ensureCompanyContextExists(companyId) {
   try {
-    await vectorContextService.seedCompanyContext(companyId, {
-      businessDescription: companyData.businessDescription,
-      targetAudience: companyData.targetAudience,
-      productServices: companyData.aiContextProfile?.productServices || [],
-      keyMessages: companyData.aiContextProfile?.keyMessages || [],
-      businessPersonality: companyData.aiContextProfile?.businessPersonality,
-      brandVoice: companyData.aiContextProfile?.brandVoice,
-    });
-
-    logger.info(`Initialized context for company ${companyId}`);
+    // Just ensure context exists, don't duplicate seeding
+    await vectorContextService.ensureCompanyContextExists(companyId);
+    logger.info(`Verified context exists for company ${companyId}`);
     return true;
   } catch (error) {
-    logger.error(
-      `Failed to initialize context for company ${companyId}:`,
-      error
-    );
+    logger.error(`Failed to verify context for company ${companyId}:`, error);
     return false;
   }
 }
@@ -627,5 +631,5 @@ module.exports = {
   ChatbotChain,
   ImageGenerationChain,
   createChain,
-  initializeCompanyContext,
+  ensureCompanyContextExists,
 };

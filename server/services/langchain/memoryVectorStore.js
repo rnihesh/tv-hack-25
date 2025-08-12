@@ -33,22 +33,46 @@ class MemoryVectorStore {
       : this.createCollection(companyId);
   }
 
-  // Add documents to collection
+  // Add documents to collection with duplicate checking
   async addDocuments(companyId, documents, metadatas, embeddings, ids) {
     const collection = this.getCollection(companyId);
 
-    // Add the documents
+    // Check for duplicates by content
+    const newDocuments = [];
+    const newMetadatas = [];
+    const newEmbeddings = [];
+    const newIds = [];
+
     for (let i = 0; i < documents.length; i++) {
-      collection.documents.push(documents[i]);
-      collection.metadatas.push(metadatas[i]);
-      collection.embeddings.push(embeddings[i]);
-      collection.ids.push(ids[i]);
+      const documentContent = documents[i];
+      const isDuplicate = collection.documents.some(
+        (existingDoc) =>
+          existingDoc === documentContent ||
+          existingDoc.includes(documentContent.substring(0, 50)) // Check first 50 chars
+      );
+
+      if (!isDuplicate) {
+        newDocuments.push(documentContent);
+        newMetadatas.push(metadatas[i]);
+        newEmbeddings.push(embeddings[i]);
+        newIds.push(ids[i]);
+      }
+    }
+
+    // Add only new documents
+    for (let i = 0; i < newDocuments.length; i++) {
+      collection.documents.push(newDocuments[i]);
+      collection.metadatas.push(newMetadatas[i]);
+      collection.embeddings.push(newEmbeddings[i]);
+      collection.ids.push(newIds[i]);
     }
 
     logger.info(
-      `Added ${documents.length} documents to company ${companyId} memory store`
+      `Added ${newDocuments.length} new documents (skipped ${
+        documents.length - newDocuments.length
+      } duplicates) to company ${companyId} memory store`
     );
-    return { success: true };
+    return { success: true, addedCount: newDocuments.length };
   }
 
   // Query the collection
