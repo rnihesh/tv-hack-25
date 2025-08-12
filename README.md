@@ -1,168 +1,116 @@
-# 🔥 Phoenix AI Toolkit - Revolutionary AI-Powered Digital Platform
+# Phoenix AI Toolkit
 
-<div align="center">
+A comprehensive AI-powered platform that helps small businesses create websites, manage email campaigns, deploy chatbots, and generate marketing content using advanced AI models.
 
-![Phoenix AI Toolkit](https://img.shields.io/badge/Phoenix-AI%20Toolkit-ff6b35?style=for-the-badge&logo=phoenix&logoColor=white)
-![Version](https://img.shields.io/badge/version-1.0.0-blue?style=for-the-badge)
-![License](https://img.shields.io/badge/license-ISC-green?style=for-the-badge)
+## Features
 
-**🚀 The Ultimate AI-Driven Digital Transformation Platform for Small Businesses**
+**AI Website Generator**
 
-_Empowering businesses with cutting-edge AI technology to dominate the digital landscape_
+- Generate responsive websites using Google Gemini 2.5 Flash and Ollama LLaMA3
+- Multiple templates and customization options
+- Mobile-first responsive design
 
-[🌐 Live Demo](https://phoenix-sol.vercel.app) • [📖 Documentation](#documentation) • [🎥 Video Demo](#features) • [🚀 Get Started](#quick-start)
+**Email Marketing Suite**
 
-</div>
+- AI-powered email campaign generation
+- Customer segmentation and targeting
+- Performance analytics and tracking
 
----
+**Context-Aware Chatbot**
 
-## 🌟 **What Makes Phoenix AI Toolkit Extraordinary?**
+- Business context memory across conversations
+- Natural language processing
+- Sentiment analysis and continuous learning
 
-Phoenix AI Toolkit is not just another SaaS platform—it's a **revolutionary ecosystem** that transforms how small businesses operate digitally. Built with state-of-the-art AI technologies, it's the **only platform you'll ever need** to create, manage, and scale your digital presence.
+**Image Generation Studio**
 
-### 🎯 **Core Philosophy**
+- Create marketing visuals and graphics
+- Multiple artistic styles and formats
+- Cloudinary integration for storage
 
-> "Democratizing AI-powered digital transformation for every business, regardless of size or technical expertise."
+**Feedback Analytics**
 
----
+- Vector-based similarity search
+- Sentiment trend analysis
+- AI-generated business insights
 
-## ✨ **Groundbreaking Features**
+## Technology Stack
 
-### 🎨 **AI Website Generator** - _Build Stunning Websites in Minutes_
+**Frontend**
 
-- **🤖 Smart AI Design**: Powered by Google Gemini 2.5 Flash & Ollama LLaMA3
-- **🎭 Dynamic Templates**: Professional, creative, and industry-specific designs
-- **📱 Mobile-First**: Responsive designs that look perfect on every device
-- **⚡ Instant Deployment**: One-click deployment to Vercel/Netlify
-- **🔧 Full Customization**: Complete control over colors, layouts, and content
+- React 19.1 with Vite 7.0
+- Tailwind CSS 4.1
+- React Router DOM 7.7
 
-### 📧 **Intelligent Email Marketing Suite** - _Campaigns That Convert_
+**Backend**
 
-- **🧠 AI Content Enhancement**: Transform basic descriptions into compelling campaigns
-- **🎯 Smart Segmentation**: Target the right customers with precision
-- **📊 Predictive Analytics**: Estimated open rates and click-through predictions
-- **⏰ Smart Scheduling**: Optimal send time recommendations
-- **📈 Performance Tracking**: Real-time campaign analytics
+- Node.js 18+ with Express.js
+- MongoDB with Mongoose ODM
+- LangChain for AI orchestration
+- Vector storage with ChromaDB/FAISS
 
-### 🤖 **Context-Aware AI Chatbot** - _24/7 Intelligent Customer Service_
+**AI & Services**
 
-- **🧠 Business Context Memory**: Remembers your business details across conversations
-- **💬 Natural Language Processing**: Human-like interactions powered by advanced AI
-- **📊 Sentiment Analysis**: Understands customer emotions and responds appropriately
-- **🔄 Continuous Learning**: Gets smarter with every interaction
-- **📱 Multi-Platform Integration**: Works on websites, social media, and messaging apps
+- Google Gemini 2.5 Flash
+- Ollama LLaMA3 (local support)
+- Stripe for payments
+- Cloudinary for media management
 
-### 🎨 **AI Image Generation Studio** - _Create Stunning Visuals Instantly_
-
-- **🖼️ Professional Quality**: Generate marketing images, logos, and graphics
-- **🎭 Multiple Styles**: From photorealistic to artistic illustrations
-- **☁️ Cloud Storage**: Automatic upload to Cloudinary with optimization
-- **🔄 Batch Processing**: Generate multiple variations simultaneously
-- **📐 Custom Dimensions**: Perfect sizing for any platform or use case
-
-### 📊 **Advanced Feedback Analytics** - _Turn Customer Insights into Action_
-
-- **🔍 Vector-Based Search**: Find similar feedback using semantic understanding
-- **📈 Sentiment Trends**: Track customer satisfaction over time
-- **🎯 AI Insights Generation**: Actionable business recommendations
-- **📝 Theme Extraction**: Identify key topics and pain points
-- **🤖 Chatbot Integration**: Query feedback data using natural language
-
----
-
-## 🏗️ **Revolutionary Architecture**
-
-### 🛠️ **Technology Stack**
-
-#### **Frontend Powerhouse**
-
-- **⚛️ React 19.1** - Latest React with concurrent features
-- **⚡ Vite 7.0** - Lightning-fast development and builds
-- **🎨 Tailwind CSS 4.1** - Modern utility-first styling
-- **📝 React Markdown** - Rich content rendering
-- **🧭 React Router DOM 7.7** - Seamless navigation
-
-#### **Backend Excellence**
-
-- **🚀 Node.js 18+** - High-performance JavaScript runtime
-- **⚡ Express.js** - Robust web application framework
-- **🗄️ MongoDB** - Flexible document database with Mongoose ODM
-- **🧠 LangChain** - Advanced AI integration framework
-- **🔍 ChromaDB** - Vector database for AI context storage
-
-#### **AI & Machine Learning**
-
-- **🤖 Google Gemini 2.5 Flash** - Cutting-edge language model
-- **🦙 Ollama LLaMA3** - Local AI model support
-- **🔗 LangChain** - AI workflow orchestration
-- **🧠 Vector Embeddings** - Semantic search and context understanding
-
-#### **Infrastructure & Services**
-
-- **💳 Stripe** - Secure payment processing
-- **☁️ Cloudinary** - Image management and optimization
-- **🔐 JWT** - Secure authentication
-- **📊 Winston** - Comprehensive logging
-- **🛡️ Helmet** - Security middleware
-
-### 📁 **Intelligent Project Structure**
+## Project Structure
 
 ```
 phoenix-ai-toolkit/
-├── 🎨 client/                    # React Frontend
+├── client/                    # React frontend
 │   ├── src/
-│   │   ├── 🏠 components/        # Reusable UI components
-│   │   ├── 🌐 website-generator/ # Website creation tools
-│   │   ├── 📧 mailer/           # Email marketing suite
-│   │   ├── 🤖 chatbot/          # AI chatbot interface
-│   │   ├── 🎨 aiImageGenerator/ # Image generation studio
-│   │   ├── 👥 community/        # Community features
-│   │   └── 🔧 utils/            # Utility functions
-└── 🚀 server/                   # Node.js Backend
-    ├── 🎛️ controllers/          # Business logic
-    ├── 📊 models/               # Database schemas
-    ├── 🛣️ routes/               # API endpoints
-    ├── 🤖 services/             # AI & external services
-    │   ├── langchain/           # LangChain integrations
-    │   └── feedback-langchain/  # Feedback analysis
-    ├── 🛡️ middlewares/          # Security & validation
-    └── 🔧 utils/                # Helper functions
+│   │   ├── components/        # Reusable UI components
+│   │   ├── website-generator/ # Website creation tools
+│   │   ├── mailer/           # Email marketing suite
+│   │   ├── chatbot/          # AI chatbot interface
+│   │   ├── aiImageGenerator/ # Image generation studio
+│   │   └── utils/            # Utility functions
+└── server/                   # Node.js backend
+    ├── controllers/          # Business logic
+    ├── models/               # Database schemas
+    ├── routes/               # API endpoints
+    ├── services/             # AI & external services
+    │   ├── langchain/        # LangChain integrations
+    │   └── feedback-langchain/ # Feedback analysis
+    ├── middlewares/          # Security & validation
+    └── utils/                # Helper functions
 ```
 
----
+## Quick Start
 
-## 🚀 **Quick Start Guide**
+### Prerequisites
 
-### 📋 **Prerequisites**
+- Node.js 18+
+- MongoDB 4.4+
+- Git
 
-- **Node.js** 18+
-- **MongoDB** 4.4+
-- **Git** (for cloning)
+### Installation
 
-### ⚡ **Installation**
-
-1. **Clone the Repository**
+1. **Clone the repository**
 
    ```bash
    git clone https://github.com/your-username/phoenix-ai-toolkit.git
    cd phoenix-ai-toolkit
    ```
 
-2. **Install Dependencies**
+2. **Install dependencies**
 
    ```bash
    # Install all dependencies (client + server)
    npm run install:all
    ```
 
-3. **Environment Setup**
+3. **Environment setup**
 
    ```bash
    # Copy environment template
    cp server/.env.example server/.env
    ```
 
-4. **Configure Environment Variables**
+4. **Configure environment variables**
 
    ```env
    # Database
@@ -180,55 +128,23 @@ phoenix-ai-toolkit/
    CLOUDINARY_CLOUD_NAME=your-cloudinary-name
    ```
 
-5. **Start Development Servers**
+5. **Start development servers**
 
    ```bash
    # Terminal 1 - Backend
-   npm run dev:server
+   cd server && npm run dev
 
    # Terminal 2 - Frontend
-   npm run dev:client
+   cd client && npm run dev
    ```
 
-6. **🎉 Access Your Application**
-   - **Frontend**: http://localhost:3000
-   - **Backend API**: http://localhost:4000
+6. **Access the application**
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:4000
 
----
+## API Overview
 
-## 💳 **Flexible Pricing Plans**
-
-### 🆓 **Free Plan** - _Perfect for Getting Started_
-
-- **10 daily credits**
-- 1 website template
-- 5 email campaigns
-- 3 image generations
-- 50 chatbot queries
-
-### 🚀 **Starter Plan** - _$29/month_
-
-- **100 daily credits + 500 bonus**
-- 5 website templates
-- 50 email campaigns
-- 100 image generations
-- 1,000 chatbot queries
-
-### 💎 **Professional Plan** - _$99/month_
-
-- **500 daily credits + 2000 bonus**
-- Unlimited websites
-- Unlimited email campaigns
-- 500 image generations
-- 5,000 chatbot queries
-- Priority support
-- Custom branding
-
----
-
-## 📚 **Comprehensive API Documentation**
-
-### 🔐 **Authentication Endpoints**
+### Authentication
 
 ```http
 POST /api/auth/register     # Register new company
@@ -237,17 +153,17 @@ GET  /api/auth/profile      # Get company profile
 PUT  /api/auth/profile      # Update company profile
 ```
 
-### 🌐 **Website Generation**
+### Website Generation
 
 ```http
 POST /api/website/generate      # Generate new website (5 credits)
 GET  /api/website/my-websites   # Get company's websites
 GET  /api/website/:id           # Get specific website
 PUT  /api/website/:id           # Update website
-DEL  /api/website/:id           # Delete website
+DELETE /api/website/:id         # Delete website
 ```
 
-### 📧 **Email Marketing**
+### Email Marketing
 
 ```http
 POST /api/marketing/email/generate     # Generate marketing email (1 credit)
@@ -255,7 +171,7 @@ GET  /api/marketing/campaigns          # Get email campaigns
 POST /api/marketing/campaigns/:id/send # Send email campaign
 ```
 
-### 🤖 **AI Chatbot**
+### AI Chatbot
 
 ```http
 POST /api/chatbot/message     # Send message to chatbot (1 credit)
@@ -263,165 +179,101 @@ GET  /api/chatbot/config      # Get chatbot configuration
 PUT  /api/chatbot/config      # Update chatbot configuration
 ```
 
-### 🎨 **Image Generation**
+### Image Generation
 
 ```http
 POST /api/images/generate     # Generate images (2 credits)
 GET  /api/images/history      # Get generated images
-DEL  /api/images/:id          # Delete image
+DELETE /api/images/:id        # Delete image
 ```
 
----
+## Pricing Plans
 
-## 🔒 **Enterprise-Grade Security**
+| Plan             | Price     | Credits               | Features                                                            |
+| ---------------- | --------- | --------------------- | ------------------------------------------------------------------- |
+| **Free**         | $0        | 10 daily              | 1 website, 5 emails, 3 images, 50 chats                             |
+| **Starter**      | $29/month | 100 daily + 500 bonus | 5 websites, 50 emails, 100 images, 1K chats                         |
+| **Professional** | $99/month | 500 daily + 2K bonus  | Unlimited websites & emails, 500 images, 5K chats, priority support |
 
-- **🛡️ JWT Authentication** - Secure token-based authentication
-- **🚨 Rate Limiting** - Prevents API abuse and ensures fair usage
-- **✅ Input Validation** - Comprehensive request validation with Joi
-- **🔐 Password Security** - bcrypt with high salt rounds
-- **🌐 CORS Protection** - Configured for specific origins
-- **🛡️ Helmet Security** - Additional HTTP security headers
-- **💉 Injection Protection** - MongoDB injection prevention
+## Security Features
 
----
+- JWT authentication with secure token management
+- Rate limiting to prevent API abuse
+- Input validation with Joi
+- Password hashing with bcrypt
+- CORS protection
+- HTTP security headers with Helmet
+- MongoDB injection prevention
 
-## 📊 **Advanced Monitoring & Analytics**
+## Development
 
-### 📈 **Real-Time Monitoring**
+### Available Scripts
 
-- HTTP request tracking with response times
-- Database query performance monitoring
-- AI model usage and token consumption
-- Business event tracking (registrations, subscriptions)
-- Security event monitoring (failed auth, rate limiting)
+**Frontend (client/)**
 
-### 📋 **Comprehensive Logging**
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run preview      # Preview production build
+npm run lint         # Run ESLint
+```
+
+**Backend (server/)**
+
+```bash
+npm run dev          # Start with nodemon
+npm start            # Start with node --watch
+npm test             # Run Jest tests
+npm run lint         # Run ESLint
+npm run lint:fix     # Fix ESLint issues
+```
+
+### Logging
+
+Application logs are stored in:
 
 ```
-logs/
+server/logs/
 ├── combined.log    # All application logs
 ├── error.log       # Error logs only
 ├── access.log      # HTTP access logs
 └── exceptions.log  # Unhandled exceptions
 ```
 
----
+## Team
 
-## 🎯 **Use Cases & Success Stories**
+- **Nihesh** - Lead AI Engineer
+- **Pavan** - Full Stack Developer
+- **Mahesh** - UI/UX Designer
+- **Ritheesh** - DevOps Engineer
 
-### 🏪 **Small Business Owners**
+## Contributing
 
-_"Phoenix AI Toolkit helped me create a professional website and launch email campaigns in just one afternoon. My revenue increased by 40% in the first month!"_
+We welcome contributions! Here's how to get started:
 
-### 💼 **Digital Agencies**
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-_"We use Phoenix to rapidly prototype websites for clients. What used to take weeks now takes hours."_
-
-### 🛍️ **E-commerce Stores**
-
-_"The AI chatbot handles 80% of our customer inquiries automatically, allowing our team to focus on complex issues."_
-
-### 📱 **App Developers**
-
-_"The image generation feature creates all our marketing materials. We've saved thousands on design costs."_
-
----
-
-## 🌟 **What's Coming Next**
-
-### 🗓️ **Q2 2025 Roadmap**
-
-- **🔗 Social Media Integration** - Auto-post to Instagram, Twitter, LinkedIn
-- **📊 Advanced Analytics Dashboard** - Deep insights and reporting
-- **🎨 Custom Template Builder** - Drag-and-drop website designer
-- **🤖 AI Voice Assistant** - Voice-powered business assistant
-- **📱 Mobile Apps** - iOS and Android native applications
-
-### 🚀 **Future Vision**
-
-- **🧠 AGI Integration** - Next-generation AI capabilities
-- **🌍 Multi-language Support** - Global market expansion
-- **🔌 Marketplace Integrations** - Connect with Shopify, WooCommerce, etc.
-- **🎯 AR/VR Experiences** - Immersive customer experiences
-
----
-
-## 👥 **Meet the Team**
-
-<div align="center">
-
-|      🧠 **Nihesh**      |     💻 **Pavan**     |       🎨 **Mahesh**        |        🚀 **Ritheesh**        |
-| :---------------------: | :------------------: | :------------------------: | :---------------------------: |
-|    Lead AI Engineer     | Full Stack Developer |       UI/UX Designer       |        DevOps Engineer        |
-| _AI & Machine Learning_ | _Frontend & Backend_ | _Design & User Experience_ | _Infrastructure & Deployment_ |
-
-</div>
-
----
-
-## 🤝 **Contributing**
-
-We welcome contributions from the community! Here's how you can help:
-
-1. **🍴 Fork the repository**
-2. **🌿 Create a feature branch** (`git checkout -b feature/amazing-feature`)
-3. **💾 Commit your changes** (`git commit -m 'Add amazing feature'`)
-4. **📤 Push to the branch** (`git push origin feature/amazing-feature`)
-5. **🔄 Open a Pull Request**
-
-### 📋 **Contribution Guidelines**
+### Guidelines
 
 - Follow existing code style and conventions
 - Add tests for new features
 - Update documentation as needed
 - Ensure all tests pass before submitting
 
----
+## License
 
-## 📄 **License**
+This project is licensed under the ISC License - see the [LICENSE](LICENSE) file for details.
 
-This project is licensed under the **ISC License** - see the [LICENSE](LICENSE) file for details.
+## Support
 
----
-
-## 🆘 **Support & Community**
-
-### 💬 **Get Help**
-
-- **📧 Email**: support@phoenix-ai-toolkit.com
-- **💬 Discord**: [Join our community](https://discord.gg/phoenix-ai)
-- **📖 Documentation**: [docs.phoenix-ai-toolkit.com](https://docs.phoenix-ai-toolkit.com)
-- **🐛 Bug Reports**: [GitHub Issues](https://github.com/your-username/phoenix-ai-toolkit/issues)
-
-### 🌟 **Show Your Support**
-
-If Phoenix AI Toolkit has helped your business, please ⭐ star this repository and share it with others!
+- **Issues**: [GitHub Issues](https://github.com/your-username/phoenix-ai-toolkit/issues)
+- **Email**: support@phoenix-ai-toolkit.com
+- **Demo**: [phoenix-sol.vercel.app](https://phoenix-sol.vercel.app)
 
 ---
 
-<div align="center">
-
-## 🔥 **Ready to Transform Your Business?**
-
-[![Deploy to Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/your-username/phoenix-ai-toolkit)
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
-
-**[🚀 Get Started Now](https://phoenix-sol.vercel.app) • [📖 Read the Docs](#documentation) • [🎥 Watch Demo](#features)**
-
----
-
-_Built with ❤️ by passionate developers who believe every business deserves access to cutting-edge AI technology._
-
-**Phoenix AI Toolkit** - _Where AI meets ambition._
-
-</div>
-
----
-
-<div align="center">
-
-![GitHub stars](https://img.shields.io/github/stars/your-username/phoenix-ai-toolkit?style=social)
-![GitHub forks](https://img.shields.io/github/forks/your-username/phoenix-ai-toolkit?style=social)
-![GitHub watchers](https://img.shields.io/github/watchers/your-username/phoenix-ai-toolkit?style=social)
-
-</div>
+Built with ❤️ for small businesses everywhere.
