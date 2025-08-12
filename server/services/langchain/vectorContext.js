@@ -103,6 +103,19 @@ class VectorContextService {
         return { id: `fallback_${Date.now()}` };
       }
 
+      // Check for duplicate content to prevent redundant storage
+      const collection = await this.getOrCreateCollection(companyId);
+      const existingDoc = collection.documents.find(
+        (doc) => doc.toLowerCase().trim() === document.toLowerCase().trim()
+      );
+
+      if (existingDoc) {
+        logger.info(
+          `Document already exists for company ${companyId}, skipping duplicate`
+        );
+        return { id: `existing_${Date.now()}` };
+      }
+
       // Generate embedding for document with error handling
       let embedding;
       try {
@@ -257,8 +270,14 @@ class VectorContextService {
       let company = this.companyCache.get(companyId);
       if (!company) {
         const Company = require("../../models/Company");
-        company = await Company.findById(companyId);
-        this.companyCache.set(companyId, company);
+        company = await Company.findById(companyId).select(
+          "companyName businessType businessDescription targetAudience preferences aiContextProfile"
+        );
+        if (company) {
+          // Cache for 5 minutes to balance freshness and performance
+          this.companyCache.set(companyId, company);
+          setTimeout(() => this.companyCache.delete(companyId), 5 * 60 * 1000);
+        }
       }
 
       // Combine all context
@@ -438,10 +457,23 @@ class VectorContextService {
         existingCollection.documents &&
         existingCollection.documents.length > 0
       ) {
-        logger.info(
-          `Context already exists for company ${companyId}, skipping seeding`
+        // Check if we have the company name document to verify this is proper seeding
+        const hasCompanyName = existingCollection.documents.some((doc) =>
+          doc.includes(`Company Name: ${initialData.companyName}`)
         );
-        return 0; // Return 0 documents added
+
+        if (hasCompanyName) {
+          logger.info(
+            `Context already exists for company ${companyId}, skipping seeding`
+          );
+          return 0; // Return 0 documents added
+        } else {
+          // Clear incomplete/corrupted data
+          await memoryVectorStore.deleteCollection(companyId);
+          logger.info(
+            `Cleared incomplete context for company ${companyId}, reseeding`
+          );
+        }
       }
 
       const documents = [];
@@ -482,7 +514,7 @@ class VectorContextService {
         });
       }
 
-      // Add target audience info
+      // Add target audience info (only once!)
       if (initialData.targetAudience) {
         documents.push({
           content: `Target Audience: ${initialData.targetAudience}`,
@@ -495,7 +527,10 @@ class VectorContextService {
       }
 
       // Add preferences info
-      if (initialData.preferences) {
+      if (
+        initialData.preferences &&
+        Object.keys(initialData.preferences).length > 0
+      ) {
         const preferencesText = Object.entries(initialData.preferences)
           .map(([key, value]) => `${key}: ${value}`)
           .join(", ");
@@ -527,13 +562,24 @@ class VectorContextService {
         });
       }
 
-      // Add target audience info
-      if (initialData.targetAudience) {
+      // Add AI context profile info
+      if (initialData.businessPersonality) {
         documents.push({
-          content: `Target Audience: ${initialData.targetAudience}`,
+          content: `Business Personality: ${initialData.businessPersonality}`,
           metadata: {
             source: "business_info",
-            type: "target_audience",
+            type: "business_personality",
+            importance: 7,
+          },
+        });
+      }
+
+      if (initialData.brandVoice) {
+        documents.push({
+          content: `Brand Voice: ${initialData.brandVoice}`,
+          metadata: {
+            source: "business_info",
+            type: "brand_voice",
             importance: 7,
           },
         });
@@ -551,9 +597,11 @@ class VectorContextService {
         });
       }
 
-      // Store all documents
-      for (const doc of documents) {
-        await this.addDocumentToContext(companyId, doc.content, doc.metadata);
+      // Store all documents in batch to reduce API calls
+      if (documents.length > 0) {
+        for (const doc of documents) {
+          await this.addDocumentToContext(companyId, doc.content, doc.metadata);
+        }
       }
 
       logger.info(
@@ -576,23 +624,26 @@ class VectorContextService {
       // Lazy initialization: seed context if not exists
       await this.ensureCompanyContextExists(companyId);
 
-      // Get relevant context
+      // Get relevant context with optimized search
       const context = await this.getCompanyContext(
         companyId,
         contextType,
         sessionId
       );
 
-      // Search for query-specific context only if different from general context
+      // For queries longer than 10 chars, get additional query-specific context
+      // Combine with general context search to reduce API calls
       let queryContext = [];
       if (userQuery && userQuery.length > 10) {
+        // Use a more specific search that builds on the general context
         queryContext = await this.searchContext(companyId, userQuery, {
-          limit: 2,
-          threshold: 0.7,
+          limit: 3,
+          threshold: 0.6, // Slightly lower threshold for better recall
+          excludeTypes: ["company_name", "business_type"], // Avoid duplicating basic info
         });
       }
 
-      // Format context for prompt injection
+      // Format context for prompt injection with deduplication
       const contextText = this.formatContextForPrompt(context, queryContext);
 
       return contextText;
@@ -610,9 +661,12 @@ class VectorContextService {
         return; // Context already exists
       }
 
-      // Seed context lazily
+      // Seed context lazily with comprehensive company data
       const Company = require("../../models/Company");
-      const company = await Company.findById(companyId);
+      const company = await Company.findById(companyId).select(
+        "companyName businessType businessDescription targetAudience preferences aiContextProfile"
+      );
+
       if (company) {
         await this.seedCompanyContext(companyId, {
           companyName: company.companyName,
@@ -620,7 +674,10 @@ class VectorContextService {
           businessDescription: company.businessDescription,
           targetAudience: company.targetAudience,
           preferences: company.preferences,
-          aiContextProfile: company.aiContextProfile,
+          productServices: company.aiContextProfile?.productServices,
+          keyMessages: company.aiContextProfile?.keyMessages,
+          businessPersonality: company.aiContextProfile?.businessPersonality,
+          brandVoice: company.aiContextProfile?.brandVoice,
         });
         logger.info(`Lazily seeded context for company ${companyId}`);
       }
@@ -634,58 +691,83 @@ class VectorContextService {
   formatContextForPrompt(fullContext, queryContext) {
     const sections = [];
 
-    // Company information
+    // Company information - Make this very prominent for chatbot
     if (fullContext.companyInfo) {
       const company = fullContext.companyInfo;
-      let companySection = `Company: ${company.name || "Unknown Company"}
+      let companySection = `=== COMPANY INFORMATION ===
+Company Name: ${company.name || "Unknown Company"}
 Business Type: ${company.businessType || "General Business"}`;
 
       if (company.description && company.description !== "undefined") {
-        companySection += `\nDescription: ${company.description}`;
+        companySection += `
+Business Description: ${company.description}`;
       }
 
       if (company.targetAudience && company.targetAudience !== "undefined") {
-        companySection += `\nTarget Audience: ${company.targetAudience}`;
+        companySection += `
+Target Audience: ${company.targetAudience}`;
       }
 
       if (company.preferences?.communicationTone) {
-        companySection += `\nCommunication Tone: ${company.preferences.communicationTone}`;
+        companySection += `
+Communication Tone: ${company.preferences.communicationTone}`;
       }
 
       if (company.preferences?.brandStyle) {
-        companySection += `\nBrand Style: ${company.preferences.brandStyle}`;
+        companySection += `
+Brand Style: ${company.preferences.brandStyle}`;
       }
 
       if (company.preferences?.colorScheme) {
-        companySection += `\nPreferred Colors: ${company.preferences.colorScheme}`;
+        companySection += `
+Preferred Colors: ${company.preferences.colorScheme}`;
       }
 
       // Add AI context profile information
       if (company.aiProfile?.businessPersonality) {
-        companySection += `\nBusiness Personality: ${company.aiProfile.businessPersonality}`;
+        companySection += `
+Business Personality: ${company.aiProfile.businessPersonality}`;
       }
 
       if (company.aiProfile?.keyMessages?.length > 0) {
-        companySection += `\nKey Messages: ${company.aiProfile.keyMessages.join(
-          ", "
-        )}`;
+        companySection += `
+Key Messages: ${company.aiProfile.keyMessages.join(", ")}`;
       }
 
       if (company.aiProfile?.brandVoice) {
-        companySection += `\nBrand Voice: ${company.aiProfile.brandVoice}`;
+        companySection += `
+Brand Voice: ${company.aiProfile.brandVoice}`;
+      }
+
+      if (company.aiProfile?.productServices?.length > 0) {
+        const services = company.aiProfile.productServices
+          .map((service) => `${service.name}: ${service.description}`)
+          .join(", ");
+        companySection += `
+Products/Services: ${services}`;
       }
 
       sections.push(companySection);
     }
 
-    // Relevant business context from vector store
+    // Relevant business context from vector store (with deduplication)
     if (queryContext && queryContext.length > 0) {
+      const seenContent = new Set();
       const relevantInfo = queryContext
-        .filter((doc) => doc.content && doc.content.trim()) // Filter out empty content
+        .filter((doc) => {
+          if (!doc.content || !doc.content.trim()) return false;
+
+          // Simple deduplication based on content similarity
+          const contentKey = doc.content.toLowerCase().substring(0, 50);
+          if (seenContent.has(contentKey)) return false;
+
+          seenContent.add(contentKey);
+          return true;
+        })
         .map((doc) => doc.content)
         .join("\n");
       if (relevantInfo.trim()) {
-        sections.push(`Relevant Business Context:\n${relevantInfo}`);
+        sections.push(`=== RELEVANT BUSINESS CONTEXT ===\n${relevantInfo}`);
       }
     }
 
@@ -698,7 +780,7 @@ Business Type: ${company.businessType || "General Business"}`;
         .slice(-4) // Last 4 messages
         .map((msg) => `${msg.role}: ${msg.content}`)
         .join("\n");
-      sections.push(`Recent Conversation:\n${recentMessages}`);
+      sections.push(`=== RECENT CONVERSATION ===\n${recentMessages}`);
     }
 
     return sections.join("\n\n");

@@ -1,0 +1,1538 @@
+[
+  [
+    "feedback_1754236872174_csbrifkrc",
+    {
+      "text": "I love this product!",
+      "sentiment": "Positive",
+      "source": "Twitter",
+      "date": "2023-06-15 09:23:14",
+      "userId": "@user123",
+      "location": "New York",
+      "confidence": 0.85,
+      "processedAt": "2025-08-03T16:01:12.167Z",
+      "enhanced": true,
+      "id": "feedback_1754236872174_csbrifkrc",
+      "addedAt": "2025-08-03T16:01:12.992Z"
+    }
+  ],
+  [
+    "feedback_1754236872997_spxxbk4pb",
+    {
+      "text": "The service was terrible.",
+      "sentiment": "Negative",
+      "source": "Yelp Reviews",
+      "date": "2023-06-15 11:45:32",
+      "userId": "user456",
+      "location": "Los Angeles",
+      "confidence": 0.65,
+      "processedAt": "2025-08-03T16:01:12.997Z",
+      "enhanced": true,
+      "id": "feedback_1754236872997_spxxbk4pb",
+      "addedAt": "2025-08-03T16:01:13.040Z"
+    }
+  ],
+  [
+    "feedback_1754236873045_uyjihxd75",
+    {
+      "text": "This movie is amazing!",
+      "sentiment": "Positive",
+      "source": "IMDb",
+      "date": "2023-06-15 14:10:22",
+      "userId": "moviefan789",
+      "location": "London",
+      "confidence": 0.92,
+      "processedAt": "2025-08-03T16:01:13.045Z",
+      "enhanced": true,
+      "id": "feedback_1754236873045_uyjihxd75",
+      "addedAt": "2025-08-03T16:01:13.080Z"
+    }
+  ],
+  [
+    "feedback_1754236873084_bknajhhiy",
+    {
+      "text": "I'm so disappointed with their customer support.",
+      "sentiment": "Negative",
+      "source": "Online Forum",
+      "date": "2023-06-15 17:35:11",
+      "userId": "forumuser1",
+      "location": "Toronto",
+      "confidence": 0.78,
+      "processedAt": "2025-08-03T16:01:13.084Z",
+      "enhanced": true,
+      "id": "feedback_1754236873084_bknajhhiy",
+      "addedAt": "2025-08-03T16:01:13.116Z"
+    }
+  ],
+  [
+    "feedback_1754236873117_5g8ymyedk",
+    {
+      "text": "Just had the best meal of my life!",
+      "sentiment": "Positive",
+      "source": "TripAdvisor",
+      "date": "2023-06-16 08:50:59",
+      "userId": "foodie22",
+      "location": "Paris",
+      "confidence": 0.88,
+      "processedAt": "2025-08-03T16:01:13.117Z",
+      "enhanced": true,
+      "id": "feedback_1754236873117_5g8ymyedk",
+      "addedAt": "2025-08-03T16:01:13.140Z"
+    }
+  ],
+  [
+    "feedback_1754236873141_85jzemjju",
+    {
+      "text": "The quality of this product is subpar.",
+      "sentiment": "Negative",
+      "source": "Amazon Reviews",
+      "date": "2023-06-16 10:15:27",
+      "userId": "shopper123",
+      "location": "San Francisco",
+      "confidence": 0.72,
+      "processedAt": "2025-08-03T16:01:13.141Z",
+      "enhanced": true,
+      "id": "feedback_1754236873141_85jzemjju",
+      "addedAt": "2025-08-03T16:01:13.163Z"
+    }
+  ],
+  [
+    "feedback_1754236873164_so9b8nzud",
+    {
+      "text": "I can't stop listening to this song. It's incredible!",
+      "sentiment": "Positive",
+      "source": "Spotify",
+      "date": "2023-06-16 13:40:18",
+      "userId": "musiclover456",
+      "location": "Berlin",
+      "confidence": 0.91,
+      "processedAt": "2025-08-03T16:01:13.164Z",
+      "enhanced": true,
+      "id": "feedback_1754236873164_so9b8nzud",
+      "addedAt": "2025-08-03T16:01:13.187Z"
+    }
+  ],
+  [
+    "feedback_1754236873188_rs5ijkszv",
+    {
+      "text": "Their website is so user-friendly. Love it!",
+      "sentiment": "Positive",
+      "source": "Website Testimonial",
+      "date": "2023-06-16 16:05:36",
+      "userId": "testimonialuser1",
+      "location": "Sydney",
+      "confidence": 0.87,
+      "processedAt": "2025-08-03T16:01:13.188Z",
+      "enhanced": true,
+      "id": "feedback_1754236873188_rs5ijkszv",
+      "addedAt": "2025-08-03T16:01:13.212Z"
+    }
+  ],
+  [
+    "feedback_1754236873214_m5e9u336o",
+    {
+      "text": "I loved the movie! It was fantastic!",
+      "sentiment": "Positive",
+      "source": "IMDb",
+      "date": "2023-07-02 09:12:34",
+      "userId": "user123",
+      "location": "New York",
+      "confidence": 0.92,
+      "processedAt": "2025-08-03T16:01:13.214Z",
+      "enhanced": true,
+      "id": "feedback_1754236873214_m5e9u336o",
+      "addedAt": "2025-08-03T16:01:13.239Z"
+    }
+  ],
+  [
+    "feedback_1754236873244_9d9bqxxqm",
+    {
+      "text": "The customer service was terrible.",
+      "sentiment": "Negative",
+      "source": "Yelp Reviews",
+      "date": "2023-07-02 10:45:21",
+      "userId": "user456",
+      "location": "Los Angeles",
+      "confidence": 0.65,
+      "processedAt": "2025-08-03T16:01:13.244Z",
+      "enhanced": true,
+      "id": "feedback_1754236873244_9d9bqxxqm",
+      "addedAt": "2025-08-03T16:01:13.267Z"
+    }
+  ],
+  [
+    "feedback_1754236873271_kzb4xj9hn",
+    {
+      "text": "This book made me feel inspired. Highly recommended!",
+      "sentiment": "Positive",
+      "source": "Goodreads",
+      "date": "2023-07-02 12:34:56",
+      "userId": "bookworm789",
+      "location": "London",
+      "confidence": 0.88,
+      "processedAt": "2025-08-03T16:01:13.271Z",
+      "enhanced": true,
+      "id": "feedback_1754236873271_kzb4xj9hn",
+      "addedAt": "2025-08-03T16:01:13.295Z"
+    }
+  ],
+  [
+    "feedback_1754236873300_i3sfh2m4w",
+    {
+      "text": "I'm extremely disappointed with their product quality.",
+      "sentiment": "Negative",
+      "source": "Online Store",
+      "date": "2023-07-02 15:21:43",
+      "userId": "shopper789",
+      "location": "San Francisco",
+      "confidence": 0.72,
+      "processedAt": "2025-08-03T16:01:13.300Z",
+      "enhanced": true,
+      "id": "feedback_1754236873300_i3sfh2m4w",
+      "addedAt": "2025-08-03T16:01:13.325Z"
+    }
+  ],
+  [
+    "feedback_1754236873328_cyn1f9myc",
+    {
+      "text": "Just had the most amazing vacation! I can't wait to go back.",
+      "sentiment": "Positive",
+      "source": "TripAdvisor",
+      "date": "2023-07-02 18:01:23",
+      "userId": "travelenthusiast1",
+      "location": "Sydney",
+      "confidence": 0.93,
+      "processedAt": "2025-08-03T16:01:13.328Z",
+      "enhanced": true,
+      "id": "feedback_1754236873328_cyn1f9myc",
+      "addedAt": "2025-08-03T16:01:13.352Z"
+    }
+  ],
+  [
+    "feedback_1754236873359_ci244zcea",
+    {
+      "text": "The food at this restaurant was awful. Never going back again!",
+      "sentiment": "Negative",
+      "source": "Zomato",
+      "date": "2023-07-02 20:45:37",
+      "userId": "foodlover123",
+      "location": "Mumbai",
+      "confidence": 0.55,
+      "processedAt": "2025-08-03T16:01:13.359Z",
+      "enhanced": true,
+      "id": "feedback_1754236873359_ci244zcea",
+      "addedAt": "2025-08-03T16:01:13.382Z"
+    }
+  ],
+  [
+    "feedback_1754236873385_yu9o0cyiz",
+    {
+      "text": "I can't stop listening to this song. It's my new favorite!",
+      "sentiment": "Positive",
+      "source": "Spotify",
+      "date": "2023-07-03 09:17:52",
+      "userId": "musiclover789",
+      "location": "Berlin",
+      "confidence": 0.91,
+      "processedAt": "2025-08-03T16:01:13.385Z",
+      "enhanced": true,
+      "id": "feedback_1754236873385_yu9o0cyiz",
+      "addedAt": "2025-08-03T16:01:13.411Z"
+    }
+  ],
+  [
+    "feedback_1754236873417_vma39ykac",
+    {
+      "text": "Their website is so confusing and poorly designed.",
+      "sentiment": "Negative",
+      "source": "Website Review",
+      "date": "2023-07-03 11:59:18",
+      "userId": "user789",
+      "location": "Toronto",
+      "confidence": 0.68,
+      "processedAt": "2025-08-03T16:01:13.417Z",
+      "enhanced": true,
+      "id": "feedback_1754236873417_vma39ykac",
+      "addedAt": "2025-08-03T16:01:13.441Z"
+    }
+  ],
+  [
+    "feedback_1754236873443_j9cj6lxcv",
+    {
+      "text": "I had an incredible experience at the theme park. So much fun!",
+      "sentiment": "Positive",
+      "source": "Trip Report",
+      "date": "2023-07-03 14:40:05",
+      "userId": "thrillseeker1",
+      "location": "Orlando",
+      "confidence": 0.89,
+      "processedAt": "2025-08-03T16:01:13.443Z",
+      "enhanced": true,
+      "id": "feedback_1754236873443_j9cj6lxcv",
+      "addedAt": "2025-08-03T16:01:13.466Z"
+    }
+  ],
+  [
+    "feedback_1754236873469_7y6cu1tvv",
+    {
+      "text": "The product arrived damaged. Very disappointed.",
+      "sentiment": "Negative",
+      "source": "Online Store",
+      "date": "2023-07-03 17:25:09",
+      "userId": "buyer123",
+      "location": "Chicago",
+      "confidence": 0.76,
+      "processedAt": "2025-08-03T16:01:13.469Z",
+      "enhanced": true,
+      "id": "feedback_1754236873469_7y6cu1tvv",
+      "addedAt": "2025-08-03T16:01:13.491Z"
+    }
+  ],
+  [
+    "feedback_1754236873493_xx1c5if7z",
+    {
+      "text": "The concert was absolutely breathtaking. Best performance ever!",
+      "sentiment": "Positive",
+      "source": "Event Review",
+      "date": "2023-07-03 20:15:33",
+      "userId": "musicfan456",
+      "location": "Paris",
+      "confidence": 0.95,
+      "processedAt": "2025-08-03T16:01:13.493Z",
+      "enhanced": true,
+      "id": "feedback_1754236873493_xx1c5if7z",
+      "addedAt": "2025-08-03T16:01:13.516Z"
+    }
+  ],
+  [
+    "feedback_1754236873520_p666tinly",
+    {
+      "text": "I had a terrible experience with their customer support.",
+      "sentiment": "Negative",
+      "source": "Online Chat",
+      "date": "2023-07-04 08:32:41",
+      "userId": "user1234",
+      "location": "Sydney",
+      "confidence": 0.61,
+      "processedAt": "2025-08-03T16:01:13.520Z",
+      "enhanced": true,
+      "id": "feedback_1754236873520_p666tinly",
+      "addedAt": "2025-08-03T16:01:13.544Z"
+    }
+  ],
+  [
+    "feedback_1754236873548_jya67f7u4",
+    {
+      "text": "This movie is a masterpiece! I was blown away.",
+      "sentiment": "Positive",
+      "source": "IMDb",
+      "date": "2023-07-04 14:05:27",
+      "userId": "cinephile789",
+      "location": "Los Angeles",
+      "confidence": 0.93,
+      "processedAt": "2025-08-03T16:01:13.548Z",
+      "enhanced": true,
+      "id": "feedback_1754236873548_jya67f7u4",
+      "addedAt": "2025-08-03T16:01:13.572Z"
+    }
+  ],
+  [
+    "feedback_1754236873575_m9sjn6lxq",
+    {
+      "text": "The customer service at this store is top-notch.",
+      "sentiment": "Positive",
+      "source": "Yelp Reviews",
+      "date": "2023-07-04 16:35:19",
+      "userId": "shopper456",
+      "location": "New York",
+      "confidence": 0.82,
+      "processedAt": "2025-08-03T16:01:13.575Z",
+      "enhanced": true,
+      "id": "feedback_1754236873575_m9sjn6lxq",
+      "addedAt": "2025-08-03T16:01:13.599Z"
+    }
+  ],
+  [
+    "feedback_1754236873601_f7dqvcgl1",
+    {
+      "text": "I'm disappointed with the ending of this book. It fell flat.",
+      "sentiment": "Negative",
+      "source": "Goodreads",
+      "date": "2023-07-04 19:18:53",
+      "userId": "booklover123",
+      "location": "London",
+      "confidence": 0.68,
+      "processedAt": "2025-08-03T16:01:13.601Z",
+      "enhanced": true,
+      "id": "feedback_1754236873601_f7dqvcgl1",
+      "addedAt": "2025-08-03T16:01:13.624Z"
+    }
+  ],
+  [
+    "feedback_1754236873628_jokbys092",
+    {
+      "text": "The product I received was damaged. Unacceptable.",
+      "sentiment": "Negative",
+      "source": "Online Store",
+      "date": "2023-07-04 21:52:41",
+      "userId": "buyer789",
+      "location": "San Francisco",
+      "confidence": 0.75,
+      "processedAt": "2025-08-03T16:01:13.628Z",
+      "enhanced": true,
+      "id": "feedback_1754236873628_jokbys092",
+      "addedAt": "2025-08-03T16:01:13.651Z"
+    }
+  ],
+  [
+    "feedback_1754236873654_qul86ti19",
+    {
+      "text": "Just had the worst flight experience. Delayed and rude staff.",
+      "sentiment": "Negative",
+      "source": "Airline Review",
+      "date": "2023-07-05 09:10:15",
+      "userId": "traveler456",
+      "location": "Sydney",
+      "confidence": 0.57,
+      "processedAt": "2025-08-03T16:01:13.653Z",
+      "enhanced": true,
+      "id": "feedback_1754236873654_qul86ti19",
+      "addedAt": "2025-08-03T16:01:13.676Z"
+    }
+  ],
+  [
+    "feedback_1754236873679_s1rtbfljz",
+    {
+      "text": "The hotel stay was absolutely amazing! Luxury at its finest.",
+      "sentiment": "Positive",
+      "source": "TripAdvisor",
+      "date": "2023-07-05 12:30:08",
+      "userId": "traveladdict1",
+      "location": "Paris",
+      "confidence": 0.95,
+      "processedAt": "2025-08-03T16:01:13.679Z",
+      "enhanced": true,
+      "id": "feedback_1754236873679_s1rtbfljz",
+      "addedAt": "2025-08-03T16:01:13.703Z"
+    }
+  ],
+  [
+    "feedback_1754236873706_v9kowwl50",
+    {
+      "text": "The food at this restaurant was outstanding. Highly recommended!",
+      "sentiment": "Positive",
+      "source": "Zomato",
+      "date": "2023-07-05 15:45:32",
+      "userId": "foodie789",
+      "location": "Mumbai",
+      "confidence": 0.89,
+      "processedAt": "2025-08-03T16:01:13.706Z",
+      "enhanced": true,
+      "id": "feedback_1754236873706_v9kowwl50",
+      "addedAt": "2025-08-03T16:01:13.728Z"
+    }
+  ],
+  [
+    "feedback_1754236873732_roc681j25",
+    {
+      "text": "This playlist is my go-to for workouts. Energizing and motivating!",
+      "sentiment": "Positive",
+      "source": "Spotify",
+      "date": "2023-07-05 18:20:17",
+      "userId": "gymrat123",
+      "location": "Berlin",
+      "confidence": 0.91,
+      "processedAt": "2025-08-03T16:01:13.732Z",
+      "enhanced": true,
+      "id": "feedback_1754236873732_roc681j25",
+      "addedAt": "2025-08-03T16:01:13.755Z"
+    }
+  ],
+  [
+    "feedback_1754236873760_mhrxxrbde",
+    {
+      "text": "I had a frustrating experience navigating through their website.",
+      "sentiment": "Negative",
+      "source": "Website Review",
+      "date": "2023-07-05 21:05:44",
+      "userId": "user987",
+      "location": "Toronto",
+      "confidence": 0.67,
+      "processedAt": "2025-08-03T16:01:13.760Z",
+      "enhanced": true,
+      "id": "feedback_1754236873760_mhrxxrbde",
+      "addedAt": "2025-08-03T16:01:13.783Z"
+    }
+  ],
+  [
+    "feedback_1754236873788_xc4h57oe2",
+    {
+      "text": "The roller coaster ride was thrilling! Heart-pounding excitement!",
+      "sentiment": "Positive",
+      "source": "Theme Park Review",
+      "date": "2023-07-06 08:48:39",
+      "userId": "thrillseeker2",
+      "location": "Orlando",
+      "confidence": 0.92,
+      "processedAt": "2025-08-03T16:01:13.788Z",
+      "enhanced": true,
+      "id": "feedback_1754236873788_xc4h57oe2",
+      "addedAt": "2025-08-03T16:01:13.814Z"
+    }
+  ],
+  [
+    "feedback_1754236873818_dqikr5m1b",
+    {
+      "text": "The product I ordered never arrived. Terrible service.",
+      "sentiment": "Negative",
+      "source": "Online Store",
+      "date": "2023-07-06 11:25:56",
+      "userId": "customer123",
+      "location": "Chicago",
+      "confidence": 0.64,
+      "processedAt": "2025-08-03T16:01:13.818Z",
+      "enhanced": true,
+      "id": "feedback_1754236873818_dqikr5m1b",
+      "addedAt": "2025-08-03T16:01:13.843Z"
+    }
+  ],
+  [
+    "feedback_1754236873848_s481jofpd",
+    {
+      "text": "I can't get enough of this band. Their music is incredible!",
+      "sentiment": "Positive",
+      "source": "Music Review",
+      "date": "2023-07-06 14:15:23",
+      "userId": "musiclover987",
+      "location": "London",
+      "confidence": 0.94,
+      "processedAt": "2025-08-03T16:01:13.848Z",
+      "enhanced": true,
+      "id": "feedback_1754236873848_s481jofpd",
+      "addedAt": "2025-08-03T16:01:13.872Z"
+    }
+  ],
+  [
+    "feedback_1754236873873_vwp5a3azz",
+    {
+      "text": "I had a great chat with their customer support. Helpful and friendly.",
+      "sentiment": "Positive",
+      "source": "Online Chat",
+      "date": "2023-07-06 17:02:11",
+      "userId": "user7890",
+      "location": "Sydney",
+      "confidence": 0.85,
+      "processedAt": "2025-08-03T16:01:13.873Z",
+      "enhanced": true,
+      "id": "feedback_1754236873873_vwp5a3azz",
+      "addedAt": "2025-08-03T16:01:13.897Z"
+    }
+  ],
+  [
+    "feedback_1754236873902_myjm21i58",
+    {
+      "text": "This restaurant has the most delicious food. I can't wait to go back!",
+      "sentiment": "Positive",
+      "source": "TripAdvisor",
+      "date": "2023-07-09 09:12:54",
+      "userId": "foodie123",
+      "location": "Paris",
+      "confidence": 0.94,
+      "processedAt": "2025-08-03T16:01:13.901Z",
+      "enhanced": true,
+      "id": "feedback_1754236873902_myjm21i58",
+      "addedAt": "2025-08-03T16:01:13.926Z"
+    }
+  ],
+  [
+    "feedback_1754236873930_pdyzkg9m2",
+    {
+      "text": "The product I purchased broke within a week. Poor quality.",
+      "sentiment": "Negative",
+      "source": "Online Store",
+      "date": "2023-07-09 11:45:32",
+      "userId": "shopper246",
+      "location": "Los Angeles",
+      "confidence": 0.61,
+      "processedAt": "2025-08-03T16:01:13.930Z",
+      "enhanced": true,
+      "id": "feedback_1754236873930_pdyzkg9m2",
+      "addedAt": "2025-08-03T16:01:13.953Z"
+    }
+  ],
+  [
+    "feedback_1754236873957_tef5fx150",
+    {
+      "text": "This book is thought-provoking and beautifully written. Highly recommended!",
+      "sentiment": "Positive",
+      "source": "Goodreads",
+      "date": "2023-07-09 14:23:18",
+      "userId": "bookworm567",
+      "location": "London",
+      "confidence": 0.89,
+      "processedAt": "2025-08-03T16:01:13.957Z",
+      "enhanced": true,
+      "id": "feedback_1754236873957_tef5fx150",
+      "addedAt": "2025-08-03T16:01:13.982Z"
+    }
+  ],
+  [
+    "feedback_1754236873987_f09hd3rvm",
+    {
+      "text": "The customer service at this store is exceptional. They went above and beyond.",
+      "sentiment": "Positive",
+      "source": "Retail Store",
+      "date": "2023-07-09 17:05:46",
+      "userId": "shopper7890",
+      "location": "New York",
+      "confidence": 0.87,
+      "processedAt": "2025-08-03T16:01:13.987Z",
+      "enhanced": true,
+      "id": "feedback_1754236873987_f09hd3rvm",
+      "addedAt": "2025-08-03T16:01:14.013Z"
+    }
+  ],
+  [
+    "feedback_1754236874017_397lo02hc",
+    {
+      "text": "I had a terrible experience with their technical support. No resolution.",
+      "sentiment": "Negative",
+      "source": "Online Helpdesk",
+      "date": "2023-07-09 19:40:27",
+      "userId": "user9876",
+      "location": "San Francisco",
+      "confidence": 0.63,
+      "processedAt": "2025-08-03T16:01:14.017Z",
+      "enhanced": true,
+      "id": "feedback_1754236874017_397lo02hc",
+      "addedAt": "2025-08-03T16:01:14.041Z"
+    }
+  ],
+  [
+    "feedback_1754236874046_to44nr36t",
+    {
+      "text": "The live concert was electrifying! The band's energy was contagious.",
+      "sentiment": "Positive",
+      "source": "Event Review",
+      "date": "2023-07-10 08:50:13",
+      "userId": "musiclover7890",
+      "location": "Sydney",
+      "confidence": 0.92,
+      "processedAt": "2025-08-03T16:01:14.046Z",
+      "enhanced": true,
+      "id": "feedback_1754236874046_to44nr36t",
+      "addedAt": "2025-08-03T16:01:14.071Z"
+    }
+  ],
+  [
+    "feedback_1754236874074_n64vcbu7v",
+    {
+      "text": "I'm disappointed with the food at this restaurant. It was tasteless.",
+      "sentiment": "Negative",
+      "source": "Zomato",
+      "date": "2023-07-10 11:32:59",
+      "userId": "foodcritic123",
+      "location": "Mumbai",
+      "confidence": 0.68,
+      "processedAt": "2025-08-03T16:01:14.074Z",
+      "enhanced": true,
+      "id": "feedback_1754236874074_n64vcbu7v",
+      "addedAt": "2025-08-03T16:01:14.098Z"
+    }
+  ],
+  [
+    "feedback_1754236874103_rp0k3uv3g",
+    {
+      "text": "This song always puts me in a good mood. It's my go-to feel-good track!",
+      "sentiment": "Positive",
+      "source": "Spotify",
+      "date": "2023-07-10 14:20:05",
+      "userId": "playlistlover456",
+      "location": "Berlin",
+      "confidence": 0.93,
+      "processedAt": "2025-08-03T16:01:14.103Z",
+      "enhanced": true,
+      "id": "feedback_1754236874103_rp0k3uv3g",
+      "addedAt": "2025-08-03T16:01:14.127Z"
+    }
+  ],
+  [
+    "feedback_1754236874132_qw8xib9ve",
+    {
+      "text": "The website is slow and unresponsive. Difficult to navigate.",
+      "sentiment": "Negative",
+      "source": "Website Review",
+      "date": "2023-07-10 17:15:22",
+      "userId": "user24680",
+      "location": "Toronto",
+      "confidence": 0.65,
+      "processedAt": "2025-08-03T16:01:14.132Z",
+      "enhanced": true,
+      "id": "feedback_1754236874132_qw8xib9ve",
+      "addedAt": "2025-08-03T16:01:14.155Z"
+    }
+  ],
+  [
+    "feedback_1754236874160_jdvuurbvy",
+    {
+      "text": "The roller coaster ride was exhilarating! Pure adrenaline rush!",
+      "sentiment": "Positive",
+      "source": "Theme Park Review",
+      "date": "2023-07-10 20:02:37",
+      "userId": "thrillseeker789",
+      "location": "Orlando",
+      "confidence": 0.95,
+      "processedAt": "2025-08-03T16:01:14.160Z",
+      "enhanced": true,
+      "id": "feedback_1754236874160_jdvuurbvy",
+      "addedAt": "2025-08-03T16:01:14.184Z"
+    }
+  ],
+  [
+    "feedback_1754236874189_fm9dplcol",
+    {
+      "text": "The product I ordered arrived damaged. Very disappointed with the packaging.",
+      "sentiment": "Negative",
+      "source": "Online Store",
+      "date": "2023-07-11 08:40:51",
+      "userId": "buyer7890",
+      "location": "Chicago",
+      "confidence": 0.67,
+      "processedAt": "2025-08-03T16:01:14.189Z",
+      "enhanced": true,
+      "id": "feedback_1754236874189_fm9dplcol",
+      "addedAt": "2025-08-03T16:01:14.212Z"
+    }
+  ],
+  [
+    "feedback_1754236874217_08xw3rfvn",
+    {
+      "text": "I'm captivated by this band's unique sound. They're a breath of fresh air!",
+      "sentiment": "Positive",
+      "source": "Music Review",
+      "date": "2023-07-11 11:22:17",
+      "userId": "musicfan567",
+      "location": "London",
+      "confidence": 0.94,
+      "processedAt": "2025-08-03T16:01:14.217Z",
+      "enhanced": true,
+      "id": "feedback_1754236874217_08xw3rfvn",
+      "addedAt": "2025-08-03T16:01:14.240Z"
+    }
+  ],
+  [
+    "feedback_1754236874243_18cijfa1t",
+    {
+      "text": "The customer support was quick to respond and resolved my issue. Impressed!",
+      "sentiment": "Positive",
+      "source": "Online Chat",
+      "date": "2023-07-11 14:18:42",
+      "userId": "user123456",
+      "location": "Sydney",
+      "confidence": 0.85,
+      "processedAt": "2025-08-03T16:01:14.243Z",
+      "enhanced": true,
+      "id": "feedback_1754236874243_18cijfa1t",
+      "addedAt": "2025-08-03T16:01:14.269Z"
+    }
+  ],
+  [
+    "feedback_1754236874272_e0j69a1r1",
+    {
+      "text": "This restaurant has the best food. I highly recommend it!",
+      "sentiment": "Positive",
+      "source": "Yelp Reviews",
+      "date": "2023-07-11 17:30:15",
+      "userId": "foodie246",
+      "location": "Los Angeles",
+      "confidence": 0.9,
+      "processedAt": "2025-08-03T16:01:14.272Z",
+      "enhanced": true,
+      "id": "feedback_1754236874272_e0j69a1r1",
+      "addedAt": "2025-08-03T16:01:14.295Z"
+    }
+  ],
+  [
+    "feedback_1754236874298_gd2uo1ya5",
+    {
+      "text": "The plot of this movie is confusing and hard to follow.",
+      "sentiment": "Negative",
+      "source": "IMDb",
+      "date": "2023-07-11 20:15:42",
+      "userId": "moviegoer789",
+      "location": "London",
+      "confidence": 0.62,
+      "processedAt": "2025-08-03T16:01:14.298Z",
+      "enhanced": true,
+      "id": "feedback_1754236874298_gd2uo1ya5",
+      "addedAt": "2025-08-03T16:01:14.323Z"
+    }
+  ],
+  [
+    "feedback_1754236874326_lchx6kaxp",
+    {
+      "text": "I'm addicted to this game. It's so much fun!",
+      "sentiment": "Positive",
+      "source": "Gaming Forum",
+      "date": "2023-07-12 09:05:59",
+      "userId": "gamer123",
+      "location": "New York",
+      "confidence": 0.88,
+      "processedAt": "2025-08-03T16:01:14.326Z",
+      "enhanced": true,
+      "id": "feedback_1754236874326_lchx6kaxp",
+      "addedAt": "2025-08-03T16:01:14.348Z"
+    }
+  ],
+  [
+    "feedback_1754236874352_3skgolplq",
+    {
+      "text": "The customer service at this hotel was terrible. Avoid at all costs.",
+      "sentiment": "Negative",
+      "source": "Travel Website",
+      "date": "2023-07-12 11:45:27",
+      "userId": "traveler246",
+      "location": "Paris",
+      "confidence": 0.57,
+      "processedAt": "2025-08-03T16:01:14.352Z",
+      "enhanced": true,
+      "id": "feedback_1754236874352_3skgolplq",
+      "addedAt": "2025-08-03T16:01:14.375Z"
+    }
+  ],
+  [
+    "feedback_1754236874379_74cypqtu3",
+    {
+      "text": "This book bored me to tears. I couldn't finish it.",
+      "sentiment": "Negative",
+      "source": "Goodreads",
+      "date": "2023-07-12 14:30:18",
+      "userId": "bookworm246",
+      "location": "San Francisco",
+      "confidence": 0.68,
+      "processedAt": "2025-08-03T16:01:14.379Z",
+      "enhanced": true,
+      "id": "feedback_1754236874379_74cypqtu3",
+      "addedAt": "2025-08-03T16:01:14.403Z"
+    }
+  ],
+  [
+    "feedback_1754236874407_3mbvy5fwr",
+    {
+      "text": "I'm impressed with the sound quality of these headphones. Excellent!",
+      "sentiment": "Positive",
+      "source": "Online Store",
+      "date": "2023-07-12 17:10:36",
+      "userId": "audiophile789",
+      "location": "Berlin",
+      "confidence": 0.92,
+      "processedAt": "2025-08-03T16:01:14.407Z",
+      "enhanced": true,
+      "id": "feedback_1754236874407_3mbvy5fwr",
+      "addedAt": "2025-08-03T16:01:14.431Z"
+    }
+  ],
+  [
+    "feedback_1754236874434_ulec7xw8i",
+    {
+      "text": "The website design is sleek and user-friendly. Easy to navigate.",
+      "sentiment": "Positive",
+      "source": "Website Testimonial",
+      "date": "2023-07-13 08:50:59",
+      "userId": "testimonialuser2",
+      "location": "Sydney",
+      "confidence": 0.87,
+      "processedAt": "2025-08-03T16:01:14.434Z",
+      "enhanced": true,
+      "id": "feedback_1754236874434_ulec7xw8i",
+      "addedAt": "2025-08-03T16:01:14.457Z"
+    }
+  ],
+  [
+    "feedback_1754236874459_yg4fhulet",
+    {
+      "text": "I had a terrible experience with their delivery service. Late and unprofessional.",
+      "sentiment": "Negative",
+      "source": "Online Store",
+      "date": "2023-07-13 11:25:27",
+      "userId": "shopper4567",
+      "location": "Chicago",
+      "confidence": 0.64,
+      "processedAt": "2025-08-03T16:01:14.459Z",
+      "enhanced": true,
+      "id": "feedback_1754236874459_yg4fhulet",
+      "addedAt": "2025-08-03T16:01:14.483Z"
+    }
+  ],
+  [
+    "feedback_1754236874491_eb74ali65",
+    {
+      "text": "The concert was mind-blowing! The band knows how to put on a show.",
+      "sentiment": "Positive",
+      "source": "Event Review",
+      "date": "2023-07-13 14:05:42",
+      "userId": "musiclover1234",
+      "location": "Paris",
+      "confidence": 0.95,
+      "processedAt": "2025-08-03T16:01:14.491Z",
+      "enhanced": true,
+      "id": "feedback_1754236874491_eb74ali65",
+      "addedAt": "2025-08-03T16:01:14.515Z"
+    }
+  ],
+  [
+    "feedback_1754236874518_ql1pw61nu",
+    {
+      "text": "I'm extremely disappointed with the customer support. No resolution.",
+      "sentiment": "Negative",
+      "source": "Online Chat",
+      "date": "2023-07-13 16:35:19",
+      "userId": "user98765",
+      "location": "Toronto",
+      "confidence": 0.61,
+      "processedAt": "2025-08-03T16:01:14.518Z",
+      "enhanced": true,
+      "id": "feedback_1754236874518_ql1pw61nu",
+      "addedAt": "2025-08-03T16:01:14.545Z"
+    }
+  ],
+  [
+    "feedback_1754236874549_41x7qnu71",
+    {
+      "text": "The hotel staff were rude and unprofessional. Terrible customer service.",
+      "sentiment": "Negative",
+      "source": "Hotel Review",
+      "date": "2023-07-17 08:50:13",
+      "userId": "traveler789",
+      "location": "Paris",
+      "confidence": 0.55,
+      "processedAt": "2025-08-03T16:01:14.549Z",
+      "enhanced": true,
+      "id": "feedback_1754236874549_41x7qnu71",
+      "addedAt": "2025-08-03T16:01:14.573Z"
+    }
+  ],
+  [
+    "feedback_1754236874576_d539tcbg4",
+    {
+      "text": "The food at this restaurant was mediocre. Nothing special.",
+      "sentiment": "Negative",
+      "source": "Zomato",
+      "date": "2023-07-17 11:32:59",
+      "userId": "foodlover2468",
+      "location": "Mumbai",
+      "confidence": 0.65,
+      "processedAt": "2025-08-03T16:01:14.576Z",
+      "enhanced": true,
+      "id": "feedback_1754236874576_d539tcbg4",
+      "addedAt": "2025-08-03T16:01:14.600Z"
+    }
+  ],
+  [
+    "feedback_1754236874606_ce49s7mex",
+    {
+      "text": "This song always puts me in a nostalgic mood. It reminds me of good times.",
+      "sentiment": "Positive",
+      "source": "Spotify",
+      "date": "2023-07-17 14:20:05",
+      "userId": "nostalgiacat123",
+      "location": "Berlin",
+      "confidence": 0.88,
+      "processedAt": "2025-08-03T16:01:14.606Z",
+      "enhanced": true,
+      "id": "feedback_1754236874606_ce49s7mex",
+      "addedAt": "2025-08-03T16:01:14.630Z"
+    }
+  ],
+  [
+    "feedback_1754236874633_568ysot4s",
+    {
+      "text": "The website loading speed is frustratingly slow. Needs improvement.",
+      "sentiment": "Negative",
+      "source": "Website Review",
+      "date": "2023-07-17 17:15:22",
+      "userId": "user12345",
+      "location": "Toronto",
+      "confidence": 0.62,
+      "processedAt": "2025-08-03T16:01:14.633Z",
+      "enhanced": true,
+      "id": "feedback_1754236874633_568ysot4s",
+      "addedAt": "2025-08-03T16:01:14.655Z"
+    }
+  ],
+  [
+    "feedback_1754236874659_lrfos824w",
+    {
+      "text": "The food at this cafe exceeded my expectations. Absolutely delicious!",
+      "sentiment": "Positive",
+      "source": "Food Blog",
+      "date": "2023-07-13 19:18:53",
+      "userId": "foodlover246",
+      "location": "Mumbai",
+      "confidence": 0.92,
+      "processedAt": "2025-08-03T16:01:14.659Z",
+      "enhanced": true,
+      "id": "feedback_1754236874659_lrfos824w",
+      "addedAt": "2025-08-03T16:01:14.682Z"
+    }
+  ],
+  [
+    "feedback_1754236874686_pxl5rd7iw",
+    {
+      "text": "I'm disappointed with the ending of this TV show. It left too many unanswered questions.",
+      "sentiment": "Negative",
+      "source": "TV Show Review",
+      "date": "2023-07-14 08:32:41",
+      "userId": "tvfan123",
+      "location": "Los Angeles",
+      "confidence": 0.66,
+      "processedAt": "2025-08-03T16:01:14.686Z",
+      "enhanced": true,
+      "id": "feedback_1754236874686_pxl5rd7iw",
+      "addedAt": "2025-08-03T16:01:14.709Z"
+    }
+  ],
+  [
+    "feedback_1754236874713_4060x8gew",
+    {
+      "text": "This album is a masterpiece. Every song is a work of art!",
+      "sentiment": "Positive",
+      "source": "Music Review",
+      "date": "2023-07-14 11:05:27",
+      "userId": "musicenthusiast1",
+      "location": "London",
+      "confidence": 0.93,
+      "processedAt": "2025-08-03T16:01:14.713Z",
+      "enhanced": true,
+      "id": "feedback_1754236874713_4060x8gew",
+      "addedAt": "2025-08-03T16:01:14.737Z"
+    }
+  ],
+  [
+    "feedback_1754236874742_bofbomgte",
+    {
+      "text": "The website layout is cluttered and confusing. Difficult to find information.",
+      "sentiment": "Negative",
+      "source": "Website Review",
+      "date": "2023-07-14 14:40:05",
+      "userId": "user2468",
+      "location": "Sydney",
+      "confidence": 0.67,
+      "processedAt": "2025-08-03T16:01:14.742Z",
+      "enhanced": true,
+      "id": "feedback_1754236874742_bofbomgte",
+      "addedAt": "2025-08-03T16:01:14.765Z"
+    }
+  ],
+  [
+    "feedback_1754236874769_rvau9u0ge",
+    {
+      "text": "The roller coaster at this theme park is a thrilling experience. A must-try!",
+      "sentiment": "Positive",
+      "source": "Theme Park Review",
+      "date": "2023-07-14 17:25:09",
+      "userId": "thrillseeker3",
+      "location": "Orlando",
+      "confidence": 0.91,
+      "processedAt": "2025-08-03T16:01:14.769Z",
+      "enhanced": true,
+      "id": "feedback_1754236874769_rvau9u0ge",
+      "addedAt": "2025-08-03T16:01:14.793Z"
+    }
+  ],
+  [
+    "feedback_1754236874798_tp87b9oqv",
+    {
+      "text": "The product I ordered never arrived. Poor customer service.",
+      "sentiment": "Negative",
+      "source": "Online Store",
+      "date": "2023-07-15 08:50:13",
+      "userId": "buyer1234",
+      "location": "Chicago",
+      "confidence": 0.63,
+      "processedAt": "2025-08-03T16:01:14.798Z",
+      "enhanced": true,
+      "id": "feedback_1754236874798_tp87b9oqv",
+      "addedAt": "2025-08-03T16:01:14.822Z"
+    }
+  ],
+  [
+    "feedback_1754236874826_00uwg7re7",
+    {
+      "text": "I'm in awe of this artist's talent. Their paintings are breathtaking!",
+      "sentiment": "Positive",
+      "source": "Art Review",
+      "date": "2023-07-15 12:30:08",
+      "userId": "artlover123",
+      "location": "Paris",
+      "confidence": 0.94,
+      "processedAt": "2025-08-03T16:01:14.826Z",
+      "enhanced": true,
+      "id": "feedback_1754236874826_00uwg7re7",
+      "addedAt": "2025-08-03T16:01:14.850Z"
+    }
+  ],
+  [
+    "feedback_1754236874854_3n7mta1s1",
+    {
+      "text": "The food at this restaurant was disappointing. Not worth the price.",
+      "sentiment": "Negative",
+      "source": "Zomato",
+      "date": "2023-07-15 15:45:32",
+      "userId": "foodcritic246",
+      "location": "Mumbai",
+      "confidence": 0.68,
+      "processedAt": "2025-08-03T16:01:14.854Z",
+      "enhanced": true,
+      "id": "feedback_1754236874854_3n7mta1s1",
+      "addedAt": "2025-08-03T16:01:14.886Z"
+    }
+  ],
+  [
+    "feedback_1754236874888_dkl97ouzj",
+    {
+      "text": "This playlist is perfect for relaxation. Soothing and calming!",
+      "sentiment": "Positive",
+      "source": "Spotify",
+      "date": "2023-07-15 18:20:17",
+      "userId": "relaxmusiclover",
+      "location": "Berlin",
+      "confidence": 0.91,
+      "processedAt": "2025-08-03T16:01:14.888Z",
+      "enhanced": true,
+      "id": "feedback_1754236874888_dkl97ouzj",
+      "addedAt": "2025-08-03T16:01:14.912Z"
+    }
+  ],
+  [
+    "feedback_1754236874913_7rsz2sa0m",
+    {
+      "text": "The website navigation is smooth and intuitive. I found what I needed quickly.",
+      "sentiment": "Positive",
+      "source": "Website Testimonial",
+      "date": "2023-07-15 21:05:44",
+      "userId": "happyuser123",
+      "location": "Toronto",
+      "confidence": 0.88,
+      "processedAt": "2025-08-03T16:01:14.913Z",
+      "enhanced": true,
+      "id": "feedback_1754236874913_7rsz2sa0m",
+      "addedAt": "2025-08-03T16:01:14.937Z"
+    }
+  ],
+  [
+    "feedback_1754236874941_85poho4ld",
+    {
+      "text": "The ride on this cruise ship was an unforgettable experience. I loved every moment!",
+      "sentiment": "Positive",
+      "source": "Travel Blog",
+      "date": "2023-07-16 09:12:54",
+      "userId": "travelenthusiast2",
+      "location": "Sydney",
+      "confidence": 0.95,
+      "processedAt": "2025-08-03T16:01:14.941Z",
+      "enhanced": true,
+      "id": "feedback_1754236874941_85poho4ld",
+      "addedAt": "2025-08-03T16:01:14.964Z"
+    }
+  ],
+  [
+    "feedback_1754236874968_wllu8nkei",
+    {
+      "text": "The product I received was of poor quality. It broke after a few uses.",
+      "sentiment": "Negative",
+      "source": "Online Store",
+      "date": "2023-07-16 11:45:32",
+      "userId": "shopper567",
+      "location": "Los Angeles",
+      "confidence": 0.61,
+      "processedAt": "2025-08-03T16:01:14.968Z",
+      "enhanced": true,
+      "id": "feedback_1754236874968_wllu8nkei",
+      "addedAt": "2025-08-03T16:01:14.992Z"
+    }
+  ],
+  [
+    "feedback_1754236874998_s0y0puxp9",
+    {
+      "text": "This book kept me hooked from start to finish. A captivating read!",
+      "sentiment": "Positive",
+      "source": "Goodreads",
+      "date": "2023-07-16 14:23:18",
+      "userId": "bookworm7890",
+      "location": "London",
+      "confidence": 0.9,
+      "processedAt": "2025-08-03T16:01:14.998Z",
+      "enhanced": true,
+      "id": "feedback_1754236874998_s0y0puxp9",
+      "addedAt": "2025-08-03T16:01:15.023Z"
+    }
+  ],
+  [
+    "feedback_1754236875026_ytueqe01n",
+    {
+      "text": "The customer service at this store is outstanding. They truly care about their customers.",
+      "sentiment": "Positive",
+      "source": "Retail Store",
+      "date": "2023-07-16 17:05:46",
+      "userId": "happyshopper1",
+      "location": "New York",
+      "confidence": 0.92,
+      "processedAt": "2025-08-03T16:01:15.026Z",
+      "enhanced": true,
+      "id": "feedback_1754236875026_ytueqe01n",
+      "addedAt": "2025-08-03T16:01:15.053Z"
+    }
+  ],
+  [
+    "feedback_1754236875058_yyq8iurqg",
+    {
+      "text": "I had a frustrating experience with their technical support. No resolution provided.",
+      "sentiment": "Negative",
+      "source": "Online Helpdesk",
+      "date": "2023-07-16 19:40:27",
+      "userId": "user98765",
+      "location": "San Francisco",
+      "confidence": 0.67,
+      "processedAt": "2025-08-03T16:01:15.058Z",
+      "enhanced": true,
+      "id": "feedback_1754236875058_yyq8iurqg",
+      "addedAt": "2025-08-03T16:01:15.083Z"
+    }
+  ],
+  [
+    "feedback_1754236875088_6zvfb2bqe",
+    {
+      "text": "The hotel staff were rude and unprofessional. Terrible customer service.",
+      "sentiment": "Negative",
+      "source": "Hotel Review",
+      "date": "2023-07-17 08:50:13",
+      "userId": "traveler789",
+      "location": "Paris",
+      "confidence": 0.55,
+      "processedAt": "2025-08-03T16:01:15.088Z",
+      "enhanced": true,
+      "id": "feedback_1754236875088_6zvfb2bqe",
+      "addedAt": "2025-08-03T16:01:15.113Z"
+    }
+  ],
+  [
+    "feedback_1754236875117_4oy57qpya",
+    {
+      "text": "The food at this restaurant was mediocre. Nothing special.",
+      "sentiment": "Negative",
+      "source": "Zomato",
+      "date": "2023-07-17 11:32:59",
+      "userId": "foodlover2468",
+      "location": "Mumbai",
+      "confidence": 0.65,
+      "processedAt": "2025-08-03T16:01:15.117Z",
+      "enhanced": true,
+      "id": "feedback_1754236875117_4oy57qpya",
+      "addedAt": "2025-08-03T16:01:15.142Z"
+    }
+  ],
+  [
+    "feedback_1754236875148_zelsyk4kf",
+    {
+      "text": "This song always puts me in a nostalgic mood. It reminds me of good times.",
+      "sentiment": "Positive",
+      "source": "Spotify",
+      "date": "2023-07-17 14:20:05",
+      "userId": "nostalgiacat123",
+      "location": "Berlin",
+      "confidence": 0.88,
+      "processedAt": "2025-08-03T16:01:15.148Z",
+      "enhanced": true,
+      "id": "feedback_1754236875148_zelsyk4kf",
+      "addedAt": "2025-08-03T16:01:15.173Z"
+    }
+  ],
+  [
+    "feedback_1754236875179_euz0qjd9r",
+    {
+      "text": "The website loading speed is frustratingly slow. Needs improvement.",
+      "sentiment": "Negative",
+      "source": "Website Review",
+      "date": "2023-07-17 17:15:22",
+      "userId": "user12345",
+      "location": "Toronto",
+      "confidence": 0.62,
+      "processedAt": "2025-08-03T16:01:15.179Z",
+      "enhanced": true,
+      "id": "feedback_1754236875179_euz0qjd9r",
+      "addedAt": "2025-08-03T16:01:15.203Z"
+    }
+  ],
+  [
+    "feedback_1754236875208_ncnw39t77",
+    {
+      "text": "I love this product!",
+      "sentiment": "Positive",
+      "source": "Twitter",
+      "date": "2023-06-15 09:23:14",
+      "userId": "@user123",
+      "location": "New York",
+      "confidence": 0.85,
+      "processedAt": "2025-08-03T16:01:15.208Z",
+      "enhanced": true,
+      "id": "feedback_1754236875208_ncnw39t77",
+      "addedAt": "2025-08-03T16:01:15.230Z"
+    }
+  ],
+  [
+    "feedback_1754236875235_jwy87rj0v",
+    {
+      "text": "The service was terrible.",
+      "sentiment": "Negative",
+      "source": "Yelp Reviews",
+      "date": "2023-06-15 11:45:32",
+      "userId": "user456",
+      "location": "Los Angeles",
+      "confidence": 0.65,
+      "processedAt": "2025-08-03T16:01:15.235Z",
+      "enhanced": true,
+      "id": "feedback_1754236875235_jwy87rj0v",
+      "addedAt": "2025-08-03T16:01:15.257Z"
+    }
+  ],
+  [
+    "feedback_1754236875260_mzc7pvr16",
+    {
+      "text": "This movie is amazing!",
+      "sentiment": "Positive",
+      "source": "IMDb",
+      "date": "2023-06-15 14:10:22",
+      "userId": "moviefan789",
+      "location": "London",
+      "confidence": 0.92,
+      "processedAt": "2025-08-03T16:01:15.260Z",
+      "enhanced": true,
+      "id": "feedback_1754236875260_mzc7pvr16",
+      "addedAt": "2025-08-03T16:01:15.283Z"
+    }
+  ],
+  [
+    "feedback_1754236875288_zojt2l9lw",
+    {
+      "text": "I'm so disappointed with their customer support.",
+      "sentiment": "Negative",
+      "source": "Online Forum",
+      "date": "2023-06-15 17:35:11",
+      "userId": "forumuser1",
+      "location": "Toronto",
+      "confidence": 0.78,
+      "processedAt": "2025-08-03T16:01:15.288Z",
+      "enhanced": true,
+      "id": "feedback_1754236875288_zojt2l9lw",
+      "addedAt": "2025-08-03T16:01:15.314Z"
+    }
+  ],
+  [
+    "feedback_1754236875320_zaxm84qab",
+    {
+      "text": "Just had the best meal of my life!",
+      "sentiment": "Positive",
+      "source": "TripAdvisor",
+      "date": "2023-06-16 08:50:59",
+      "userId": "foodie22",
+      "location": "Paris",
+      "confidence": 0.88,
+      "processedAt": "2025-08-03T16:01:15.320Z",
+      "enhanced": true,
+      "id": "feedback_1754236875320_zaxm84qab",
+      "addedAt": "2025-08-03T16:01:15.344Z"
+    }
+  ],
+  [
+    "feedback_1754236875349_vcj99d7bc",
+    {
+      "text": "The quality of this product is subpar.",
+      "sentiment": "Negative",
+      "source": "Amazon Reviews",
+      "date": "2023-06-16 10:15:27",
+      "userId": "shopper123",
+      "location": "San Francisco",
+      "confidence": 0.72,
+      "processedAt": "2025-08-03T16:01:15.349Z",
+      "enhanced": true,
+      "id": "feedback_1754236875349_vcj99d7bc",
+      "addedAt": "2025-08-03T16:01:15.374Z"
+    }
+  ],
+  [
+    "feedback_1754236875381_555687j42",
+    {
+      "text": "I can't stop listening to this song. It's incredible!",
+      "sentiment": "Positive",
+      "source": "Spotify",
+      "date": "2023-06-16 13:40:18",
+      "userId": "musiclover456",
+      "location": "Berlin",
+      "confidence": 0.91,
+      "processedAt": "2025-08-03T16:01:15.381Z",
+      "enhanced": true,
+      "id": "feedback_1754236875381_555687j42",
+      "addedAt": "2025-08-03T16:01:15.404Z"
+    }
+  ],
+  [
+    "feedback_1754236875410_5gdsmxcdp",
+    {
+      "text": "Their website is so user-friendly. Love it!",
+      "sentiment": "Positive",
+      "source": "Website Testimonial",
+      "date": "2023-06-16 16:05:36",
+      "userId": "testimonialuser1",
+      "location": "Sydney",
+      "confidence": 0.87,
+      "processedAt": "2025-08-03T16:01:15.410Z",
+      "enhanced": true,
+      "id": "feedback_1754236875410_5gdsmxcdp",
+      "addedAt": "2025-08-03T16:01:15.433Z"
+    }
+  ],
+  [
+    "feedback_1754236875439_lilx4bd12",
+    {
+      "text": "I loved the movie! It was fantastic!",
+      "sentiment": "Positive",
+      "source": "IMDb",
+      "date": "2023-07-02 09:12:34",
+      "userId": "user123",
+      "location": "New York",
+      "confidence": 0.92,
+      "processedAt": "2025-08-03T16:01:15.439Z",
+      "enhanced": true,
+      "id": "feedback_1754236875439_lilx4bd12",
+      "addedAt": "2025-08-03T16:01:15.464Z"
+    }
+  ],
+  [
+    "feedback_1754236875470_lhrsl2tb5",
+    {
+      "text": "The customer service was terrible.",
+      "sentiment": "Negative",
+      "source": "Yelp Reviews",
+      "date": "2023-07-02 10:45:21",
+      "userId": "user456",
+      "location": "Los Angeles",
+      "confidence": 0.65,
+      "processedAt": "2025-08-03T16:01:15.470Z",
+      "enhanced": true,
+      "id": "feedback_1754236875470_lhrsl2tb5",
+      "addedAt": "2025-08-03T16:01:15.492Z"
+    }
+  ],
+  [
+    "feedback_1754236875497_p12gingm6",
+    {
+      "text": "This book made me feel inspired. Highly recommended!",
+      "sentiment": "Positive",
+      "source": "Goodreads",
+      "date": "2023-07-02 12:34:56",
+      "userId": "bookworm789",
+      "location": "London",
+      "confidence": 0.88,
+      "processedAt": "2025-08-03T16:01:15.497Z",
+      "enhanced": true,
+      "id": "feedback_1754236875497_p12gingm6",
+      "addedAt": "2025-08-03T16:01:15.521Z"
+    }
+  ],
+  [
+    "feedback_1754236875526_zsmckk55e",
+    {
+      "text": "I'm extremely disappointed with their product quality.",
+      "sentiment": "Negative",
+      "source": "Online Store",
+      "date": "2023-07-02 15:21:43",
+      "userId": "shopper789",
+      "location": "San Francisco",
+      "confidence": 0.72,
+      "processedAt": "2025-08-03T16:01:15.526Z",
+      "enhanced": true,
+      "id": "feedback_1754236875526_zsmckk55e",
+      "addedAt": "2025-08-03T16:01:15.550Z"
+    }
+  ],
+  [
+    "feedback_1754236875556_7i709hwwg",
+    {
+      "text": "Just had the most amazing vacation! I can't wait to go back.",
+      "sentiment": "Positive",
+      "source": "TripAdvisor",
+      "date": "2023-07-02 18:01:23",
+      "userId": "travelenthusiast1",
+      "location": "Sydney",
+      "confidence": 0.93,
+      "processedAt": "2025-08-03T16:01:15.556Z",
+      "enhanced": true,
+      "id": "feedback_1754236875556_7i709hwwg",
+      "addedAt": "2025-08-03T16:01:15.580Z"
+    }
+  ],
+  [
+    "feedback_1754236875584_lgptkkv2b",
+    {
+      "text": "The food at this restaurant was awful. Never going back again!",
+      "sentiment": "Negative",
+      "source": "Zomato",
+      "date": "2023-07-02 20:45:37",
+      "userId": "foodlover123",
+      "location": "Mumbai",
+      "confidence": 0.55,
+      "processedAt": "2025-08-03T16:01:15.584Z",
+      "enhanced": true,
+      "id": "feedback_1754236875584_lgptkkv2b",
+      "addedAt": "2025-08-03T16:01:15.607Z"
+    }
+  ],
+  [
+    "feedback_1754236875612_098s5biaw",
+    {
+      "text": "I can't stop listening to this song. It's my new favorite!",
+      "sentiment": "Positive",
+      "source": "Spotify",
+      "date": "2023-07-03 09:17:52",
+      "userId": "musiclover789",
+      "location": "Berlin",
+      "confidence": 0.91,
+      "processedAt": "2025-08-03T16:01:15.612Z",
+      "enhanced": true,
+      "id": "feedback_1754236875612_098s5biaw",
+      "addedAt": "2025-08-03T16:01:15.637Z"
+    }
+  ],
+  [
+    "feedback_1754236875641_fc1mal9ha",
+    {
+      "text": "Their website is so confusing and poorly designed.",
+      "sentiment": "Negative",
+      "source": "Website Review",
+      "date": "2023-07-03 11:59:18",
+      "userId": "user789",
+      "location": "Toronto",
+      "confidence": 0.68,
+      "processedAt": "2025-08-03T16:01:15.641Z",
+      "enhanced": true,
+      "id": "feedback_1754236875641_fc1mal9ha",
+      "addedAt": "2025-08-03T16:01:15.664Z"
+    }
+  ],
+  [
+    "feedback_1754236875668_btia7b84h",
+    {
+      "text": "I had an incredible experience at the theme park. So much fun!",
+      "sentiment": "Positive",
+      "source": "Trip Report",
+      "date": "2023-07-03 14:40:05",
+      "userId": "thrillseeker1",
+      "location": "Orlando",
+      "confidence": 0.89,
+      "processedAt": "2025-08-03T16:01:15.668Z",
+      "enhanced": true,
+      "id": "feedback_1754236875668_btia7b84h",
+      "addedAt": "2025-08-03T16:01:15.690Z"
+    }
+  ]
+]
