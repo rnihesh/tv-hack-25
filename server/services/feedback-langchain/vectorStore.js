@@ -1,9 +1,11 @@
 const { RecursiveCharacterTextSplitter } = require("langchain/text_splitter");
-const { MemoryVectorStore } = require("langchain/vectorstores/memory");
+const { FaissStore } = require("@langchain/community/vectorstores/faiss");
 const { GoogleGenerativeAIEmbeddings } = require("@langchain/google-genai");
 const { OllamaEmbeddings } = require("@langchain/community/embeddings/ollama");
 const config = require("../../config/env-config");
 const { logger } = require("../../utils/logger");
+const path = require("path");
+const fs = require("fs");
 
 class FeedbackVectorStore {
   constructor() {
@@ -12,6 +14,10 @@ class FeedbackVectorStore {
     this.textSplitter = null;
     this.initialized = false;
     this.feedbackIndex = new Map(); // In-memory index for feedback documents
+    this.vectorStorePath = path.join(
+      __dirname,
+      "../../../data/feedback_vectors"
+    );
   }
 
   async initialize() {
@@ -67,8 +73,35 @@ class FeedbackVectorStore {
         throw new Error("No embedding service available");
       }
 
-      // Initialize vector store
-      this.vectorStore = new MemoryVectorStore(this.embeddings);
+      // Initialize vector store with FaissStore (persistent storage)
+      const vectorStoreDirectory = path.dirname(this.vectorStorePath);
+      if (!fs.existsSync(vectorStoreDirectory)) {
+        fs.mkdirSync(vectorStoreDirectory, { recursive: true });
+      }
+
+      // Try to load existing vector store
+      if (fs.existsSync(this.vectorStorePath)) {
+        try {
+          logger.info("Loading existing Faiss vector store...");
+          this.vectorStore = await FaissStore.load(
+            this.vectorStorePath,
+            this.embeddings
+          );
+          logger.info("Existing vector store loaded successfully");
+        } catch (error) {
+          logger.warn(
+            "Failed to load existing vector store, creating new one:",
+            error.message
+          );
+          this.vectorStore = new FaissStore(this.embeddings, {});
+        }
+      } else {
+        logger.info("Creating new Faiss vector store...");
+        this.vectorStore = new FaissStore(this.embeddings, {});
+      }
+
+      // Load feedback index from file if it exists
+      await this.loadFeedbackIndex();
 
       // Initialize text splitter for large feedback texts
       this.textSplitter = new RecursiveCharacterTextSplitter({
@@ -133,6 +166,10 @@ User: ${feedback.userId || "anonymous"}
         id: feedbackId,
         addedAt: new Date(),
       });
+
+      // Save the vector store and index to disk
+      await this.saveVectorStore();
+      await this.saveFeedbackIndex();
 
       logger.info(`Added feedback ${feedbackId} to vector store`);
       return feedbackId;
@@ -243,9 +280,54 @@ User: ${feedback.userId || "anonymous"}
   async clearStore() {
     this.feedbackIndex.clear();
     if (this.vectorStore) {
-      this.vectorStore = new MemoryVectorStore(this.embeddings);
+      try {
+        // Create a new empty vector store
+        this.vectorStore = new FaissStore(this.embeddings, {});
+        await this.saveVectorStore();
+        await this.saveFeedbackIndex();
+      } catch (error) {
+        logger.warn("Error clearing vector store:", error.message);
+      }
     }
     logger.info("Feedback vector store cleared");
+  }
+
+  async saveVectorStore() {
+    try {
+      if (this.vectorStore) {
+        await this.vectorStore.save(this.vectorStorePath);
+        logger.debug("Vector store saved to disk");
+      }
+    } catch (error) {
+      logger.error("Failed to save vector store:", error);
+    }
+  }
+
+  async saveFeedbackIndex() {
+    try {
+      const indexPath = this.vectorStorePath + "_index.json";
+      const indexData = Array.from(this.feedbackIndex.entries());
+      fs.writeFileSync(indexPath, JSON.stringify(indexData, null, 2));
+      logger.debug("Feedback index saved to disk");
+    } catch (error) {
+      logger.error("Failed to save feedback index:", error);
+    }
+  }
+
+  async loadFeedbackIndex() {
+    try {
+      const indexPath = this.vectorStorePath + "_index.json";
+      if (fs.existsSync(indexPath)) {
+        const indexData = JSON.parse(fs.readFileSync(indexPath, "utf8"));
+        this.feedbackIndex = new Map(indexData);
+        logger.info(
+          `Loaded ${this.feedbackIndex.size} feedback items from index`
+        );
+      }
+    } catch (error) {
+      logger.warn("Failed to load feedback index:", error);
+      this.feedbackIndex = new Map();
+    }
   }
 }
 
