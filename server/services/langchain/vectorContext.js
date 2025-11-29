@@ -159,7 +159,7 @@ class VectorContextService {
         await VectorStore.updateOne(
           { companyId },
           {
-            $inc: { documentCount: 1 },
+            $inc: { "indexMetrics.totalDocuments": 1 },
             $set: { lastUpdated: new Date() },
           },
           { upsert: true }
@@ -329,13 +329,34 @@ class VectorContextService {
 
       // Extract and store important information in vector store
       if (this.shouldStoreInVector(userMessage, metadata)) {
-        await this.addDocumentToContext(companyId, userMessage, {
-          source: "conversation",
-          contextType,
-          sessionId,
-          importance: this.calculateImportance(userMessage, metadata),
-          extractedAt: new Date().toISOString(),
-        });
+        const docResult = await this.addDocumentToContext(
+          companyId,
+          userMessage,
+          {
+            source: "conversation",
+            contextType,
+            sessionId,
+            importance: this.calculateImportance(userMessage, metadata),
+            extractedAt: new Date().toISOString(),
+          }
+        );
+
+        // Track vector document ID in AI context
+        if (
+          docResult.id &&
+          !docResult.id.startsWith("existing_") &&
+          !docResult.id.startsWith("fallback_")
+        ) {
+          if (!aiContext.vectorDocumentIds) {
+            aiContext.vectorDocumentIds = [];
+          }
+          aiContext.vectorDocumentIds.push(docResult.id);
+          // Keep only last 20 document IDs
+          if (aiContext.vectorDocumentIds.length > 20) {
+            aiContext.vectorDocumentIds =
+              aiContext.vectorDocumentIds.slice(-20);
+          }
+        }
       }
 
       // Update business context patterns
@@ -400,12 +421,15 @@ class VectorContextService {
 
   async extractBusinessPatterns(aiContext, userMessage, aiResponse) {
     try {
-      // Simple pattern extraction (can be enhanced with NLP)
+      // Enhanced pattern extraction
       const patterns = [];
+      const preferences = {};
+      const lowerMessage = userMessage.toLowerCase();
+      const lowerResponse = aiResponse.toLowerCase();
 
       // Extract product/service mentions
       const productMentions = userMessage.match(
-        /(?:our|my|the)\s+(product|service|offering)s?\s+(\w+)/gi
+        /(?:our|my|the|sell|offer|provide)\s+(product|service|offering|solution)s?\s*(\w*)/gi
       );
       if (productMentions) {
         patterns.push({
@@ -416,7 +440,7 @@ class VectorContextService {
 
       // Extract customer pain points
       const painPoints = userMessage.match(
-        /(?:problem|issue|challenge|difficulty|struggle)\s+with\s+(\w+)/gi
+        /(?:problem|issue|challenge|difficulty|struggle|trouble|concern|worry)\s+(?:with|about)?\s*(\w+)/gi
       );
       if (painPoints) {
         patterns.push({
@@ -427,7 +451,7 @@ class VectorContextService {
 
       // Extract goals and objectives
       const goals = userMessage.match(
-        /(?:want to|need to|goal is to|objective is to)\s+(\w+)/gi
+        /(?:want to|need to|goal is to|objective is to|trying to|looking to|plan to|hope to)\s+([\w\s]+?)(?:\.|,|$)/gi
       );
       if (goals) {
         patterns.push({
@@ -436,9 +460,105 @@ class VectorContextService {
         });
       }
 
-      // Update business context with extracted patterns
-      if (patterns.length > 0) {
-        await aiContext.updateBusinessContext({ learnedPatterns: patterns });
+      // Extract pricing mentions
+      const priceMentions = userMessage.match(
+        /(?:price|cost|budget|afford|expensive|cheap|\$\d+|\d+\s*(?:dollars|USD))/gi
+      );
+      if (priceMentions) {
+        patterns.push({
+          pattern: "pricing_interest",
+          context: priceMentions.join(", "),
+        });
+      }
+
+      // Extract competitor mentions
+      const competitorMentions = userMessage.match(
+        /(?:competitor|competition|alternative|compared to|instead of|vs|versus)\s+([\w\s]+?)(?:\.|,|$)/gi
+      );
+      if (competitorMentions) {
+        patterns.push({
+          pattern: "competitor_mention",
+          context: competitorMentions.join(", "),
+        });
+      }
+
+      // Extract topic preferences from messages (not just questions)
+      const topics = [];
+      if (
+        lowerMessage.includes("price") ||
+        lowerMessage.includes("cost") ||
+        lowerMessage.includes("pricing")
+      )
+        topics.push("pricing");
+      if (lowerMessage.includes("service") || lowerMessage.includes("product"))
+        topics.push("offerings");
+      if (
+        lowerMessage.includes("support") ||
+        lowerMessage.includes("help") ||
+        lowerMessage.includes("team")
+      )
+        topics.push("support");
+      if (
+        lowerMessage.includes("feature") ||
+        lowerMessage.includes("capability")
+      )
+        topics.push("features");
+      if (
+        lowerMessage.includes("deliver") ||
+        lowerMessage.includes("ship") ||
+        lowerMessage.includes("slow")
+      )
+        topics.push("delivery");
+      if (
+        lowerMessage.includes("quality") ||
+        lowerMessage.includes("good") ||
+        lowerMessage.includes("bad")
+      )
+        topics.push("quality");
+      if (
+        lowerMessage.includes("sale") ||
+        lowerMessage.includes("buy") ||
+        lowerMessage.includes("purchase")
+      )
+        topics.push("sales");
+
+      if (topics.length > 0) {
+        preferences.topicsOfInterest = topics;
+      }
+
+      // Detect sentiment from message
+      const positiveWords = (
+        lowerMessage.match(
+          /\b(great|good|excellent|love|amazing|wonderful|perfect|best|happy|satisfied)\b/g
+        ) || []
+      ).length;
+      const negativeWords = (
+        lowerMessage.match(
+          /\b(bad|poor|terrible|hate|awful|worst|unhappy|disappointed|frustrated|angry)\b/g
+        ) || []
+      ).length;
+
+      if (positiveWords > 0 || negativeWords > 0) {
+        preferences.lastSentiment =
+          positiveWords > negativeWords
+            ? "positive"
+            : negativeWords > positiveWords
+            ? "negative"
+            : "neutral";
+        preferences.sentimentScore = positiveWords - negativeWords;
+      }
+
+      // Update business context with extracted patterns and preferences
+      if (patterns.length > 0 || Object.keys(preferences).length > 0) {
+        await aiContext.updateBusinessContext({
+          learnedPatterns: patterns,
+          extractedPreferences: preferences,
+        });
+        logger.info(
+          `Extracted ${patterns.length} patterns and ${
+            Object.keys(preferences).length
+          } preferences for context`
+        );
       }
     } catch (error) {
       logger.error("Error extracting business patterns:", error);
@@ -601,6 +721,28 @@ class VectorContextService {
       if (documents.length > 0) {
         for (const doc of documents) {
           await this.addDocumentToContext(companyId, doc.content, doc.metadata);
+        }
+
+        // Update MongoDB VectorStore with correct document count
+        try {
+          await VectorStore.updateOne(
+            { companyId },
+            {
+              $set: {
+                "indexMetrics.totalDocuments": documents.length,
+                lastUpdated: new Date(),
+                indexStatus: "ready",
+              },
+            },
+            { upsert: true }
+          );
+          logger.info(
+            `Updated VectorStore totalDocuments to ${documents.length} for company ${companyId}`
+          );
+        } catch (dbError) {
+          logger.warn(
+            `Failed to update VectorStore totalDocuments: ${dbError.message}`
+          );
         }
       }
 

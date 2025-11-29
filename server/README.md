@@ -9,7 +9,7 @@ A comprehensive AI-powered backend API for small businesses to manage their digi
 - **Intelligent Chatbot**: Context-aware customer service chatbot with memory
 - **Image Generation**: Create marketing images and visuals
 - **Credit-Based System**: Flexible usage tracking with subscription tiers
-- **Vector Database Integration**: Contextual AI responses using LangChain + ChromaDB
+- **Vector Context System**: Contextual AI responses using LangChain + in-memory vector store
 - **Comprehensive Authentication**: JWT-based auth with role management
 - **Payment Integration**: Stripe-based subscription and credit purchasing
 - **Analytics & Monitoring**: Detailed usage analytics and performance monitoring
@@ -20,7 +20,7 @@ A comprehensive AI-powered backend API for small businesses to manage their digi
 
 - **Backend**: Node.js + Express.js
 - **Database**: MongoDB with Mongoose ODM
-- **Vector DB**: ChromaDB for AI context storage
+- **Vector Store**: In-memory vector store with MongoDB metadata persistence
 - **AI/ML**: LangChain with Google Gemini and Ollama support
 - **Authentication**: JWT with bcrypt password hashing
 - **Payments**: Stripe for subscriptions and credit purchases
@@ -72,7 +72,6 @@ server/
 
 - Node.js 18+
 - MongoDB 4.4+
-- ChromaDB (for vector storage)
 - Ollama (optional, for local AI models)
 
 ### 1. Install Dependencies
@@ -107,9 +106,8 @@ OLLAMA_URL=http://localhost:11434
 STRIPE_SECRET_KEY=sk_test_your-stripe-secret-key
 STRIPE_PUBLISHABLE_KEY=pk_test_your-stripe-publishable-key
 
-# Vector Database
-CHROMA_HOST=localhost
-CHROMA_PORT=8000
+# Vector Store (uses in-memory with MongoDB metadata)
+# No additional configuration needed
 ```
 
 ### 3. Start Required Services
@@ -122,17 +120,6 @@ docker run -d -p 27017:27017 --name mongodb mongo:latest
 
 # Or install locally and start
 mongod
-```
-
-**ChromaDB:**
-
-```bash
-# Using Docker
-docker run -d -p 8000:8000 --name chromadb chromadb/chroma
-
-# Or using pip
-pip install chromadb
-chroma run --host localhost --port 8000
 ```
 
 **Ollama (Optional):**

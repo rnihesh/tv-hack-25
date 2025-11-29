@@ -8,10 +8,18 @@ const { logger } = require("../utils/logger");
 const { uploadImageToCloudinary } = require("../config/cloudinary");
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 
 // Credit costs for image operations
 const CREDIT_COSTS = {
   image_generation: 3,
+};
+
+// Generate unique filename to handle concurrent requests
+const generateUniqueFileName = (prefix = "img") => {
+  const timestamp = Date.now();
+  const randomId = crypto.randomBytes(8).toString("hex");
+  return `${prefix}-${timestamp}-${randomId}.png`;
 };
 
 // Initialize Google AI for image generation
@@ -20,13 +28,11 @@ let imageGenAI;
 try {
   if (config.geminiApiKey) {
     genAI = new GoogleGenerativeAI(config.geminiApiKey);
-    // Initialize Google GenAI for native image generation with Gemini 2.0 Flash
+    // Initialize Google GenAI for Imagen image generation
     imageGenAI = new GoogleGenAI({
       apiKey: config.geminiApiKey,
     });
-    logger.info(
-      "Google GenAI initialized for Gemini 2.0 Flash image generation"
-    );
+    logger.info("Google GenAI initialized for Imagen image generation");
   }
 } catch (error) {
   logger.error("Failed to initialize Google AI:", error);
@@ -90,7 +96,7 @@ exports.generateImage = async (req, res) => {
       const response = await result.response;
       const imageDescription = response.text();
 
-      // Generate real AI image using Gemini 2.0 Flash native image generation
+      // Generate real AI image using Imagen native image generation
       const generateGeminiImage = async (prompt, style, aspectRatio) => {
         try {
           if (!imageGenAI) {
@@ -126,83 +132,95 @@ exports.generateImage = async (req, res) => {
           }
 
           logger.info(
-            `Generating image with Gemini 2.0 Flash: ${enhancedPrompt}`
+            `Generating image with Imagen 3: ${enhancedPrompt}`
           );
 
-          // Generate image using Gemini 2.0 Flash with native image generation
-          const response = await imageGenAI.models.generateContent({
-            model: "gemini-2.0-flash-preview-image-generation",
-            contents: enhancedPrompt,
+          // Map aspect ratio to Imagen supported format
+          let imagenAspectRatio = "1:1";
+          if (aspectRatio === "16:9") {
+            imagenAspectRatio = "16:9";
+          } else if (aspectRatio === "9:16") {
+            imagenAspectRatio = "9:16";
+          } else if (aspectRatio === "4:3") {
+            imagenAspectRatio = "4:3";
+          } else if (aspectRatio === "3:4") {
+            imagenAspectRatio = "3:4";
+          }
+
+          // Generate image using Imagen 3 model
+          // const resModels = await imageGenAI.models.listModels({ modality: Modality.IMAGE });
+          // logger.info("Available Imagen models:", { models: resModels });
+          const response = await imageGenAI.models.generateImages({
+            model: "imagen-3.0-generate-002",
+            prompt: enhancedPrompt,
             config: {
-              responseModalities: [Modality.TEXT, Modality.IMAGE],
+              numberOfImages: 1,
+              aspectRatio: imagenAspectRatio,
             },
           });
 
-          // Process the response
+          // Process the Imagen response
           if (
-            response.candidates &&
-            response.candidates[0] &&
-            response.candidates[0].content.parts
+            response.generatedImages &&
+            response.generatedImages.length > 0
           ) {
-            for (const part of response.candidates[0].content.parts) {
-              if (part.inlineData && part.inlineData.data) {
-                // Create uploads directory if it doesn't exist
-                const uploadsDir = path.join(
-                  __dirname,
-                  "..",
-                  "uploads",
-                  "images"
-                );
-                if (!fs.existsSync(uploadsDir)) {
-                  fs.mkdirSync(uploadsDir, { recursive: true });
-                }
-
-                // Save image to local file and upload to Cloudinary
-                const timestamp = Date.now();
-                const fileName = `gemini-${timestamp}.png`;
-                const filePath = path.join(uploadsDir, fileName);
-
-                const imageData = part.inlineData.data;
-                const buffer = Buffer.from(imageData, "base64");
-                fs.writeFileSync(filePath, buffer);
-
-                // Ensure file is written and accessible
-                if (!fs.existsSync(filePath)) {
-                  throw new Error("Failed to write image file");
-                }
-
-                // Upload to Cloudinary
-                let cloudinaryUrl = null;
-                try {
-                  const cloudinaryResult = await uploadImageToCloudinary(
-                    buffer,
-                    fileName
-                  );
-                  cloudinaryUrl = cloudinaryResult.secure_url;
-                  logger.info(`Image uploaded to Cloudinary: ${cloudinaryUrl}`);
-                } catch (cloudinaryError) {
-                  logger.warn(
-                    `Cloudinary upload failed, using local URL: ${cloudinaryError.message}`
-                  );
-                }
-
-                // Return Cloudinary URL if available, otherwise production URL
-                const baseUrl =
-                  process.env.NODE_ENV === "production"
-                    ? `https://phoenix-sol.onrender.com`
-                    : `http://localhost:3000`;
-                const imageUrl =
-                  cloudinaryUrl || `${baseUrl}/uploads/images/${fileName}`;
-
-                logger.info(`Gemini image saved successfully: ${imageUrl}`);
-                return { imageUrl, localPath: filePath, cloudinaryUrl };
+            const generatedImage = response.generatedImages[0];
+            if (generatedImage.image && generatedImage.image.imageBytes) {
+              // Create uploads directory if it doesn't exist
+              const uploadsDir = path.join(
+                __dirname,
+                "..",
+                "uploads",
+                "images"
+              );
+              if (!fs.existsSync(uploadsDir)) {
+                fs.mkdirSync(uploadsDir, { recursive: true });
               }
+
+              // Save image to local file and upload to Cloudinary
+              const fileName = generateUniqueFileName("imagen");
+              const filePath = path.join(uploadsDir, fileName);
+
+              const imageData = generatedImage.image.imageBytes;
+              const buffer = Buffer.from(imageData, "base64");
+              fs.writeFileSync(filePath, buffer);
+
+              // Ensure file is written and accessible
+              if (!fs.existsSync(filePath)) {
+                throw new Error("Failed to write image file");
+              }
+
+              // Upload to Cloudinary
+              let cloudinaryUrl = null;
+              try {
+                const cloudinaryResult = await uploadImageToCloudinary(
+                  buffer,
+                  fileName
+                );
+                cloudinaryUrl = cloudinaryResult.secure_url;
+                logger.info(`Image uploaded to Cloudinary: ${cloudinaryUrl}`);
+              } catch (cloudinaryError) {
+                logger.warn(
+                  `Cloudinary upload failed, using local URL: ${cloudinaryError.message}`
+                );
+              }
+
+              // Return Cloudinary URL if available, otherwise production URL
+              const baseUrl =
+                process.env.NODE_ENV === "production"
+                  ? `https://phoenix-sol.onrender.com`
+                  : `http://localhost:${config.port || 3000}`;
+              const imageUrl =
+                cloudinaryUrl || `${baseUrl}/uploads/images/${fileName}`;
+
+              logger.info(`Imagen image saved successfully: ${imageUrl}`);
+              return { imageUrl, localPath: filePath, cloudinaryUrl };
             }
           }
 
-          throw new Error("No image data found in response");
+          throw new Error("No image data found in Imagen response");
         } catch (error) {
-          logger.error("Gemini 2.0 Flash image generation failed:", error);
+          logger.error("Imagen image generation failed:", error);
 
           // Fallback to placeholder
           const dimensions =
@@ -240,7 +258,7 @@ exports.generateImage = async (req, res) => {
         imageUrl = req.body.cloudinaryUrl;
         cloudinaryUrl = req.body.cloudinaryUrl;
       } else {
-        // Generate real AI image with Gemini 2.0 Flash
+        // Generate real AI image with Imagen
         const imageResult = await generateGeminiImage(
           prompt,
           style,
@@ -285,7 +303,7 @@ exports.generateImage = async (req, res) => {
           creditsUsed: CREDIT_COSTS.image_generation,
           generatedAt: new Date(),
           metadata: {
-            aiModel: "gemini-2.0-flash-exp",
+            aiModel: "imagen-3.0-generate-002",
             cloudinaryUrl: cloudinaryUrl, // Keep for backward compatibility
             localUrl: imageUrl !== cloudinaryUrl ? imageUrl : null,
           },

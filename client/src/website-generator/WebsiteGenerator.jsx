@@ -75,6 +75,10 @@ const WebsiteGenerator = () => {
   // Use the authenticated user's company data directly
   const displayUser = user?.company || user;
 
+  // Animation class names
+  const fadeIn = "animate-fadeIn";
+  const slideUp = "animate-slideUp";
+
   // Safety check: if no valid user data after auth loading, return null to let ProtectedRoute handle
   if (!authLoading && (!displayUser || !displayUser._id)) {
     return null;
@@ -96,23 +100,25 @@ const WebsiteGenerator = () => {
     try {
       setLoading(true);
       console.log("Loading websites for company:", displayUser._id);
-      
+
       // Check if userData exists in localStorage
-      const userData = localStorage.getItem('userData');
+      const userData = localStorage.getItem("userData");
       console.log("UserData from localStorage:", userData);
-      
+
       if (userData) {
         const parsedUserData = JSON.parse(userData);
         console.log("Parsed userData:", parsedUserData);
         console.log("Company ID from userData:", parsedUserData.company?._id);
       }
-      
+
       const response = await api.getMyWebsites();
       console.log("Websites API response:", response);
-      
+
       if (response.success) {
         // Handle both array response and paginated response
-        const websitesData = Array.isArray(response.data) ? response.data : response.data.websites || [];
+        const websitesData = Array.isArray(response.data)
+          ? response.data
+          : response.data.websites || [];
         setWebsites(websitesData);
         console.log("Loaded websites:", websitesData);
         console.log("Number of websites loaded:", websitesData.length);
@@ -122,7 +128,10 @@ const WebsiteGenerator = () => {
       }
     } catch (error) {
       console.error("Load websites error:", error);
-      const message = error.response?.data?.message || error.message || "Failed to load websites";
+      const message =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to load websites";
       showToast(message, "error");
     } finally {
       setLoading(false);
@@ -239,7 +248,11 @@ const WebsiteGenerator = () => {
   };
 
   const handleDeleteWebsite = async (websiteId) => {
-    if (!window.confirm("Are you sure you want to delete this website? This action cannot be undone.")) {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this website? This action cannot be undone."
+      )
+    ) {
       return;
     }
 
@@ -249,8 +262,8 @@ const WebsiteGenerator = () => {
 
       if (response.success) {
         showToast("Website deleted successfully!", "success");
-        setWebsites(prev => prev.filter(w => w._id !== websiteId));
-        
+        setWebsites((prev) => prev.filter((w) => w._id !== websiteId));
+
         // Clear selected website if it was deleted
         if (selectedWebsite?._id === websiteId) {
           setSelectedWebsite(null);
@@ -258,7 +271,8 @@ const WebsiteGenerator = () => {
         }
       }
     } catch (error) {
-      const message = error.response?.data?.message || "Failed to delete website";
+      const message =
+        error.response?.data?.message || "Failed to delete website";
       showToast(message, "error");
       console.error("Delete website error:", error);
     } finally {
@@ -274,135 +288,133 @@ const WebsiteGenerator = () => {
     );
   };
 
-  // Animation classes
-  const fadeIn = "animate-fadeIn";
-  const slideUp = "animate-slideUp";
-  const pulse = "animate-pulse";
-
   // Show loading spinner while auth is checking
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center transition-colors duration-300">
         <LoadingSpinner />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       <AppNavigation />
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <header className={`text-center mb-12 ${fadeIn}`}>
-          <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 text-white rounded-2xl p-8 shadow-2xl relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-400/20 animate-pulse"></div>
-            <div className="relative z-10">
-              <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
-                AI Website Generator
-              </h1>
-              <p className="text-xl opacity-90 mb-6">
-                Create and deploy professional websites with AI assistance
-              </p>
-              <div className="flex justify-center gap-4 text-sm flex-wrap">
-                <span className="bg-white bg-opacity-90 px-4 py-2 rounded-full backdrop-blur-sm text-gray-800 font-semibold shadow-lg border border-white border-opacity-50">
-                  🏢{" "}
-                  {displayUser?.companyName ||
-                    displayUser?.displayName ||
-                    "Unknown Company"}
-                </span>
-                <span className="bg-white bg-opacity-90 px-4 py-2 rounded-full backdrop-blur-sm text-gray-800 font-semibold shadow-lg border border-white border-opacity-50">
-                  💰{" "}
-                  {displayUser?.credits?.currentCredits?.toLocaleString() ||
-                    "0"}{" "}
-                  Credits
-                </span>
-                <span className="bg-white bg-opacity-90 px-4 py-2 rounded-full backdrop-blur-sm text-gray-800 font-semibold shadow-lg border border-white border-opacity-50">
-                  📊 {displayUser?.subscription?.plan?.toUpperCase() || "FREE"}{" "}
-                  Plan
-                </span>
-                <span
-                  className={`px-4 py-2 rounded-full backdrop-blur-sm font-semibold shadow-lg border ${
-                    isAuthenticated
-                      ? "bg-green-100 bg-opacity-95 text-green-800 border-green-200"
-                      : "bg-yellow-100 bg-opacity-95 text-yellow-800 border-yellow-200"
-                  }`}
+
+      {/* Page Header */}
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl shadow-lg">
+                <svg
+                  className="w-6 h-6 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
                 >
-                  {isAuthenticated ? "✅ Authenticated" : "👤 Demo Mode"}
-                </span>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
+                  />
+                </svg>
+              </div>
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                  AI Website Generator
+                </h1>
+                <p className="text-gray-600 dark:text-gray-400 mt-1">
+                  Create and deploy professional websites with AI assistance
+                </p>
               </div>
             </div>
+            <div className="flex items-center space-x-2 px-4 py-2 bg-violet-50 dark:bg-violet-900/20 rounded-lg border border-violet-200 dark:border-violet-700">
+              <svg
+                className="w-4 h-4 text-violet-600 dark:text-violet-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                />
+              </svg>
+              <span className="text-sm font-medium text-violet-700 dark:text-violet-300">
+                5 credits per website
+              </span>
+            </div>
           </div>
-        </header>
+        </div>
+      </div>
 
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Tab Navigation */}
-        <nav className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-1 mb-8 shadow-sm">
-          <div className="flex">
+        <nav className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-1.5 mb-6 shadow-sm">
+          <div className="flex flex-wrap gap-1">
             <button
-              className={`flex-1 py-3 px-6 rounded-lg font-medium transition-all ${
+              className={`flex-1 py-3 px-4 sm:px-6 rounded-lg font-medium text-sm transition-all duration-200 whitespace-nowrap ${
                 activeTab === "generate"
-                  ? "bg-blue-600 dark:bg-blue-600 text-white shadow-sm"
-                  : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  ? "bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-md"
+                  : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
               }`}
               onClick={() => setActiveTab("generate")}
             >
-              Generate Website
+              ✨ Generate
             </button>
             <button
-              className={`flex-1 py-3 px-6 rounded-lg font-medium transition-all ${
+              className={`flex-1 py-3 px-4 sm:px-6 rounded-lg font-medium text-sm transition-all duration-200 whitespace-nowrap ${
                 activeTab === "manage"
-                  ? "bg-blue-600 dark:bg-blue-600 text-white shadow-sm"
-                  : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  ? "bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-md"
+                  : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
               }`}
               onClick={() => setActiveTab("manage")}
             >
-              My Websites
+              📁 My Websites
             </button>
             {selectedWebsite && (
               <button
-                className={`flex-1 py-3 px-6 rounded-lg font-medium transition-all ${
+                className={`flex-1 py-3 px-4 sm:px-6 rounded-lg font-medium text-sm transition-all duration-200 whitespace-nowrap ${
                   activeTab === "preview"
-                    ? "bg-blue-600 dark:bg-blue-600 text-white shadow-sm"
-                    : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    ? "bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-md"
+                    : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                 }`}
                 onClick={() => setActiveTab("preview")}
               >
-                Preview
+                👁️ Preview
               </button>
             )}
           </div>
         </nav>
 
         {/* Main Content */}
-        <main className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-8 relative shadow-sm">
+        <main className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 sm:p-8 relative shadow-sm">
           {loading && <LoadingSpinner />}
 
           {/* Generate Website Tab */}
-          
 
           {/* My Websites Tab */}
           {activeTab === "manage" && (
-            <div className={`${fadeIn} space-y-6`}>
-              <div className="flex items-center justify-between mb-8">
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                 <div>
-                  <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-200">
+                  <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
                     My Websites
                   </h2>
-                  <p className="text-gray-600 dark:text-gray-400 mt-2">
-                    Manage your AI-generated websites and deploy them to the internet
+                  <p className="text-gray-600 dark:text-gray-400 mt-1">
+                    Manage your AI-generated websites and deploy them to the
+                    internet
                   </p>
-                  {/* Debug info */}
-                  <div className="mt-2 text-xs text-gray-500">
-                    Company ID: {displayUser?._id || "Not found"} | 
-                    Websites Count: {websites.length} | 
-                    Loading: {loading ? "Yes" : "No"} |
-                    Token: {localStorage.getItem("authToken") ? "Present" : "Missing"}
-                  </div>
                 </div>
                 <div className="flex gap-3">
                   <button
                     onClick={loadWebsites}
                     disabled={loading}
-                    className="bg-gray-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-700 transition-colors flex items-center gap-2 disabled:opacity-50"
+                    className="bg-gray-600 dark:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors flex items-center gap-2 disabled:opacity-50"
                   >
                     <svg
                       className="w-4 h-4"
@@ -462,18 +474,18 @@ const WebsiteGenerator = () => {
                       />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-600 mb-4">
+                  <h3 className="text-xl font-semibold text-gray-600 dark:text-gray-300 mb-4">
                     Loading your websites...
                   </h3>
-                  <p className="text-gray-500">
+                  <p className="text-gray-500 dark:text-gray-400">
                     Please wait while we fetch your websites from the server.
                   </p>
                 </div>
               ) : websites.length === 0 ? (
                 <div className="text-center py-16">
-                  <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <div className="w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-6">
                     <svg
-                      className="w-12 h-12 text-gray-400"
+                      className="w-12 h-12 text-gray-400 dark:text-gray-500"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -486,11 +498,12 @@ const WebsiteGenerator = () => {
                       />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-600 mb-4">
+                  <h3 className="text-xl font-semibold text-gray-600 dark:text-gray-300 mb-4">
                     No websites found
                   </h3>
-                  <p className="text-gray-500 mb-8">
-                    You haven't created any websites yet. Start by generating your first AI-powered website!
+                  <p className="text-gray-500 dark:text-gray-400 mb-8">
+                    You haven't created any websites yet. Start by generating
+                    your first AI-powered website!
                   </p>
                   <button
                     onClick={() => {
@@ -517,7 +530,9 @@ const WebsiteGenerator = () => {
                             {website.templateName || "Untitled Website"}
                           </h4>
                           <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                            <span className="capitalize">{website.industry || "General"}</span>
+                            <span className="capitalize">
+                              {website.industry || "General"}
+                            </span>
                             {website.aiGenerated && (
                               <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
                                 AI Generated
@@ -547,7 +562,8 @@ const WebsiteGenerator = () => {
                             <span className="font-medium">Prompt:</span>{" "}
                             <span className="italic">
                               {website.generationPrompt.length > 60
-                                ? website.generationPrompt.substring(0, 60) + "..."
+                                ? website.generationPrompt.substring(0, 60) +
+                                  "..."
                                 : website.generationPrompt}
                             </span>
                           </div>
@@ -557,7 +573,11 @@ const WebsiteGenerator = () => {
                             {website.structure.styling.colorScheme?.primary && (
                               <span
                                 className="w-4 h-4 rounded-full border border-gray-300"
-                                style={{ backgroundColor: website.structure.styling.colorScheme.primary }}
+                                style={{
+                                  backgroundColor:
+                                    website.structure.styling.colorScheme
+                                      .primary,
+                                }}
                                 title={`Primary: ${website.structure.styling.colorScheme.primary}`}
                               ></span>
                             )}
@@ -641,7 +661,7 @@ const WebsiteGenerator = () => {
                     </div>
                     <div>
                       <div className="text-2xl font-bold text-green-600">
-                        {websites.filter(w => w.isPublished).length}
+                        {websites.filter((w) => w.isPublished).length}
                       </div>
                       <div className="text-sm text-gray-600 dark:text-gray-400">
                         Published
@@ -649,7 +669,7 @@ const WebsiteGenerator = () => {
                     </div>
                     <div>
                       <div className="text-2xl font-bold text-yellow-600">
-                        {websites.filter(w => !w.isPublished).length}
+                        {websites.filter((w) => !w.isPublished).length}
                       </div>
                       <div className="text-sm text-gray-600 dark:text-gray-400">
                         Drafts
@@ -657,7 +677,7 @@ const WebsiteGenerator = () => {
                     </div>
                     <div>
                       <div className="text-2xl font-bold text-purple-600">
-                        {websites.filter(w => w.aiGenerated).length}
+                        {websites.filter((w) => w.aiGenerated).length}
                       </div>
                       <div className="text-sm text-gray-600 dark:text-gray-400">
                         AI Generated
@@ -682,7 +702,7 @@ const WebsiteGenerator = () => {
               <div className="grid md:grid-cols-2 gap-8">
                 {/* Create Website Card */}
                 <div
-                  className={`group bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 border border-gray-100 ${slideUp}`}
+                  className={`group bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-xl hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 border border-gray-100 dark:border-gray-700 ${slideUp}`}
                 >
                   <div className="text-center">
                     <div className="w-20 h-20 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
@@ -700,10 +720,10 @@ const WebsiteGenerator = () => {
                         />
                       </svg>
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-800 mb-4">
+                    <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">
                       Create New Website
                     </h3>
-                    <p className="text-gray-600 mb-8 leading-relaxed">
+                    <p className="text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
                       Generate a professional website using AI. Describe your
                       business and let our AI create a stunning website for you.
                     </p>
@@ -718,7 +738,7 @@ const WebsiteGenerator = () => {
 
                 {/* Deploy Website Card */}
                 <div
-                  className={`group bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 border border-gray-100 ${slideUp}`}
+                  className={`group bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-xl hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 border border-gray-100 dark:border-gray-700 ${slideUp}`}
                   style={{ animationDelay: "0.2s" }}
                 >
                   <div className="text-center">
@@ -737,10 +757,10 @@ const WebsiteGenerator = () => {
                         />
                       </svg>
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-800 mb-4">
+                    <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">
                       Deploy Website
                     </h3>
-                    <p className="text-gray-600 mb-8 leading-relaxed">
+                    <p className="text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
                       Select from your existing websites and deploy them to the
                       internet. Make your website live in seconds.
                     </p>
@@ -757,23 +777,23 @@ const WebsiteGenerator = () => {
               {/* Recent Websites Preview */}
               {websites.length > 0 && (
                 <div
-                  className={`bg-white rounded-2xl p-8 shadow-xl border border-gray-100 ${slideUp}`}
+                  className={`bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-xl border border-gray-100 dark:border-gray-700 ${slideUp}`}
                   style={{ animationDelay: "0.4s" }}
                 >
-                  <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+                  <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center">
                     Your Recent Websites
                   </h3>
                   <div className="grid md:grid-cols-3 gap-4">
                     {websites.slice(0, 3).map((website, index) => (
                       <div
                         key={website._id}
-                        className="bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors cursor-pointer"
+                        className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors cursor-pointer"
                         onClick={() => handleSelectWebsite(website)}
                       >
-                        <div className="text-sm font-semibold text-gray-800 truncate">
+                        <div className="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate">
                           {website.templateName}
                         </div>
-                        <div className="text-xs text-gray-500 mt-1">
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                           {website.isDeployed ? "🌐 Deployed" : "📝 Draft"}
                         </div>
                       </div>
@@ -785,10 +805,10 @@ const WebsiteGenerator = () => {
               {/* User Statistics Dashboard */}
               {isAuthenticated && displayUser && (
                 <div
-                  className={`bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl p-8 shadow-xl border border-gray-200 ${slideUp}`}
+                  className={`bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-8 shadow-xl border border-gray-200 dark:border-gray-600 ${slideUp}`}
                   style={{ animationDelay: "0.6s" }}
                 >
-                  <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+                  <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center">
                     Your Account Overview
                   </h3>
                   <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -796,7 +816,7 @@ const WebsiteGenerator = () => {
                       <div className="text-3xl font-bold text-blue-600">
                         {displayUser?.usage?.websitesGenerated || 0}
                       </div>
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-gray-600 dark:text-gray-400">
                         Websites Generated
                       </div>
                     </div>
@@ -804,13 +824,15 @@ const WebsiteGenerator = () => {
                       <div className="text-3xl font-bold text-green-600">
                         {displayUser?.usage?.emailsSent || 0}
                       </div>
-                      <div className="text-sm text-gray-600">Emails Sent</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">
+                        Emails Sent
+                      </div>
                     </div>
                     <div className="text-center">
                       <div className="text-3xl font-bold text-purple-600">
                         {displayUser?.usage?.imagesGenerated || 0}
                       </div>
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-gray-600 dark:text-gray-400">
                         Images Generated
                       </div>
                     </div>
@@ -818,34 +840,34 @@ const WebsiteGenerator = () => {
                       <div className="text-3xl font-bold text-orange-600">
                         {displayUser?.usage?.chatbotQueries || 0}
                       </div>
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-gray-600 dark:text-gray-400">
                         Chatbot Queries
                       </div>
                     </div>
                   </div>
-                  <div className="mt-6 pt-6 border-t border-gray-200">
+                  <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-600">
                     <div className="grid md:grid-cols-3 gap-4 text-sm">
                       <div className="text-center">
-                        <span className="font-semibold text-gray-700">
+                        <span className="font-semibold text-gray-700 dark:text-gray-300">
                           Business Type:
                         </span>
-                        <div className="text-blue-600 capitalize">
+                        <div className="text-blue-600 dark:text-blue-400 capitalize">
                           {displayUser?.businessType || "Not specified"}
                         </div>
                       </div>
                       <div className="text-center">
-                        <span className="font-semibold text-gray-700">
+                        <span className="font-semibold text-gray-700 dark:text-gray-300">
                           Credits Used Today:
                         </span>
-                        <div className="text-red-600">
+                        <div className="text-red-600 dark:text-red-400">
                           {displayUser?.credits?.dailyCreditsUsed || 0}
                         </div>
                       </div>
                       <div className="text-center">
-                        <span className="font-semibold text-gray-700">
+                        <span className="font-semibold text-gray-700 dark:text-gray-300">
                           Total Credits Used:
                         </span>
-                        <div className="text-gray-600">
+                        <div className="text-gray-600 dark:text-gray-400">
                           {displayUser?.credits?.totalCreditsUsed?.toLocaleString() ||
                             0}
                         </div>
@@ -860,17 +882,17 @@ const WebsiteGenerator = () => {
           {/* Create Website Step */}
           {currentStep === "create" && (
             <div
-              className={`bg-white rounded-2xl shadow-2xl border border-gray-100 relative overflow-hidden ${fadeIn}`}
+              className={`bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 relative overflow-hidden ${fadeIn}`}
             >
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-400 to-blue-500"></div>
               <div className="p-8">
                 <div className="flex items-center justify-between mb-8">
-                  <h2 className="text-3xl font-bold text-gray-800">
+                  <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100">
                     Create New Website
                   </h2>
                   <button
                     onClick={() => setCurrentStep("home")}
-                    className="text-gray-500 hover:text-gray-700 transition-colors"
+                    className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
                   >
                     <svg
                       className="w-6 h-6"
@@ -950,17 +972,17 @@ const WebsiteGenerator = () => {
           {/* Deploy Website Step */}
           {currentStep === "deploy" && (
             <div
-              className={`bg-white rounded-2xl shadow-2xl border border-gray-100 relative overflow-hidden ${fadeIn}`}
+              className={`bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 relative overflow-hidden ${fadeIn}`}
             >
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-400 to-pink-500"></div>
               <div className="p-8">
                 <div className="flex items-center justify-between mb-8">
-                  <h2 className="text-3xl font-bold text-gray-800">
+                  <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100">
                     Deploy Website
                   </h2>
                   <button
                     onClick={() => setCurrentStep("home")}
-                    className="text-gray-500 hover:text-gray-700 transition-colors"
+                    className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
                   >
                     <svg
                       className="w-6 h-6"
@@ -980,9 +1002,9 @@ const WebsiteGenerator = () => {
 
                 {websites.length === 0 ? (
                   <div className="text-center py-12">
-                    <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <div className="w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-6">
                       <svg
-                        className="w-12 h-12 text-gray-400"
+                        className="w-12 h-12 text-gray-400 dark:text-gray-500"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -995,10 +1017,10 @@ const WebsiteGenerator = () => {
                         />
                       </svg>
                     </div>
-                    <h3 className="text-xl font-semibold text-gray-600 mb-4">
+                    <h3 className="text-xl font-semibold text-gray-600 dark:text-gray-300 mb-4">
                       No websites found
                     </h3>
-                    <p className="text-gray-500 mb-8">
+                    <p className="text-gray-500 dark:text-gray-400 mb-8">
                       Create your first website to deploy it
                     </p>
                     <button
@@ -1013,11 +1035,11 @@ const WebsiteGenerator = () => {
                     {websites.map((website) => (
                       <div
                         key={website._id}
-                        className="bg-gray-50 rounded-xl p-6 hover:bg-gray-100 transition-all transform hover:-translate-y-1 hover:shadow-lg cursor-pointer border border-gray-200"
+                        className="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 hover:bg-gray-100 dark:hover:bg-gray-600 transition-all transform hover:-translate-y-1 hover:shadow-lg cursor-pointer border border-gray-200 dark:border-gray-600"
                         onClick={() => handleSelectWebsite(website)}
                       >
                         <div className="flex items-start justify-between mb-4">
-                          <h4 className="font-semibold text-gray-800 truncate flex-1">
+                          <h4 className="font-semibold text-gray-800 dark:text-gray-200 truncate flex-1">
                             {website.templateName}
                           </h4>
                           <span
@@ -1030,7 +1052,7 @@ const WebsiteGenerator = () => {
                             {website.isDeployed ? "Deployed" : "Draft"}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-600 mb-4">
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                           Created:{" "}
                           {new Date(website.createdAt).toLocaleDateString()}
                         </p>
@@ -1039,7 +1061,7 @@ const WebsiteGenerator = () => {
                             href={website.deploymentUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium"
                             onClick={(e) => e.stopPropagation()}
                           >
                             View Live Site →
@@ -1067,17 +1089,17 @@ const WebsiteGenerator = () => {
           {/* Preview and Deploy Step */}
           {currentStep === "preview" && selectedWebsite && (
             <div
-              className={`bg-white rounded-2xl shadow-2xl border border-gray-100 relative overflow-hidden ${fadeIn}`}
+              className={`bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 relative overflow-hidden ${fadeIn}`}
             >
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-purple-500"></div>
               <div className="p-8">
                 <div className="flex items-center justify-between mb-8">
-                  <h2 className="text-3xl font-bold text-gray-800">
+                  <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100">
                     Website Preview & Deploy
                   </h2>
                   <button
                     onClick={() => setCurrentStep("home")}
-                    className="text-gray-500 hover:text-gray-700 transition-colors"
+                    className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
                   >
                     <svg
                       className="w-6 h-6"
@@ -1099,8 +1121,8 @@ const WebsiteGenerator = () => {
 
                 {/* Deploy Section */}
                 {!selectedWebsite.isDeployed ? (
-                  <div className="mt-8 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-8 border border-purple-200">
-                    <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+                  <div className="mt-8 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/30 dark:to-blue-900/30 rounded-xl p-8 border border-purple-200 dark:border-purple-700">
+                    <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center">
                       Ready to Deploy?
                     </h3>
 
@@ -1193,10 +1215,10 @@ const WebsiteGenerator = () => {
                   </div>
                 ) : selectedWebsite.isDeployed &&
                   selectedWebsite.deploymentUrl ? (
-                  <div className="mt-8 bg-green-50 rounded-xl p-8 border border-green-200 text-center">
-                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="mt-8 bg-green-50 dark:bg-green-900/30 rounded-xl p-8 border border-green-200 dark:border-green-700 text-center">
+                    <div className="w-16 h-16 bg-green-100 dark:bg-green-800 rounded-full flex items-center justify-center mx-auto mb-4">
                       <svg
-                        className="w-8 h-8 text-green-600"
+                        className="w-8 h-8 text-green-600 dark:text-green-400"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -1209,10 +1231,10 @@ const WebsiteGenerator = () => {
                         />
                       </svg>
                     </div>
-                    <h3 className="text-2xl font-bold text-green-800 mb-4">
+                    <h3 className="text-2xl font-bold text-green-800 dark:text-green-300 mb-4">
                       Already Deployed!
                     </h3>
-                    <p className="text-green-700 mb-6">
+                    <p className="text-green-700 dark:text-green-400 mb-6">
                       Your website is live and accessible on the internet.
                     </p>
                     <a

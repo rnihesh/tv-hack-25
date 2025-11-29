@@ -76,10 +76,10 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
     if (!structure || typeof structure !== "object") {
       return (
         <div className="text-center py-8">
-          <div className="text-gray-500 mb-2">
+          <div className="text-gray-500 dark:text-gray-400 mb-2">
             No website structure available
           </div>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-gray-400 dark:text-gray-500">
             The website structure could not be loaded or is invalid.
           </p>
         </div>
@@ -89,9 +89,9 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
     try {
       // Create a mock website layout that resembles the actual website
       return (
-        <div className="bg-white border rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg shadow-sm overflow-hidden">
           {/* Mock Header */}
-          <header className="bg-white border-b border-gray-200 px-6 py-4">
+          <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 {structure.header?.logo && (
@@ -99,7 +99,7 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
                     {structure.header.logo.charAt(0).toUpperCase()}
                   </div>
                 )}
-                <h1 className="text-xl font-bold text-gray-900">
+                <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">
                   {structure.header?.logo || website?.templateName || "Website"}
                 </h1>
               </div>
@@ -111,7 +111,7 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
                       <a
                         key={index}
                         href="#"
-                        className="text-gray-600 hover:text-gray-900 font-medium"
+                        className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 font-medium"
                         onClick={(e) => e.preventDefault()}
                       >
                         {item}
@@ -120,7 +120,7 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
                 </nav>
               )}
               {structure.header?.contactInfo && (
-                <div className="hidden lg:flex items-center space-x-4 text-sm text-gray-600">
+                <div className="hidden lg:flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
                   {structure.header.contactInfo.phone && (
                     <span>📞 {structure.header.contactInfo.phone}</span>
                   )}
@@ -154,21 +154,23 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
 
           {/* Mock About Section */}
           {structure.about && (
-            <section className="px-6 py-16 bg-gray-50">
+            <section className="px-6 py-16 bg-gray-50 dark:bg-gray-700">
               <div className="max-w-4xl mx-auto">
-                <h3 className="text-3xl font-bold text-gray-900 mb-6 text-center">
+                <h3 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6 text-center">
                   {structure.about.title || "About Us"}
                 </h3>
-                <p className="text-lg text-gray-600 text-center max-w-3xl mx-auto">
+                <p className="text-lg text-gray-600 dark:text-gray-300 text-center max-w-3xl mx-auto">
                   {structure.about.content ||
                     "Learn more about our company and what we do."}
                 </p>
                 {structure.about.mission && (
-                  <div className="mt-8 p-6 bg-white rounded-lg shadow-sm">
-                    <h4 className="font-semibold text-gray-900 mb-3">
+                  <div className="mt-8 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                    <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">
                       Our Mission
                     </h4>
-                    <p className="text-gray-600">{structure.about.mission}</p>
+                    <p className="text-gray-600 dark:text-gray-300">
+                      {structure.about.mission}
+                    </p>
                   </div>
                 )}
               </div>
@@ -179,21 +181,21 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
           {structure.services &&
             Array.isArray(structure.services) &&
             structure.services.length > 0 && (
-              <section className="px-6 py-16">
+              <section className="px-6 py-16 bg-white dark:bg-gray-800">
                 <div className="max-w-6xl mx-auto">
-                  <h3 className="text-3xl font-bold text-gray-900 mb-12 text-center">
+                  <h3 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-12 text-center">
                     Our Services
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {structure.services.slice(0, 6).map((service, index) => (
                       <div
                         key={index}
-                        className="bg-white p-6 rounded-lg shadow-sm border hover:shadow-md transition-shadow"
+                        className="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-sm border dark:border-gray-600 hover:shadow-md transition-shadow"
                       >
-                        <h4 className="text-xl font-semibold text-gray-900 mb-3">
+                        <h4 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">
                           {service.title || `Service ${index + 1}`}
                         </h4>
-                        <p className="text-gray-600 mb-4">
+                        <p className="text-gray-600 dark:text-gray-300 mb-4">
                           {service.description ||
                             "Professional service description goes here."}
                         </p>
@@ -204,7 +206,7 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
                               .map((feature, featureIndex) => (
                                 <li
                                   key={featureIndex}
-                                  className="text-sm text-gray-600 flex items-center"
+                                  className="text-sm text-gray-600 dark:text-gray-400 flex items-center"
                                 >
                                   <span className="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
                                   {feature}
@@ -273,11 +275,11 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
             !structure.about &&
             !structure.services &&
             !structure.contact && (
-              <div className="px-6 py-16">
-                <h3 className="text-2xl font-bold text-gray-900 mb-4 text-center">
+              <div className="px-6 py-16 bg-white dark:bg-gray-800">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4 text-center">
                   Website Structure Preview
                 </h3>
-                <p className="text-gray-600 mb-8 text-center">
+                <p className="text-gray-600 dark:text-gray-400 mb-8 text-center">
                   This website contains custom content that will be displayed
                   when deployed.
                 </p>
@@ -285,66 +287,66 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
                 {/* Show generation details if available */}
                 {structure.sections && structure.sections[0]?.customData && (
                   <div className="mb-8">
-                    <h4 className="text-lg font-semibold text-gray-900 mb-4">
+                    <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
                       Generation Details
                     </h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {structure.sections[0].customData.prompt && (
-                        <div className="bg-blue-50 p-4 rounded-lg">
-                          <div className="text-sm font-medium text-blue-900 mb-2">
+                        <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg">
+                          <div className="text-sm font-medium text-blue-900 dark:text-blue-300 mb-2">
                             Prompt
                           </div>
-                          <div className="text-blue-800 text-sm">
+                          <div className="text-blue-800 dark:text-blue-200 text-sm">
                             "{structure.sections[0].customData.prompt}"
                           </div>
                         </div>
                       )}
                       {structure.sections[0].customData.templateType && (
-                        <div className="bg-green-50 p-4 rounded-lg">
-                          <div className="text-sm font-medium text-green-900 mb-2">
+                        <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg">
+                          <div className="text-sm font-medium text-green-900 dark:text-green-300 mb-2">
                             Template Type
                           </div>
-                          <div className="text-green-800 text-sm">
+                          <div className="text-green-800 dark:text-green-200 text-sm">
                             {structure.sections[0].customData.templateType}
                           </div>
                         </div>
                       )}
                       {structure.sections[0].customData.style && (
-                        <div className="bg-purple-50 p-4 rounded-lg">
-                          <div className="text-sm font-medium text-purple-900 mb-2">
+                        <div className="bg-purple-50 dark:bg-purple-900/30 p-4 rounded-lg">
+                          <div className="text-sm font-medium text-purple-900 dark:text-purple-300 mb-2">
                             Style
                           </div>
-                          <div className="text-purple-800 text-sm">
+                          <div className="text-purple-800 dark:text-purple-200 text-sm">
                             {structure.sections[0].customData.style}
                           </div>
                         </div>
                       )}
                       {structure.sections[0].customData.colorScheme && (
-                        <div className="bg-orange-50 p-4 rounded-lg">
-                          <div className="text-sm font-medium text-orange-900 mb-2">
+                        <div className="bg-orange-50 dark:bg-orange-900/30 p-4 rounded-lg">
+                          <div className="text-sm font-medium text-orange-900 dark:text-orange-300 mb-2">
                             Color Scheme
                           </div>
-                          <div className="text-orange-800 text-sm">
+                          <div className="text-orange-800 dark:text-orange-200 text-sm">
                             {structure.sections[0].customData.colorScheme}
                           </div>
                         </div>
                       )}
                       {structure.sections[0].customData.model && (
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                          <div className="text-sm font-medium text-gray-900 mb-2">
+                        <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                          <div className="text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">
                             AI Model
                           </div>
-                          <div className="text-gray-800 text-sm">
+                          <div className="text-gray-800 dark:text-gray-200 text-sm">
                             {structure.sections[0].customData.model}
                           </div>
                         </div>
                       )}
                       {structure.sections[0].customData.tokensUsed && (
-                        <div className="bg-yellow-50 p-4 rounded-lg">
-                          <div className="text-sm font-medium text-yellow-900 mb-2">
+                        <div className="bg-yellow-50 dark:bg-yellow-900/30 p-4 rounded-lg">
+                          <div className="text-sm font-medium text-yellow-900 dark:text-yellow-300 mb-2">
                             Tokens Used
                           </div>
-                          <div className="text-yellow-800 text-sm">
+                          <div className="text-yellow-800 dark:text-yellow-200 text-sm">
                             {structure.sections[0].customData.tokensUsed}
                           </div>
                         </div>
@@ -354,22 +356,24 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
                 )}
 
                 {/* Notice about missing HTML content */}
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+                <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-lg p-4 mb-6">
                   <div className="flex items-start">
-                    <div className="text-amber-600 text-lg mr-3">⚠️</div>
+                    <div className="text-amber-600 dark:text-amber-400 text-lg mr-3">
+                      ⚠️
+                    </div>
                     <div>
-                      <h4 className="text-amber-900 font-semibold mb-2">
+                      <h4 className="text-amber-900 dark:text-amber-300 font-semibold mb-2">
                         HTML Content Not Found
                       </h4>
-                      <p className="text-amber-800 text-sm mb-3">
+                      <p className="text-amber-800 dark:text-amber-200 text-sm mb-3">
                         This website appears to have been generated but the HTML
                         content is not stored in the expected location. The
                         website structure contains metadata but no renderable
                         content.
                       </p>
-                      <p className="text-amber-800 text-sm">
+                      <p className="text-amber-800 dark:text-amber-200 text-sm">
                         <strong>Expected:</strong> HTML content in{" "}
-                        <code className="bg-amber-100 px-1 rounded">
+                        <code className="bg-amber-100 dark:bg-amber-800 px-1 rounded">
                           structure.sections[0].content
                         </code>
                       </p>
@@ -378,12 +382,12 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
                 </div>
 
                 {/* Raw structure for debugging */}
-                <details className="bg-gray-50 border rounded-lg">
-                  <summary className="px-4 py-3 cursor-pointer font-medium text-gray-700 hover:bg-gray-100">
+                <details className="bg-gray-50 dark:bg-gray-700 border dark:border-gray-600 rounded-lg">
+                  <summary className="px-4 py-3 cursor-pointer font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600">
                     View Raw Structure Data (Debug)
                   </summary>
-                  <div className="p-4 border-t">
-                    <pre className="text-xs text-gray-600 whitespace-pre-wrap overflow-auto max-h-64 bg-white p-3 rounded border">
+                  <div className="p-4 border-t dark:border-gray-600">
+                    <pre className="text-xs text-gray-600 dark:text-gray-300 whitespace-pre-wrap overflow-auto max-h-64 bg-white dark:bg-gray-800 p-3 rounded border dark:border-gray-600">
                       {JSON.stringify(structure, null, 2)}
                     </pre>
                   </div>
@@ -396,10 +400,10 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
       console.error("Error rendering website structure:", error);
       return (
         <div className="text-center py-8">
-          <div className="text-red-500 mb-2">
+          <div className="text-red-500 dark:text-red-400 mb-2">
             Error loading website structure
           </div>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-gray-400 dark:text-gray-500">
             There was an error rendering the website structure. Please try
             refreshing.
           </p>
@@ -414,7 +418,7 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
         <div>
           <label
             htmlFor="templateName"
-            className="block text-sm font-medium text-gray-700 mb-2"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
           >
             Website Name
           </label>
@@ -423,14 +427,14 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
             id="templateName"
             value={editData.templateName}
             onChange={(e) => handleInputChange("templateName", e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
 
         <div>
           <label
             htmlFor="style"
-            className="block text-sm font-medium text-gray-700 mb-2"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
           >
             Style
           </label>
@@ -438,7 +442,7 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
             id="style"
             value={editData.customizations.style || ""}
             onChange={(e) => handleCustomizationChange("style", e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="">Select Style</option>
             <option value="modern">Modern</option>
@@ -452,7 +456,7 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
         <div>
           <label
             htmlFor="colorScheme"
-            className="block text-sm font-medium text-gray-700 mb-2"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
           >
             Color Scheme
           </label>
@@ -462,7 +466,7 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
             onChange={(e) =>
               handleCustomizationChange("colorScheme", e.target.value)
             }
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="">Select Color Scheme</option>
             <option value="blue">Blue</option>
@@ -479,7 +483,7 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
         <div>
           <label
             htmlFor="communicationTone"
-            className="block text-sm font-medium text-gray-700 mb-2"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
           >
             Communication Tone
           </label>
@@ -489,7 +493,7 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
             onChange={(e) =>
               handleCustomizationChange("communicationTone", e.target.value)
             }
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="">Select Tone</option>
             <option value="formal">Formal</option>
@@ -534,7 +538,7 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
     return (
       <div className="space-y-4">
         {/* Iframe Preview */}
-        <div className="w-full h-[600px] border rounded-lg overflow-hidden bg-white shadow-sm">
+        <div className="w-full h-[600px] border dark:border-gray-600 rounded-lg overflow-hidden bg-white shadow-sm">
           <iframe
             srcDoc={cleanHtmlContent}
             className="w-full h-full border-0"
@@ -556,12 +560,12 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
         </div>
 
         {/* Alternative: Raw HTML Code View */}
-        <details className="bg-gray-50 border rounded-lg">
-          <summary className="px-4 py-3 cursor-pointer font-medium text-gray-700 hover:bg-gray-100">
+        <details className="bg-gray-50 dark:bg-gray-700 border dark:border-gray-600 rounded-lg">
+          <summary className="px-4 py-3 cursor-pointer font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600">
             View HTML Source Code
           </summary>
-          <div className="p-4 border-t">
-            <pre className="text-xs text-gray-600 whitespace-pre-wrap overflow-auto max-h-64 bg-white p-3 rounded border">
+          <div className="p-4 border-t dark:border-gray-600">
+            <pre className="text-xs text-gray-600 dark:text-gray-300 whitespace-pre-wrap overflow-auto max-h-64 bg-white dark:bg-gray-800 p-3 rounded border dark:border-gray-600">
               {cleanHtmlContent}
             </pre>
           </div>
@@ -607,10 +611,10 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
   if (!website) {
     return (
       <div className="text-center py-16">
-        <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+        <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
           No website selected
         </h2>
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-gray-400">
           Select a website from your list to view it here
         </p>
       </div>
@@ -622,19 +626,19 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-8">
         <div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
             {website.templateName}
           </h2>
           <div className="flex flex-wrap gap-3">
-            <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+            <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300 rounded-full text-sm font-medium">
               {website.industry}
             </span>
             {website.aiGenerated && (
-              <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">
+              <span className="px-3 py-1 bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300 rounded-full text-sm font-medium">
                 🤖 AI Generated
               </span>
             )}
-            <span className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm">
+            <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300 rounded-full text-sm">
               Created: {new Date(website.createdAt).toLocaleDateString()}
             </span>
           </div>
@@ -653,7 +657,7 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
               <button
                 onClick={handleEditToggle}
                 disabled={loading}
-                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Cancel
               </button>
@@ -672,24 +676,30 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
       {/* Customizations Bar */}
       {website?.customizations &&
         Object.keys(website.customizations).length > 0 && (
-          <div className="bg-gray-50 rounded-lg p-4 mb-8">
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
               <div>
-                <span className="font-medium text-gray-700">Style:</span>
-                <span className="ml-2 text-gray-600">
+                <span className="font-medium text-gray-700 dark:text-gray-300">
+                  Style:
+                </span>
+                <span className="ml-2 text-gray-600 dark:text-gray-400">
                   {website.customizations?.style || "Not set"}
                 </span>
               </div>
               <div>
-                <span className="font-medium text-gray-700">Color:</span>
-                <span className="ml-2 text-gray-600">
+                <span className="font-medium text-gray-700 dark:text-gray-300">
+                  Color:
+                </span>
+                <span className="ml-2 text-gray-600 dark:text-gray-400">
                   {website.customizations?.colorScheme || "Not set"}
                 </span>
               </div>
               {website.customizations?.communicationTone && (
                 <div>
-                  <span className="font-medium text-gray-700">Tone:</span>
-                  <span className="ml-2 text-gray-600">
+                  <span className="font-medium text-gray-700 dark:text-gray-300">
+                    Tone:
+                  </span>
+                  <span className="ml-2 text-gray-600 dark:text-gray-400">
                     {website.customizations.communicationTone}
                   </span>
                 </div>
@@ -702,7 +712,7 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
       <div className="space-y-8">
         {editMode ? (
           <div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-6">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">
               Edit Website Settings
             </h3>
             {renderEditForm()}
@@ -712,22 +722,24 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
             {/* Show HTML preview if available, otherwise show structure */}
             {hasHTMLContent() ? (
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-6">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">
                   Website Preview (HTML)
                 </h3>
                 {renderHTMLPreview()}
               </div>
             ) : website?.structure ? (
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-6">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">
                   Website Preview (Structure)
                 </h3>
                 {renderWebsiteStructure(website.structure)}
               </div>
             ) : (
               <div className="text-center py-12">
-                <div className="text-gray-500 mb-2">No preview available</div>
-                <p className="text-sm text-gray-400">
+                <div className="text-gray-500 dark:text-gray-400 mb-2">
+                  No preview available
+                </div>
+                <p className="text-sm text-gray-400 dark:text-gray-500">
                   This website doesn't have HTML content or structure data to
                   display.
                 </p>
@@ -739,47 +751,49 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
 
       {/* Metadata */}
       {website?.metadata && Object.keys(website.metadata).length > 0 && (
-        <div className="mt-12 pt-8 border-t border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
             Generation Details
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {website.metadata?.templateType && (
-              <div className="bg-gray-50 p-3 rounded-lg">
-                <div className="text-sm font-medium text-gray-700">
+              <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Template Type
                 </div>
-                <div className="text-gray-600">
+                <div className="text-gray-600 dark:text-gray-400">
                   {website.metadata.templateType}
                 </div>
               </div>
             )}
             {website.metadata?.tokensUsed && (
-              <div className="bg-gray-50 p-3 rounded-lg">
-                <div className="text-sm font-medium text-gray-700">
+              <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Tokens Used
                 </div>
-                <div className="text-gray-600">
+                <div className="text-gray-600 dark:text-gray-400">
                   {website.metadata.tokensUsed}
                 </div>
               </div>
             )}
             {website.metadata?.processingTime && (
-              <div className="bg-gray-50 p-3 rounded-lg">
-                <div className="text-sm font-medium text-gray-700">
+              <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Processing Time
                 </div>
-                <div className="text-gray-600">
+                <div className="text-gray-600 dark:text-gray-400">
                   {website.metadata.processingTime}
                 </div>
               </div>
             )}
             {website.metadata?.model && (
-              <div className="bg-gray-50 p-3 rounded-lg">
-                <div className="text-sm font-medium text-gray-700">
+              <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   AI Model
                 </div>
-                <div className="text-gray-600">{website.metadata.model}</div>
+                <div className="text-gray-600 dark:text-gray-400">
+                  {website.metadata.model}
+                </div>
               </div>
             )}
           </div>

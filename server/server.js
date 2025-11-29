@@ -37,8 +37,6 @@ const { httpLogger, logger } = require("./utils/logger");
 // Route imports
 const authRoutes = require("./routes/authRoutes");
 const websiteRoutes = require("./routes/websiteRoutes");
-const marketingRoutes = require("./routes/marketingRoutes");
-const mediaRoutes = require("./routes/mediaRoutes");
 const chatbotRoutes = require("./routes/chatbotRoutes");
 const feedbackRoutes = require("./routes/feedbackRoutes");
 const emailRoutes = require("./routes/emailRoutes");
@@ -113,7 +111,7 @@ app.use(
     credentials: true,
   })
 );
-app.set("trust proxy", true);
+
 // Rate Limiting
 // const limiter = rateLimit({
 //   windowMs: config.rateLimitWindowMs || 15 * 60 * 1000, // 15 minutes
@@ -226,8 +224,6 @@ app.get("/api/test-image", async (req, res) => {
 // API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/websites", websiteRoutes);
-app.use("/api/marketing", marketingRoutes);
-app.use("/api/media", mediaRoutes);
 app.use("/api/chatbot", chatbotRoutes);
 app.use("/api/feedback", feedbackRoutes);
 app.use("/api/csv-feedback", require("./routes/csvFeedbackRoutes"));
@@ -536,18 +532,5 @@ if (dbUrlCheck) {
     )
   );
 }
-
-// Add near the top of your file, before any other code
-process.on("uncaughtException", (err) => {
-  console.error("CRITICAL - Uncaught Exception:");
-  console.error(err);
-  process.exit(1);
-});
-
-process.on("unhandledRejection", (reason, promise) => {
-  console.error("CRITICAL - Unhandled Promise Rejection:");
-  console.error(reason);
-  process.exit(1);
-});
 
 module.exports = app;

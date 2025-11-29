@@ -6,7 +6,6 @@ import ImageHistory from "./components/ImageHistory";
 import LoadingSpinner from "./components/LoadingSpinner";
 import Toast from "./components/Toast";
 import AppNavigation from "../components/AppNavigation";
-import ThemeToggle from "../utils/ThemeToggle";
 
 const ImageGenerator = () => {
   const [activeTab, setActiveTab] = useState("generate");
@@ -46,7 +45,7 @@ const ImageGenerator = () => {
     try {
       setLoadingHistory(true);
       console.log(`Loading image history for page ${page}...`);
-      
+
       const response = await imageApi.getImageHistory({
         page,
         limit: pagination.limit,
@@ -96,7 +95,7 @@ const ImageGenerator = () => {
           pages: 0,
           hasNext: false,
         });
-        
+
         // Force refresh history from page 1
         setTimeout(() => {
           loadImageHistory(1);
@@ -123,11 +122,13 @@ const ImageGenerator = () => {
       const response = await imageApi.deleteImage(imageId);
       if (response.success) {
         // Remove the deleted image from the list
-        setImages(prevImages => prevImages.filter(img => img._id !== imageId));
+        setImages((prevImages) =>
+          prevImages.filter((img) => img._id !== imageId)
+        );
         // Update pagination total
-        setPagination(prev => ({
+        setPagination((prev) => ({
           ...prev,
-          total: prev.total - 1
+          total: prev.total - 1,
         }));
         showToast("Image deleted successfully", "success");
       }
@@ -222,26 +223,18 @@ const ImageGenerator = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       {/* Navigation */}
       <AppNavigation />
 
-      {/* Header */}
-      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 transition-colors duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            <div className="space-y-1">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                AI Image Studio
-              </h1>
-              <p className="text-gray-600 dark:text-gray-300">
-                Create stunning visuals with artificial intelligence
-              </p>
-            </div>
+      {/* Page Header */}
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center space-x-4">
-              <div className="bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 px-4 py-2 rounded-lg text-sm font-medium border border-blue-200 dark:border-blue-700">
+              <div className="p-3 bg-gradient-to-br from-pink-500 to-rose-600 rounded-xl shadow-lg">
                 <svg
-                  className="h-4 w-4 inline mr-2"
+                  className="w-6 h-6 text-white"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -250,34 +243,59 @@ const ImageGenerator = () => {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M13 10V3L4 14h7v7l9-11h-7z"
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                   />
                 </svg>
-                3 credits per image
               </div>
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                  AI Image Studio
+                </h1>
+                <p className="text-gray-600 dark:text-gray-400 mt-1">
+                  Create stunning visuals with artificial intelligence
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2 px-4 py-2 bg-pink-50 dark:bg-pink-900/20 rounded-lg border border-pink-200 dark:border-pink-700">
+              <svg
+                className="w-4 h-4 text-pink-600 dark:text-pink-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                />
+              </svg>
+              <span className="text-sm font-medium text-pink-700 dark:text-pink-300">
+                3 credits per image
+              </span>
             </div>
           </div>
         </div>
-      </header>
+      </div>
 
-      {/* Navigation Tabs */}
-      <nav className="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 transition-colors duration-300">
+      {/* Tab Navigation */}
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex space-x-8">
+          <div className="flex space-x-1 overflow-x-auto">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 transition-all duration-200 ${
+                className={`py-4 px-4 border-b-2 font-medium text-sm flex items-center space-x-2 transition-all duration-200 whitespace-nowrap ${
                   activeTab === tab.id
-                    ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                    ? "border-pink-500 text-pink-600 dark:text-pink-400"
                     : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600"
                 }`}
               >
                 {getTabIcon(tab.icon)}
                 <span>{tab.label}</span>
                 {tab.id === "preview" && generatedImage && (
-                  <span className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-xs px-2 py-1 rounded-full">
+                  <span className="bg-pink-100 dark:bg-pink-900/30 text-pink-800 dark:text-pink-300 text-xs px-2 py-0.5 rounded-full">
                     1
                   </span>
                 )}
@@ -285,10 +303,10 @@ const ImageGenerator = () => {
             ))}
           </div>
         </div>
-      </nav>
+      </div>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {activeTab === "generate" && (
           <div className="max-w-2xl mx-auto">
             <ImageForm onSubmit={handleImageGeneration} loading={loading} />

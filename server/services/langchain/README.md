@@ -1,15 +1,15 @@
 # Vector Context System for LangChain Integration
 
-This document explains the **Vector Context System** implementation for maintaining user/company context in AI-driven business applications using ChromaDB and LangChain.
+This document explains the **Vector Context System** implementation for maintaining user/company context in AI-driven business applications using an in-memory vector store with MongoDB persistence for metadata.
 
 ## 🎯 Overview
 
 The Vector Context System provides contextual awareness to all AI operations by:
 
-- **Storing business context** in ChromaDB vector database
+- **Storing business context** in an in-memory vector store (lazy-loaded from MongoDB)
 - **Retrieving relevant context** for each AI request
 - **Learning from interactions** to improve future responses
-- **Maintaining conversation memory** across sessions
+- **Maintaining conversation memory** across sessions (persisted in MongoDB)
 - **Extracting business patterns** for strategic insights
 
 ## 🏗️ Architecture
@@ -39,14 +39,15 @@ The Vector Context System provides contextual awareness to all AI operations by:
 │  • Company-scoped collections                              │
 │  • Context retrieval & storage                             │
 │  • Business pattern extraction                             │
-└──────────────────┬──────────────────────────────────────────┘
-                   │
-┌──────────────────▼──────────────────────────────────────────┐
-│                ChromaDB                                     │
-│  • Vector embeddings                                       │
-│  • Semantic search                                         │
-│  • Persistent storage                                      │
-└─────────────────────────────────────────────────────────────┘
+└─────────┬───────────────────────────────────┬───────────────┘
+          │                                   │
+┌─────────▼─────────────┐    ┌───────────────▼───────────────┐
+│  In-Memory Vector     │    │       MongoDB                 │
+│  Store                │    │  • VectorStore metadata       │
+│  • Embeddings         │◄───│  • AIContext (history)        │
+│  • Similarity search  │    │  • Business patterns          │
+│  • Lazy-loaded        │    │  • Conversation memory        │
+└───────────────────────┘    └───────────────────────────────┘
 ```
 
 ## 📁 File Structure
@@ -56,17 +57,20 @@ server/
 ├── services/langchain/
 │   ├── vectorContext.js          # Vector storage service
 │   ├── contextualChains.js       # Context-aware LangChain chains
+│   ├── memoryVectorStore.js      # In-memory vector store implementation
 │   └── models.js                 # LLM model configurations
+├── models/
+│   ├── AIContext.js              # Conversation history & patterns
+│   ├── VectorStore.js            # Vector store metadata
+│   └── Company.js                # Company & user data
 ├── controllers/
 │   ├── websiteController.js      # Website generation with context
 │   ├── emailController.js        # Email generation with context
 │   └── chatbotController.js      # Chatbot with context
-├── routes/
-│   ├── websiteRoutes.js          # Website API endpoints
-│   ├── emailRoutes.js            # Email API endpoints
-│   └── chatbotRoutes.js          # Chatbot API endpoints
-└── utils/
-    └── testVectorContext.js      # Testing and initialization
+└── routes/
+    ├── websiteRoutes.js          # Website API endpoints
+    ├── emailRoutes.js            # Email API endpoints
+    └── chatbotRoutes.js          # Chatbot API endpoints
 ```
 
 ## 🚀 Quick Start
@@ -228,13 +232,11 @@ console.log("Test results:", results);
 ### Environment Variables
 
 ```bash
-# ChromaDB Configuration
-CHROMA_HOST=localhost
-CHROMA_PORT=8000
-CHROMA_COLLECTION_PREFIX=company_
+# AI Model Configuration
+GEMINI_API_KEY=your-google-api-key
+OLLAMA_URL=http://localhost:11434
 
 # Vector Configuration
-VECTOR_DIMENSION=1536
 VECTOR_SIMILARITY_THRESHOLD=0.7
 MAX_CONTEXT_DOCS=10
 ```
@@ -246,8 +248,8 @@ MAX_CONTEXT_DOCS=10
 const contextualModels = {
   website_generation: "gemini-2.5-flash",
   email_generation: "gemini-2.5-flash",
-  chatbot_response: "ollama-llama2",
-  image_generation: "dall-e-3",
+  chatbot_response: "gemini-2.5-flash", // or "ollama-llama3"
+  image_generation: "imagen-3",
 };
 ```
 
@@ -330,11 +332,12 @@ await vectorService.optimizeContext({
 
 ### Common Issues
 
-1. **ChromaDB Connection Failed**
+1. **Vector Store Not Initialized**
 
-   ```bash
-   # Start ChromaDB
-   docker run -p 8000:8000 chromadb/chroma
+   ```javascript
+   // The in-memory vector store is lazy-loaded on first use
+   // Ensure context is seeded before querying
+   await vectorContextService.seedCompanyContext(companyId, companyData);
    ```
 
 2. **Context Not Found**

@@ -24,8 +24,8 @@ A comprehensive AI-powered platform that helps small businesses create websites,
 
 **Image Generation Studio**
 
-- Create marketing visuals and graphics
-- Multiple artistic styles and formats
+- Create marketing visuals with Google Imagen 3
+- Multiple artistic styles and aspect ratios
 - Cloudinary integration for storage
 
 **Feedback Analytics**
@@ -47,12 +47,13 @@ A comprehensive AI-powered platform that helps small businesses create websites,
 - Node.js 18+ with Express.js
 - MongoDB with Mongoose ODM
 - LangChain for AI orchestration
-- Vector storage with ChromaDB/FAISS
+- In-memory vector storage (lazy-loaded)
 
 **AI & Services**
 
-- Google Gemini 2.5 Flash
-- Ollama LLaMA3 (local support)
+- Google Gemini 2.5 Flash (text generation)
+- Google Imagen 3 (image generation)
+- Ollama LLaMA3 (local AI support)
 - Stripe for payments
 - Cloudinary for media management
 

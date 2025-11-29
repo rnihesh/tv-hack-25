@@ -6,18 +6,24 @@ const aiContextSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Company",
       required: true,
-      
     },
     contextType: {
       type: String,
-      enum: ["chatbot", "email", "email_generation", "website", "website_generation", "image_gen", "image_generation", "general"],
+      enum: [
+        "chatbot",
+        "email",
+        "email_generation",
+        "website",
+        "website_generation",
+        "image_gen",
+        "image_generation",
+        "general",
+      ],
       required: true,
-      
     },
     sessionId: {
       type: String,
       required: true,
-      
     },
     conversationHistory: [
       {
@@ -82,7 +88,6 @@ const aiContextSchema = new mongoose.Schema(
     vectorDocumentIds: [
       {
         type: String,
-        
       },
     ],
     contextualState: {
@@ -172,13 +177,43 @@ aiContextSchema.methods.addMessage = function (role, content, metadata = {}) {
 // Method to update business context
 aiContextSchema.methods.updateBusinessContext = function (newContext) {
   if (newContext.extractedPreferences) {
-    this.businessContext.extractedPreferences = {
-      ...this.businessContext.extractedPreferences,
-      ...newContext.extractedPreferences,
-    };
+    // Deep merge preferences, accumulating arrays like topicsOfInterest
+    for (const [key, value] of Object.entries(
+      newContext.extractedPreferences
+    )) {
+      if (Array.isArray(value)) {
+        // For arrays, merge and deduplicate
+        const existing = this.businessContext.extractedPreferences[key] || [];
+        const merged = [...new Set([...existing, ...value])];
+        this.businessContext.extractedPreferences[key] = merged.slice(-20); // Keep last 20
+      } else if (key === "sentimentScore") {
+        // Accumulate sentiment score
+        const existing = this.businessContext.extractedPreferences[key] || 0;
+        this.businessContext.extractedPreferences[key] = existing + value;
+      } else {
+        // For other values, update
+        this.businessContext.extractedPreferences[key] = value;
+      }
+    }
+
+    // Update sentiment analysis tracking
+    if (newContext.extractedPreferences.lastSentiment) {
+      const sentiment = newContext.extractedPreferences.lastSentiment;
+      if (!this.businessContext.customerInsights.sentimentAnalysis) {
+        this.businessContext.customerInsights.sentimentAnalysis = {
+          positive: 0,
+          negative: 0,
+          neutral: 0,
+          lastUpdated: new Date(),
+        };
+      }
+      this.businessContext.customerInsights.sentimentAnalysis[sentiment] += 1;
+      this.businessContext.customerInsights.sentimentAnalysis.lastUpdated =
+        new Date();
+    }
   }
 
-  if (newContext.learnedPatterns) {
+  if (newContext.learnedPatterns && newContext.learnedPatterns.length > 0) {
     newContext.learnedPatterns.forEach((pattern) => {
       const existing = this.businessContext.learnedPatterns.find(
         (p) => p.pattern === pattern.pattern
@@ -186,6 +221,12 @@ aiContextSchema.methods.updateBusinessContext = function (newContext) {
       if (existing) {
         existing.frequency += 1;
         existing.lastSeen = new Date();
+        // Append new context if different
+        if (pattern.context && !existing.context.includes(pattern.context)) {
+          existing.context = `${existing.context}; ${pattern.context}`.slice(
+            -500
+          );
+        }
       } else {
         this.businessContext.learnedPatterns.push({
           pattern: pattern.pattern,
@@ -195,8 +236,17 @@ aiContextSchema.methods.updateBusinessContext = function (newContext) {
         });
       }
     });
+
+    // Keep only the most recent 50 patterns
+    if (this.businessContext.learnedPatterns.length > 50) {
+      this.businessContext.learnedPatterns =
+        this.businessContext.learnedPatterns
+          .sort((a, b) => new Date(b.lastSeen) - new Date(a.lastSeen))
+          .slice(0, 50);
+    }
   }
 
+  this.markModified("businessContext");
   return this.save();
 };
 
