@@ -168,7 +168,7 @@ const SendConfirmation = ({ emailData, onBack, onSent }) => {
   }
 
   return (
-    <div className="p-8">
+    <div className="p-8 bg-white/55 dark:bg-slate-900/35 backdrop-blur-sm rounded-xl">
       {/* Header */}
       <div className="text-center mb-8">
         <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full mb-4">
@@ -186,17 +186,17 @@ const SendConfirmation = ({ emailData, onBack, onSent }) => {
             />
           </svg>
         </div>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">
           Send Your Email Campaign
         </h2>
-        <p className="text-gray-600 dark:text-gray-300">
+        <p className="text-slate-600 dark:text-slate-300">
           Review and send your campaign to selected recipients
         </p>
       </div>
 
       {/* Campaign Summary */}
-      <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-8">
-        <h3 className="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+      <div className="bg-slate-50/70 dark:bg-slate-800/55 border border-slate-200 dark:border-slate-700 rounded-lg p-6 mb-8">
+        <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
           <svg
             className="w-5 h-5 text-blue-600 dark:text-blue-400"
             fill="none"
@@ -245,7 +245,7 @@ const SendConfirmation = ({ emailData, onBack, onSent }) => {
 
       {/* Send Options */}
       <div className="space-y-6 mb-8">
-        <h3 className="font-bold text-gray-900 dark:text-white flex items-center gap-2">
+        <h3 className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
           <svg
             className="w-5 h-5 text-blue-600 dark:text-blue-400"
             fill="none"
@@ -263,7 +263,7 @@ const SendConfirmation = ({ emailData, onBack, onSent }) => {
         </h3>
 
         <div className="space-y-4">
-          <label className="flex items-start space-x-3 cursor-pointer p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+          <label className="flex items-start space-x-3 cursor-pointer p-4 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
             <input
               type="radio"
               value="now"
@@ -272,16 +272,16 @@ const SendConfirmation = ({ emailData, onBack, onSent }) => {
               className="h-4 w-4 text-blue-600 focus:ring-blue-500 mt-1"
             />
             <div>
-              <span className="font-medium text-gray-900 dark:text-white block">
+              <span className="font-medium text-slate-900 dark:text-slate-100 block">
                 Send Now
               </span>
-              <span className="text-gray-500 dark:text-gray-400 text-sm">
+              <span className="text-slate-500 dark:text-slate-400 text-sm">
                 Emails will be sent immediately to all recipients
               </span>
             </div>
           </label>
 
-          <label className="flex items-start space-x-3 cursor-pointer p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+          <label className="flex items-start space-x-3 cursor-pointer p-4 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
             <input
               type="radio"
               value="schedule"
@@ -290,10 +290,10 @@ const SendConfirmation = ({ emailData, onBack, onSent }) => {
               className="h-4 w-4 text-blue-600 focus:ring-blue-500 mt-1"
             />
             <div>
-              <span className="font-medium text-gray-900 dark:text-white block">
+              <span className="font-medium text-slate-900 dark:text-slate-100 block">
                 Schedule for Later
               </span>
-              <span className="text-gray-500 dark:text-gray-400 text-sm">
+              <span className="text-slate-500 dark:text-slate-400 text-sm">
                 Choose when to send your campaign
               </span>
             </div>
@@ -302,7 +302,7 @@ const SendConfirmation = ({ emailData, onBack, onSent }) => {
 
         {/* Schedule Options */}
         {sendOption === "schedule" && (
-          <div className="ml-7 p-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+          <div className="ml-7 p-6 gradient-panel rounded-lg">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -313,7 +313,7 @@ const SendConfirmation = ({ emailData, onBack, onSent }) => {
                   value={scheduleDate}
                   onChange={(e) => setScheduleDate(e.target.value)}
                   min={new Date().toISOString().split("T")[0]}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                  className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 transition-colors"
                 />
               </div>
 
@@ -325,7 +325,7 @@ const SendConfirmation = ({ emailData, onBack, onSent }) => {
                   type="time"
                   value={scheduleTime}
                   onChange={(e) => setScheduleTime(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                  className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 transition-colors"
                 />
               </div>
             </div>
@@ -342,7 +342,7 @@ const SendConfirmation = ({ emailData, onBack, onSent }) => {
       )}
 
       {/* Estimated Delivery */}
-      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6 mb-8">
+      <div className="gradient-panel rounded-lg p-6 mb-8">
         <h3 className="font-medium text-blue-900 dark:text-blue-100 mb-4 flex items-center gap-2">
           <svg
             className="w-5 h-5"
@@ -382,17 +382,17 @@ const SendConfirmation = ({ emailData, onBack, onSent }) => {
       </div>
 
       {/* Action Buttons */}
-      <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-700">
+      <div className="flex items-center justify-between pt-6 border-t border-slate-200 dark:border-slate-700">
         <button
           onClick={onBack}
           disabled={isSending}
-          className="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:bg-gray-50 dark:disabled:bg-gray-800 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-lg font-medium transition-colors"
+          className="bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:bg-slate-50 dark:disabled:bg-slate-800 text-slate-700 dark:text-slate-300 px-6 py-3 rounded-lg font-medium transition-colors"
         >
           ← Back to Recipients
         </button>
 
         <div className="flex items-center space-x-4">
-          <div className="text-sm text-gray-500 dark:text-gray-400">
+          <div className="text-sm text-slate-500 dark:text-slate-400">
             Step 4 of 4
           </div>
 
@@ -402,7 +402,7 @@ const SendConfirmation = ({ emailData, onBack, onSent }) => {
               isSending ||
               (sendOption === "schedule" && (!scheduleDate || !scheduleTime))
             }
-            className="bg-green-600 dark:bg-green-600 hover:bg-green-700 dark:hover:bg-green-700 disabled:bg-gray-400 dark:disabled:bg-gray-600 text-white px-8 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2"
+            className="button-enterprise disabled:bg-slate-400 dark:disabled:bg-slate-600 text-white px-8 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2"
           >
             {isSending ? (
               <>
@@ -432,7 +432,6 @@ const SendConfirmation = ({ emailData, onBack, onSent }) => {
               </>
             ) : (
               <>
-                <span>🚀</span>
                 <span>
                   {sendOption === "now" ? "Send Now" : "Schedule Email"}
                 </span>

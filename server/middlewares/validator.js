@@ -30,6 +30,8 @@ const businessTypeValidation = body("businessType")
     "technology",
     "manufacturing",
     "real_estate",
+    "finance",
+    "marketing",
     "other",
   ])
   .withMessage("Please select a valid business type");
@@ -96,6 +98,8 @@ const updateProfileValidation = [
       "technology",
       "manufacturing",
       "real_estate",
+      "finance",
+      "marketing",
       "other",
     ])
     .withMessage("Please select a valid business type"),

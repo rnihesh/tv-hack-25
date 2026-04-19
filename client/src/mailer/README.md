@@ -4,14 +4,14 @@ A complete email marketing system built with React and Tailwind CSS for the AI D
 
 ## Features
 
-### 📧 4-Step Email Campaign Process
+### 4-Step Email Campaign Process
 
 1. **Compose** - Write email description and subject
 2. **Preview** - Review AI-enhanced content  
 3. **Recipients** - Select customers to send to
 4. **Send** - Send immediately or schedule for later
 
-### 🎯 Key Capabilities
+### Key Capabilities
 
 - **AI-Enhanced Content**: Automatically improve email messages using AI
 - **Customer Management**: View and select from customer database

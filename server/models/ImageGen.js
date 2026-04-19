@@ -35,6 +35,10 @@ const imageGenSchema = new mongoose.Schema({
     type: String,
     index: true,
   },
+  cloudinaryPublicId: {
+    type: String,
+    index: true,
+  },
   imageDescription: {
     type: String,
     trim: true,
@@ -54,6 +58,7 @@ const imageGenSchema = new mongoose.Schema({
       default: "gemini-2.5-flash",
     },
     cloudinaryUrl: String, // Keep for backward compatibility
+    cloudinaryPublicId: String,
     localUrl: String,
     processingTime: {
       type: Number, // in milliseconds

@@ -1,4 +1,5 @@
 const cloudinary = require('cloudinary').v2;
+const path = require('path');
 const config = require('./env-config');
 
 // Configure Cloudinary
@@ -11,13 +12,19 @@ cloudinary.config({
 // Upload image buffer to Cloudinary
 const uploadImageToCloudinary = async (imageBuffer, fileName) => {
   try {
+    const sanitizedBaseName = path
+      .parse(fileName || `img-${Date.now()}`)
+      .name
+      .replace(/[^a-zA-Z0-9_-]/g, '_');
+
     return new Promise((resolve, reject) => {
       cloudinary.uploader.upload_stream(
         {
           resource_type: 'image',
-          public_id: `ai-images/${fileName}`,
           folder: 'ai-generated-images',
-          overwrite: true,
+          public_id: sanitizedBaseName,
+          overwrite: false,
+          invalidate: true,
           quality: 'auto',
           fetch_format: 'auto',
         },

@@ -11,10 +11,7 @@ const AuthWrapper = () => {
 
   return (
     <div className="relative">
-      {/* Theme Toggle - Fixed Position */}
-      <div className="fixed top-6 right-6 z-50">
-        <ThemeToggle />
-      </div>
+      <ThemeToggle />
 
       {/* Main Content */}
       <div className="transition-all duration-500 ease-in-out">

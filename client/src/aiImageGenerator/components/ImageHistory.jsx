@@ -1,5 +1,10 @@
 import React, { useState } from "react";
-import { getApiBaseUrl, getServerBaseUrl } from "../../utils/config.js";
+import { getServerBaseUrl } from "../../utils/config.js";
+
+const buildInlineFallbackImage = () => {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1D4ED8"/><stop offset="100%" stop-color="#3B82F6"/></linearGradient></defs><rect width="100%" height="100%" fill="url(#g)"/><text x="200" y="190" text-anchor="middle" fill="#FFFFFF" font-family="Arial,sans-serif" font-size="28" font-weight="700">No Preview</text><text x="200" y="230" text-anchor="middle" fill="#DBEAFE" font-family="Arial,sans-serif" font-size="16">Image unavailable</text></svg>`;
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+};
 
 const ImageHistory = ({
   images,
@@ -28,25 +33,35 @@ const ImageHistory = ({
   };
 
   const getProxyImageUrl = (imageUrl) => {
-    // If it's a Cloudinary URL, use it directly
-    if (imageUrl && imageUrl.includes("cloudinary.com")) {
-      return imageUrl;
+    if (!imageUrl) {
+      return buildInlineFallbackImage();
     }
-    // If it's a placeholder URL, use it directly
-    if (imageUrl && imageUrl.includes("via.placeholder.com")) {
-      return imageUrl;
-    }
-    // Convert absolute server URLs to proxy URL for local images
-    if (imageUrl) {
-      const serverUrl = getServerBaseUrl();
-      const localUrls = [serverUrl, "https://phoenix-sol.onrender.com"];
 
-      for (const url of localUrls) {
-        if (imageUrl.startsWith(url)) {
-          return imageUrl.replace(url, "");
-        }
-      }
+    // Keep data/blob URLs as-is.
+    if (imageUrl.startsWith("data:") || imageUrl.startsWith("blob:")) {
+      return imageUrl;
     }
+
+    // If it's a Cloudinary URL, use it directly
+    if (imageUrl.includes("cloudinary.com")) {
+      return imageUrl;
+    }
+
+    // If it's a placeholder URL, use it directly
+    if (imageUrl.includes("via.placeholder.com")) {
+      return imageUrl;
+    }
+
+    // Keep absolute backend URLs as-is.
+    if (/^https?:\/\//i.test(imageUrl)) {
+      return imageUrl;
+    }
+
+    // Resolve relative upload paths against backend host.
+    if (imageUrl.startsWith("/")) {
+      return `${getServerBaseUrl()}${imageUrl}`;
+    }
+
     return imageUrl;
   };
 
@@ -211,7 +226,7 @@ const ImageHistory = ({
               {/* Cloudinary Badge */}
               {image.cloudinaryUrl && (
                 <div className="absolute top-2 left-2 z-10 bg-green-500/90 text-white px-2 py-1 rounded-full text-xs font-medium">
-                  ☁️ Cloud
+                   Cloud
                 </div>
               )}
 
@@ -223,8 +238,7 @@ const ImageHistory = ({
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   loading="lazy"
                   onError={(e) => {
-                    // Fallback to placeholder if image fails to load
-                    e.target.src = `https://via.placeholder.com/400x400/6366F1/FFFFFF?text=Image+Not+Found`;
+                    e.target.src = buildInlineFallbackImage();
                   }}
                 />
                 {!deleteMode && (

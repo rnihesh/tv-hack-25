@@ -122,10 +122,10 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
               {structure.header?.contactInfo && (
                 <div className="hidden lg:flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
                   {structure.header.contactInfo.phone && (
-                    <span>📞 {structure.header.contactInfo.phone}</span>
+                    <span>Tel: {structure.header.contactInfo.phone}</span>
                   )}
                   {structure.header.contactInfo.email && (
-                    <span>✉️ {structure.header.contactInfo.email}</span>
+                    <span>Email: {structure.header.contactInfo.email}</span>
                   )}
                 </div>
               )}
@@ -231,7 +231,7 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
                   {structure.contact.address && (
                     <div>
-                      <div className="text-2xl mb-2">📍</div>
+                      <div className="text-xs font-semibold mb-2 inline-flex px-2 py-1 rounded-md bg-white/10">ADR</div>
                       <h4 className="font-semibold mb-1">Address</h4>
                       <p className="text-gray-300 text-sm">
                         {structure.contact.address}
@@ -240,7 +240,7 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
                   )}
                   {structure.contact.phone && (
                     <div>
-                      <div className="text-2xl mb-2">📞</div>
+                      <div className="text-xs font-semibold mb-2 inline-flex px-2 py-1 rounded-md bg-white/10">TEL</div>
                       <h4 className="font-semibold mb-1">Phone</h4>
                       <p className="text-gray-300 text-sm">
                         {structure.contact.phone}
@@ -249,7 +249,7 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
                   )}
                   {structure.contact.email && (
                     <div>
-                      <div className="text-2xl mb-2">✉️</div>
+                      <div className="text-xs font-semibold mb-2 inline-flex px-2 py-1 rounded-md bg-white/10">MAIL</div>
                       <h4 className="font-semibold mb-1">Email</h4>
                       <p className="text-gray-300 text-sm">
                         {structure.contact.email}
@@ -258,7 +258,7 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
                   )}
                   {structure.contact.hours && (
                     <div>
-                      <div className="text-2xl mb-2">🕐</div>
+                      <div className="text-xs font-semibold mb-2 inline-flex px-2 py-1 rounded-md bg-white/10">HRS</div>
                       <h4 className="font-semibold mb-1">Hours</h4>
                       <p className="text-gray-300 text-sm">
                         {structure.contact.hours}
@@ -359,7 +359,7 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
                 <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-lg p-4 mb-6">
                   <div className="flex items-start">
                     <div className="text-amber-600 dark:text-amber-400 text-lg mr-3">
-                      ⚠️
+                      
                     </div>
                     <div>
                       <h4 className="text-amber-900 dark:text-amber-300 font-semibold mb-2">
@@ -635,7 +635,7 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
             </span>
             {website.aiGenerated && (
               <span className="px-3 py-1 bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300 rounded-full text-sm font-medium">
-                🤖 AI Generated
+                 AI Generated
               </span>
             )}
             <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300 rounded-full text-sm">
@@ -667,7 +667,7 @@ const WebsiteViewer = ({ website, onUpdate, onDeploy, loading }) => {
               onClick={handleEditToggle}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
-              ✏️ Edit Website
+               Edit Website
             </button>
           )}
         </div>

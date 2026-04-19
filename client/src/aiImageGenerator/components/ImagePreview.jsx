@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { getServerBaseUrl } from "../../utils/config.js";
 
+const buildInlineFallbackImage = () => {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1D4ED8"/><stop offset="100%" stop-color="#3B82F6"/></linearGradient></defs><rect width="100%" height="100%" fill="url(#g)"/><text x="512" y="500" text-anchor="middle" fill="#FFFFFF" font-family="Arial,sans-serif" font-size="44" font-weight="700">Fallback Poster</text><text x="512" y="560" text-anchor="middle" fill="#DBEAFE" font-family="Arial,sans-serif" font-size="26">Image preview unavailable</text></svg>`;
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+};
+
 const ImagePreview = ({ image, onDownload, onClose }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [imgSrc, setImgSrc] = useState(null);
+  const [usedVisualFallback, setUsedVisualFallback] = useState(false);
 
   if (!image) return null;
 
@@ -13,21 +19,26 @@ const ImagePreview = ({ image, onDownload, onClose }) => {
     if (image?.imageUrl) {
       setImageError(false);
       setImageLoaded(false);
+      setUsedVisualFallback(false);
 
-      // Convert absolute server URL to proxy URL for local images
       let finalUrl = image.imageUrl;
-      const serverUrl = getServerBaseUrl();
-      const localUrls = [serverUrl, "https://phoenix-sol.onrender.com"];
+      const isDataOrBlobUrl =
+        finalUrl.startsWith("data:") || finalUrl.startsWith("blob:");
 
-      localUrls.forEach((url) => {
-        if (finalUrl.startsWith(url)) {
-          finalUrl = finalUrl.replace(url, "");
-        }
-      });
+      if (isDataOrBlobUrl) {
+        setImgSrc(finalUrl);
+        return;
+      }
+
+      // Resolve relative upload paths to backend host in development.
+      if (finalUrl.startsWith("/")) {
+        finalUrl = `${getServerBaseUrl()}${finalUrl}`;
+      }
 
       // Add timestamp to prevent caching issues for local images only
       if (!finalUrl.includes("cloudinary.com")) {
-        finalUrl = `${finalUrl}?t=${Date.now()}`;
+        const separator = finalUrl.includes("?") ? "&" : "?";
+        finalUrl = `${finalUrl}${separator}t=${Date.now()}`;
       }
 
       setImgSrc(finalUrl);
@@ -54,6 +65,13 @@ const ImagePreview = ({ image, onDownload, onClose }) => {
   };
 
   const handleImageError = (e) => {
+    if (!usedVisualFallback) {
+      const fallbackPreviewUrl = buildInlineFallbackImage();
+      setUsedVisualFallback(true);
+      setImgSrc(fallbackPreviewUrl);
+      return;
+    }
+
     setImageError(true);
     setImageLoaded(false);
   };

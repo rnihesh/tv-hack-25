@@ -2,6 +2,15 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import AppNavigation from "../components/AppNavigation";
 import { getApiBaseUrl } from "../utils/config.js";
+import {
+  Briefcase,
+  Lightbulb,
+  Megaphone,
+  MessageSquare,
+  Send,
+  Sparkles,
+  Users,
+} from "lucide-react";
 
 export default function CommunityChat() {
   const [messages, setMessages] = useState([]);
@@ -13,13 +22,13 @@ export default function CommunityChat() {
   const [messageTopics, setMessageTopics] = useState([]);
 
   const topics = [
-    { id: "all", name: "All Topics", icon: "💬", color: "gray" },
-    { id: "general", name: "General", icon: "🗨️", color: "blue" },
-    { id: "business", name: "Business", icon: "💼", color: "purple" },
-    { id: "ai", name: "AI & Tech", icon: "🤖", color: "cyan" },
-    { id: "marketing", name: "Marketing", icon: "📢", color: "green" },
-    { id: "collaboration", name: "Collaboration", icon: "🤝", color: "orange" },
-    { id: "feedback", name: "Feedback", icon: "💡", color: "yellow" },
+    { id: "all", name: "All Topics", icon: MessageSquare, color: "gray" },
+    { id: "general", name: "General", icon: MessageSquare, color: "blue" },
+    { id: "business", name: "Business", icon: Briefcase, color: "purple" },
+    { id: "ai", name: "AI & Tech", icon: Sparkles, color: "cyan" },
+    { id: "marketing", name: "Marketing", icon: Megaphone, color: "green" },
+    { id: "collaboration", name: "Collaboration", icon: Users, color: "orange" },
+    { id: "feedback", name: "Feedback", icon: Lightbulb, color: "yellow" },
   ];
 
   useEffect(() => {
@@ -121,48 +130,31 @@ export default function CommunityChat() {
     });
   };
 
-  const getTopicColor = (topicId) => {
-    const topic = topics.find((t) => t.id === topicId);
-    return topic?.color || "gray";
-  };
-
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 enterprise-shell transition-colors duration-300">
       {/* Navigation */}
       <AppNavigation />
 
       {/* Page Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+      <div className="glass-surface border-x-0 border-t-0 rounded-none">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center space-x-4">
-              <div className="p-3 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl shadow-lg">
-                <svg
-                  className="w-6 h-6 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a2 2 0 01-2-2v-6a2 2 0 012-2h8z"
-                  />
-                </svg>
+              <div className="p-3 bg-gradient-to-br from-blue-500/20 to-indigo-500/20 dark:from-blue-400/25 dark:to-indigo-400/20 rounded-xl border border-slate-200/70 dark:border-slate-700/70">
+                <Users className="w-6 h-6 text-blue-700 dark:text-blue-300" />
               </div>
               <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100">
                   Community Collaboration
                 </h1>
-                <p className="text-gray-600 dark:text-gray-400 mt-1">
+                <p className="text-slate-600 dark:text-slate-400 mt-1">
                   Connect, share ideas, and grow together
                 </p>
               </div>
             </div>
-            <div className="flex items-center space-x-2 px-4 py-2 bg-violet-50 dark:bg-violet-900/20 rounded-lg border border-violet-200 dark:border-violet-700">
-              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-              <span className="text-sm font-medium text-violet-700 dark:text-violet-300">
+            <div className="flex items-center space-x-2 px-4 py-2 gradient-panel rounded-lg">
+              <span className="w-2 h-2 bg-emerald-500 rounded-full"></span>
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
                 {Array.isArray(messages) ? messages.length : 0} messages
               </span>
             </div>
@@ -174,32 +166,35 @@ export default function CommunityChat() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Topics Sidebar */}
           <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 sticky top-24">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            <div className="glass-surface rounded-xl p-5 sticky top-24">
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4">
                 Topics
               </h3>
               <div className="space-y-2">
-                {topics.map((topic) => (
-                  <button
-                    key={topic.id}
-                    onClick={() => setSelectedTopic(topic.id)}
-                    className={`w-full text-left px-3 py-2.5 rounded-lg transition-all duration-200 flex items-center space-x-3 ${
-                      selectedTopic === topic.id
-                        ? "bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-700"
-                        : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
-                    }`}
-                  >
-                    <span className="text-lg">{topic.icon}</span>
-                    <span className="font-medium">{topic.name}</span>
-                  </button>
-                ))}
+                {topics.map((topic) => {
+                  const TopicIcon = topic.icon;
+                  return (
+                    <button
+                      key={topic.id}
+                      onClick={() => setSelectedTopic(topic.id)}
+                      className={`w-full text-left px-3 py-2.5 rounded-lg transition-all duration-200 flex items-center space-x-3 ${
+                        selectedTopic === topic.id
+                          ? "bg-blue-100/80 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-500/40"
+                          : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300"
+                      }`}
+                    >
+                      <TopicIcon className="w-4 h-4" />
+                      <span className="font-medium">{topic.name}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
 
           {/* Main Chat Area */}
           <div className="lg:col-span-3">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div className="glass-surface rounded-xl overflow-hidden">
               {/* Error Display */}
               {error && (
                 <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-400 p-4 m-6 rounded-lg">
@@ -233,7 +228,7 @@ export default function CommunityChat() {
               )}
 
               {/* Messages Area */}
-              <div className="h-96 overflow-y-auto p-6 space-y-4 bg-gray-50 dark:bg-gray-900/50">
+              <div className="h-96 overflow-y-auto p-6 space-y-4 bg-slate-50/60 dark:bg-slate-900/30 backdrop-blur-sm">
                 {(!Array.isArray(messages) || messages.length === 0) &&
                 !error ? (
                   <div className="text-center py-12">
@@ -252,10 +247,10 @@ export default function CommunityChat() {
                         />
                       </svg>
                     </div>
-                    <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                    <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100 mb-2">
                       No messages yet
                     </h3>
-                    <p className="text-gray-500 dark:text-gray-400">
+                    <p className="text-slate-500 dark:text-slate-400">
                       Be the first to start the conversation!
                     </p>
                   </div>
@@ -264,24 +259,24 @@ export default function CommunityChat() {
                   messages.map((msg) => (
                     <div
                       key={msg._id}
-                      className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow duration-200"
+                      className="bg-white/85 dark:bg-slate-800/80 rounded-xl p-4 shadow-sm border border-slate-200/80 dark:border-slate-700/80 hover:shadow-md transition-shadow duration-200"
                     >
                       <div className="flex items-start space-x-3">
-                        <div className="w-10 h-10 bg-gradient-to-r from-violet-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                        <div className="w-10 h-10 bg-blue-600 dark:bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
                           {(msg.author?.companyName || "U")
                             .charAt(0)
                             .toUpperCase()}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-2">
-                            <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
+                            <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                               {msg.author?.companyName || "Unknown User"}
                             </h4>
-                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                            <span className="text-xs text-slate-500 dark:text-slate-400">
                               {formatTime(msg.createdAt)}
                             </span>
                           </div>
-                          <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed mb-3">
+                          <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed mb-3">
                             {msg.content}
                           </p>
                           {msg.topics && msg.topics.length > 0 && (
@@ -293,9 +288,10 @@ export default function CommunityChat() {
                                 return (
                                   <span
                                     key={index}
-                                    className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300"
+                                    className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-blue-100/80 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300"
                                   >
-                                    {topic?.icon} {topic?.name || topicId}
+                                    {topic?.icon && <topic.icon className="w-3 h-3" />}
+                                    {topic?.name || topicId}
                                   </span>
                                 );
                               })}
@@ -309,10 +305,10 @@ export default function CommunityChat() {
               </div>
 
               {/* Message Input */}
-              <div className="p-6 border-t border-gray-200 dark:border-gray-700">
+              <div className="p-6 border-t border-slate-200/80 dark:border-slate-700/80 bg-white/75 dark:bg-slate-900/60">
                 {/* Topic Selection */}
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                     Add topics to your message:
                   </label>
                   <div className="flex flex-wrap gap-2">
@@ -323,11 +319,11 @@ export default function CommunityChat() {
                         onClick={() => toggleMessageTopic(topic.id)}
                         className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium transition-all duration-200 ${
                           messageTopics.includes(topic.id)
-                            ? "bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-700"
-                            : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600"
+                            ? "bg-blue-100/80 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-500/40"
+                            : "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600"
                         }`}
                       >
-                        <span className="mr-1">{topic.icon}</span>
+                        <topic.icon className="w-3 h-3 mr-1" />
                         {topic.name}
                       </button>
                     ))}
@@ -341,14 +337,14 @@ export default function CommunityChat() {
                       value={newMsg}
                       onChange={(e) => setNewMsg(e.target.value)}
                       placeholder="Share your thoughts with the community..."
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-violet-500 dark:focus:ring-violet-400 focus:border-transparent transition-all duration-200"
+                      className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-xl bg-white/90 dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200"
                       disabled={!isAuthenticated}
                     />
                   </div>
                   <button
                     type="submit"
                     disabled={loading || !isAuthenticated || !newMsg.trim()}
-                    className="px-6 py-3 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-medium rounded-xl transition-all duration-200 focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 flex items-center space-x-2"
+                    className="px-6 py-3 button-enterprise disabled:bg-slate-400 text-white font-medium rounded-xl transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 flex items-center space-x-2"
                   >
                     {loading ? (
                       <>
@@ -375,19 +371,7 @@ export default function CommunityChat() {
                       </>
                     ) : (
                       <>
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-                          />
-                        </svg>
+                        <Send className="w-4 h-4" />
                         <span>Send</span>
                       </>
                     )}

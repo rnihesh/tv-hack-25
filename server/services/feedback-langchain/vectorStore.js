@@ -1,11 +1,11 @@
 const { RecursiveCharacterTextSplitter } = require("langchain/text_splitter");
 const { FaissStore } = require("@langchain/community/vectorstores/faiss");
-const { GoogleGenerativeAIEmbeddings } = require("@langchain/google-genai");
 const { OllamaEmbeddings } = require("@langchain/community/embeddings/ollama");
 const config = require("../../config/env-config");
 const { logger } = require("../../utils/logger");
 const path = require("path");
 const fs = require("fs");
+const { GoogleEmbeddingsService } = require("../langchain/googleEmbeddings");
 
 class FeedbackVectorStore {
   constructor() {
@@ -54,9 +54,9 @@ class FeedbackVectorStore {
       // Fallback to Google
       if (!embeddingsInitialized && config.geminiApiKey) {
         try {
-          this.embeddings = new GoogleGenerativeAIEmbeddings({
+          this.embeddings = new GoogleEmbeddingsService({
             apiKey: config.geminiApiKey,
-            model: "text-embedding-004",
+            modelName: config.geminiEmbeddingModel,
           });
 
           // Skip test embeddings to save API calls

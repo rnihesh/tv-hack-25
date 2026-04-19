@@ -74,6 +74,7 @@ app.use(
       },
     },
     crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: { policy: "cross-origin" },
   })
 );
 
@@ -148,6 +149,7 @@ app.use(
       "Access-Control-Allow-Headers",
       "Origin, X-Requested-With, Content-Type, Accept"
     );
+    res.header("Cross-Origin-Resource-Policy", "cross-origin");
     next();
   },
   express.static(path.join(__dirname, "uploads"))
