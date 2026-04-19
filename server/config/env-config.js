@@ -31,7 +31,7 @@ module.exports = {
   // AI Model Configuration
   geminiApiKey: process.env.GEMINI_API_KEY,
   geminiEmbeddingModel:
-    process.env.GEMINI_EMBEDDING_MODEL || "text-embedding-004",
+    process.env.GEMINI_EMBEDDING_MODEL || "gemini-embedding-001",
   imagenModels: (process.env.IMAGEN_MODELS || process.env.IMAGEN_MODEL || "")
     .split(",")
     .map((model) => model.trim())

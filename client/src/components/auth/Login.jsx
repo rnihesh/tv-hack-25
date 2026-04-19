@@ -65,11 +65,11 @@ const Login = ({ onSwitchToRegister }) => {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
+    <div className="min-h-screen enterprise-shell flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <div className="w-20 h-20 bg-blue-600 dark:bg-blue-500 rounded-xl flex items-center justify-center mx-auto mb-6">
-            <span className="text-3xl">🚀</span>
+          <div className="w-20 h-20 bg-gradient-to-br from-blue-500/85 to-indigo-500/85 rounded-xl flex items-center justify-center mx-auto mb-6 shadow-md">
+            <span className="text-xl font-bold text-white">AI</span>
           </div>
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
             Welcome Back
@@ -79,7 +79,7 @@ const Login = ({ onSwitchToRegister }) => {
           </p>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-8 shadow-sm transition-all duration-300">
+        <div className="glass-surface rounded-xl border border-slate-200/70 dark:border-slate-700/70 p-8 shadow-sm transition-all duration-300">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {errors.general && (
               <div className="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg">
@@ -149,7 +149,7 @@ const Login = ({ onSwitchToRegister }) => {
               <button
                 type="submit"
                 disabled={loading}
-                className="group relative w-full flex justify-center items-center py-3 px-4 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="group relative w-full flex justify-center items-center py-3 px-4 button-enterprise text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <span className="flex items-center">
@@ -211,20 +211,17 @@ const Login = ({ onSwitchToRegister }) => {
 
         {/* Features */}
         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-            <div className="text-2xl mb-2">🤖</div>
+          <div className="text-center p-4 glass-surface rounded-lg border border-slate-200/70 dark:border-slate-700/70">
             <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
               AI-Powered
             </div>
           </div>
-          <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-            <div className="text-2xl mb-2">⚡</div>
+          <div className="text-center p-4 glass-surface rounded-lg border border-slate-200/70 dark:border-slate-700/70">
             <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Lightning Fast
             </div>
           </div>
-          <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-            <div className="text-2xl mb-2">🎯</div>
+          <div className="text-center p-4 glass-surface rounded-lg border border-slate-200/70 dark:border-slate-700/70">
             <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Results Driven
             </div>

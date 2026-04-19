@@ -1,6 +1,23 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import {
+  Bot,
+  ChevronRight,
+  CreditCard,
+  Globe,
+  Home,
+  Image,
+  LogIn,
+  LogOut,
+  Mail,
+  Menu,
+  Moon,
+  Sparkles,
+  Sun,
+  Users,
+  X,
+} from "lucide-react";
 
 // Theme Toggle Hook
 const useTheme = () => {
@@ -43,12 +60,12 @@ const AppNavigation = () => {
   const { isDark, toggleTheme } = useTheme();
 
   const navItems = [
-    { path: "/dashboard", label: "Dashboard", icon: "🏠" },
-    { path: "/website-generator", label: "Websites", icon: "🌐" },
-    { path: "/image-generator", label: "Images", icon: "🎨" },
-    { path: "/mailer", label: "Email", icon: "📧" },
-    { path: "/chatbot", label: "AI Chat", icon: "🤖" },
-    { path: "/community", label: "Community", icon: "💬" },
+    { path: "/dashboard", label: "Dashboard", icon: Home },
+    { path: "/website-generator", label: "Websites", icon: Globe },
+    { path: "/image-generator", label: "Images", icon: Image },
+    { path: "/mailer", label: "Email", icon: Mail },
+    { path: "/chatbot", label: "AI Chat", icon: Bot },
+    { path: "/community", label: "Community", icon: Users },
   ];
 
   // Get user display information
@@ -56,6 +73,7 @@ const AppNavigation = () => {
   const userEmail = displayUser?.email || "User";
   const companyName =
     displayUser?.companyName || displayUser?.displayName || "Company";
+  const companyInitial = companyName.charAt(0).toUpperCase();
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -101,7 +119,7 @@ const AppNavigation = () => {
   };
 
   return (
-    <nav className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50 shadow-sm">
+    <nav className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 shadow-sm backdrop-blur dark:border-slate-700 dark:bg-slate-900/95">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo/Brand */}
@@ -112,16 +130,10 @@ const AppNavigation = () => {
                 handleNavigation(isAuthenticated ? "/dashboard" : "/")
               }
             >
-              <div className="w-9 h-9 bg-gradient-to-br from-orange-500 via-red-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-                <svg
-                  className="w-5 h-5 text-white"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                </svg>
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white shadow-sm transition-colors duration-200 group-hover:bg-blue-700 dark:bg-blue-500 dark:group-hover:bg-blue-400">
+                <Sparkles className="h-4 w-4" />
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-orange-500 via-red-500 to-purple-600 bg-clip-text text-transparent">
+              <span className="text-xl font-bold text-slate-900 dark:text-slate-100">
                 Phoenix
               </span>
             </div>
@@ -133,13 +145,13 @@ const AppNavigation = () => {
                   <button
                     key={item.path}
                     onClick={() => handleNavigation(item.path)}
-                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-1.5 ${
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center gap-2 ${
                       location.pathname === item.path
-                        ? "bg-gradient-to-r from-orange-500/10 to-purple-500/10 text-orange-600 dark:text-orange-400"
-                        : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
+                        ? "bg-blue-50 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300"
+                        : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100"
                     }`}
                   >
-                    <span className="text-base">{item.icon}</span>
+                    <item.icon className="h-4 w-4" />
                     <span>{item.label}</span>
                   </button>
                 ))}
@@ -152,46 +164,22 @@ const AppNavigation = () => {
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all duration-200"
+              className="p-2 rounded-lg text-slate-500 hover:text-slate-700 dark:text-slate-300 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
               aria-label="Toggle dark mode"
             >
               {isDark ? (
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                  />
-                </svg>
+                <Sun className="h-5 w-5" />
               ) : (
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                  />
-                </svg>
+                <Moon className="h-5 w-5" />
               )}
             </button>
 
             {/* Credits Badge (Desktop) */}
             {isAuthenticated &&
               displayUser?.credits?.currentCredits !== undefined && (
-                <div className="hidden sm:flex items-center space-x-2 px-3 py-1.5 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-full border border-amber-200 dark:border-amber-700">
-                  <span className="text-amber-600 dark:text-amber-400">✨</span>
-                  <span className="text-sm font-semibold text-amber-700 dark:text-amber-300">
+                <div className="hidden sm:flex items-center gap-2 rounded-full border border-slate-200 bg-slate-100 px-3 py-1.5 dark:border-slate-700 dark:bg-slate-800">
+                  <CreditCard className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
                     {displayUser.credits.currentCredits} credits
                   </span>
                 </div>
@@ -200,16 +188,16 @@ const AppNavigation = () => {
             {/* User Avatar & Info (Desktop) */}
             {isAuthenticated && (
               <div className="hidden sm:flex items-center space-x-3">
-                <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center ring-2 ring-white dark:ring-gray-800 shadow-md">
+                <div className="w-9 h-9 bg-blue-600 dark:bg-blue-500 rounded-full flex items-center justify-center ring-2 ring-white dark:ring-slate-800 shadow-sm">
                   <span className="text-white text-sm font-bold">
-                    {companyName.charAt(0).toUpperCase()}
+                    {companyInitial}
                   </span>
                 </div>
                 <div className="hidden md:block text-right">
-                  <div className="text-sm font-semibold text-gray-900 dark:text-white">
+                  <div className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                     {companyName}
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[150px]">
+                  <div className="text-xs text-slate-500 dark:text-slate-400 truncate max-w-[150px]">
                     {userEmail}
                   </div>
                 </div>
@@ -220,62 +208,38 @@ const AppNavigation = () => {
             <div className="relative" ref={menuRef}>
               <button
                 onClick={toggleMenu}
-                className="p-2 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all duration-200"
+                className="p-2 rounded-lg text-slate-500 hover:text-slate-700 dark:text-slate-300 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
               >
                 <span className="sr-only">Open main menu</span>
                 {isMenuOpen ? (
-                  <svg
-                    className="w-6 h-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
+                  <X className="h-6 w-6" />
                 ) : (
-                  <svg
-                    className="w-6 h-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 6h16M4 12h16M4 18h16"
-                    />
-                  </svg>
+                  <Menu className="h-6 w-6" />
                 )}
               </button>
 
               {/* Dropdown Menu */}
               {isMenuOpen && (
-                <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl py-2 z-50 border border-gray-200 dark:border-gray-700 max-h-[80vh] overflow-y-auto animate-fade-in">
+                <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-slate-900 rounded-2xl shadow-xl py-2 z-50 border border-slate-200 dark:border-slate-700 max-h-[80vh] overflow-y-auto animate-fade-in">
                   {isAuthenticated ? (
                     <>
                       {/* User Info Section */}
-                      <div className="px-4 py-4 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-750">
+                      <div className="px-4 py-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/70">
                         <div className="flex items-center space-x-3">
-                          <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                          <div className="w-14 h-14 bg-blue-600 dark:bg-blue-500 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm">
                             <span className="text-white text-xl font-bold">
-                              {companyName.charAt(0).toUpperCase()}
+                              {companyInitial}
                             </span>
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="text-base font-semibold text-gray-900 dark:text-white truncate">
+                            <div className="text-base font-semibold text-slate-900 dark:text-slate-100 truncate">
                               {companyName}
                             </div>
-                            <div className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                            <div className="text-sm text-slate-500 dark:text-slate-400 truncate">
                               {userEmail}
                             </div>
                             {displayUser?.businessType && (
-                              <div className="inline-flex items-center mt-1.5 px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 rounded-full">
+                              <div className="inline-flex items-center mt-1.5 px-2 py-0.5 bg-blue-100 dark:bg-blue-500/15 rounded-full">
                                 <span className="text-xs font-medium text-blue-700 dark:text-blue-300">
                                   {displayUser.businessType
                                     .charAt(0)
@@ -290,14 +254,14 @@ const AppNavigation = () => {
 
                       {/* Credits Section (Mobile) */}
                       {displayUser?.credits?.currentCredits !== undefined && (
-                        <div className="sm:hidden px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+                        <div className="sm:hidden px-4 py-3 border-b border-slate-200 dark:border-slate-700">
                           <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-600 dark:text-gray-400">
+                            <span className="text-sm text-slate-600 dark:text-slate-400">
                               Available Credits
                             </span>
-                            <div className="flex items-center space-x-1.5 px-3 py-1 bg-amber-100 dark:bg-amber-900/30 rounded-full">
-                              <span className="text-amber-600">✨</span>
-                              <span className="font-semibold text-amber-700 dark:text-amber-300">
+                            <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-full">
+                              <CreditCard className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                              <span className="font-semibold text-slate-700 dark:text-slate-200">
                                 {displayUser.credits.currentCredits}
                               </span>
                             </div>
@@ -308,7 +272,7 @@ const AppNavigation = () => {
                       {/* Navigation Items */}
                       <div className="py-2">
                         <div className="px-4 py-2">
-                          <span className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+                          <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
                             Navigation
                           </span>
                         </div>
@@ -316,27 +280,17 @@ const AppNavigation = () => {
                           <button
                             key={item.path}
                             onClick={() => handleNavigation(item.path)}
-                            className={`w-full text-left px-4 py-3 text-sm font-medium flex items-center space-x-3 transition-all duration-200 ${
+                            className={`w-full text-left px-4 py-3 text-sm font-medium flex items-center gap-3 transition-colors duration-200 ${
                               location.pathname === item.path
-                                ? "bg-gradient-to-r from-orange-50 to-purple-50 dark:from-orange-900/20 dark:to-purple-900/20 text-orange-600 dark:text-orange-400 border-r-4 border-orange-500"
-                                : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                                ? "bg-blue-50 dark:bg-blue-500/15 text-blue-700 dark:text-blue-300 border-r-4 border-blue-600"
+                                : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/70"
                             }`}
                           >
-                            <span className="text-xl">{item.icon}</span>
+                            <item.icon className="h-5 w-5" />
                             <span>{item.label}</span>
                             {location.pathname === item.path && (
                               <div className="ml-auto">
-                                <svg
-                                  className="w-5 h-5 text-orange-500"
-                                  fill="currentColor"
-                                  viewBox="0 0 20 20"
-                                >
-                                  <path
-                                    fillRule="evenodd"
-                                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                                    clipRule="evenodd"
-                                  />
-                                </svg>
+                                <ChevronRight className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                               </div>
                             )}
                           </button>
@@ -344,26 +298,26 @@ const AppNavigation = () => {
                       </div>
 
                       {/* Buy Credits Section */}
-                      <div className="border-t border-gray-100 dark:border-gray-700 py-2">
+                      <div className="border-t border-slate-200 dark:border-slate-700 py-2">
                         <button
                           onClick={() => handleNavigation("/subscription")}
-                          className="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:hover:from-amber-900/20 dark:hover:to-orange-900/20 flex items-center space-x-3 transition-all duration-200"
+                          className="w-full text-left px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/70 flex items-center gap-3 transition-colors duration-200"
                         >
-                          <span className="text-xl">💳</span>
+                          <CreditCard className="h-5 w-5" />
                           <span>Buy Credits</span>
-                          <span className="ml-auto text-xs px-2 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full font-medium">
+                          <span className="ml-auto text-xs px-2 py-0.5 bg-emerald-100 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 rounded-full font-medium">
                             Get More
                           </span>
                         </button>
                       </div>
 
                       {/* Logout Section */}
-                      <div className="border-t border-gray-100 dark:border-gray-700 py-2">
+                      <div className="border-t border-slate-200 dark:border-slate-700 py-2">
                         <button
                           onClick={handleLogout}
-                          className="w-full text-left px-4 py-3 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center space-x-3 transition-all duration-200"
+                          className="w-full text-left px-4 py-3 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/15 flex items-center gap-3 transition-colors duration-200"
                         >
-                          <span className="text-xl">🚪</span>
+                          <LogOut className="h-5 w-5" />
                           <span>Sign Out</span>
                         </button>
                       </div>
@@ -372,27 +326,21 @@ const AppNavigation = () => {
                     /* Login Section for Unauthenticated Users */
                     <div className="py-4 px-4">
                       <div className="text-center mb-4">
-                        <div className="w-16 h-16 bg-gradient-to-br from-orange-500 via-red-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg">
-                          <svg
-                            className="w-8 h-8 text-white"
-                            fill="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                          </svg>
+                        <div className="w-16 h-16 bg-blue-600 dark:bg-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-sm">
+                          <Sparkles className="h-8 w-8 text-white" />
                         </div>
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">
                           Welcome to Phoenix
                         </h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                           AI-powered tools for your business
                         </p>
                       </div>
                       <button
                         onClick={handleLogin}
-                        className="w-full py-3 bg-gradient-to-r from-orange-500 to-purple-600 text-white rounded-xl hover:from-orange-600 hover:to-purple-700 transition-all duration-200 text-sm font-semibold flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
+                        className="w-full py-3 bg-blue-600 dark:bg-blue-500 text-white rounded-xl hover:bg-blue-700 dark:hover:bg-blue-400 transition-colors duration-200 text-sm font-semibold flex items-center justify-center gap-2 shadow-sm"
                       >
-                        <span>🔐</span>
+                        <LogIn className="h-4 w-4" />
                         <span>Sign In to Get Started</span>
                       </button>
                     </div>

@@ -10,27 +10,29 @@ const PageLayout = ({
   title,
   subtitle,
   icon,
-  iconBg = "from-blue-500 to-purple-600",
+  iconBg = "from-blue-500/20 to-indigo-500/20 dark:from-blue-400/25 dark:to-indigo-400/20",
   badge,
   maxWidth = "max-w-7xl",
 }) => {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 enterprise-shell transition-colors duration-300">
       {/* Navigation */}
       <AppNavigation />
 
       {/* Page Header */}
       {(title || subtitle) && (
-        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div className="glass-surface border-x-0 border-t-0 rounded-none">
           <div className={`${maxWidth} mx-auto px-4 sm:px-6 lg:px-8 py-6`}>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex items-center space-x-4">
                 {icon && (
                   <div
-                    className={`p-3 bg-gradient-to-br ${iconBg} rounded-xl shadow-lg`}
+                    className={`p-3 bg-gradient-to-br ${iconBg} rounded-xl border border-slate-200/70 dark:border-slate-700/70`}
                   >
                     {typeof icon === "string" ? (
-                      <span className="text-2xl">{icon}</span>
+                      <span className="text-xl font-bold text-slate-700 dark:text-slate-200">
+                        {icon}
+                      </span>
                     ) : (
                       icon
                     )}
@@ -38,12 +40,12 @@ const PageLayout = ({
                 )}
                 <div>
                   {title && (
-                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100">
                       {title}
                     </h1>
                   )}
                   {subtitle && (
-                    <p className="text-gray-600 dark:text-gray-400 mt-1">
+                    <p className="text-slate-600 dark:text-slate-400 mt-1">
                       {subtitle}
                     </p>
                   )}

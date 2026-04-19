@@ -228,16 +228,16 @@ const ImageGenerator = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <div className="min-h-screen enterprise-shell transition-colors duration-300">
       {/* Navigation */}
       <AppNavigation />
 
       {/* Page Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+      <div className="glass-surface border-b border-slate-200/70 dark:border-slate-700/70 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center space-x-4">
-              <div className="p-3 bg-gradient-to-br from-pink-500 to-rose-600 rounded-xl shadow-lg">
+              <div className="p-3 bg-gradient-to-br from-blue-500/85 to-indigo-500/85 rounded-xl shadow-md">
                 <svg
                   className="w-6 h-6 text-white"
                   fill="none"
@@ -261,9 +261,9 @@ const ImageGenerator = () => {
                 </p>
               </div>
             </div>
-            <div className="flex items-center space-x-2 px-4 py-2 bg-pink-50 dark:bg-pink-900/20 rounded-lg border border-pink-200 dark:border-pink-700">
+            <div className="flex items-center space-x-2 px-4 py-2 bg-blue-50/80 dark:bg-blue-900/20 rounded-lg border border-blue-200/70 dark:border-blue-700/50">
               <svg
-                className="w-4 h-4 text-pink-600 dark:text-pink-400"
+                className="w-4 h-4 text-blue-600 dark:text-blue-400"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -275,7 +275,7 @@ const ImageGenerator = () => {
                   d="M13 10V3L4 14h7v7l9-11h-7z"
                 />
               </svg>
-              <span className="text-sm font-medium text-pink-700 dark:text-pink-300">
+              <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
                 3 credits per image
               </span>
             </div>
@@ -284,7 +284,7 @@ const ImageGenerator = () => {
       </div>
 
       {/* Tab Navigation */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+      <div className="glass-surface border-b border-slate-200/70 dark:border-slate-700/70">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex space-x-1 overflow-x-auto">
             {tabs.map((tab) => (
@@ -293,14 +293,14 @@ const ImageGenerator = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`py-4 px-4 border-b-2 font-medium text-sm flex items-center space-x-2 transition-all duration-200 whitespace-nowrap ${
                   activeTab === tab.id
-                    ? "border-pink-500 text-pink-600 dark:text-pink-400"
+                    ? "border-blue-500 text-blue-600 dark:text-blue-400"
                     : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600"
                 }`}
               >
                 {getTabIcon(tab.icon)}
                 <span>{tab.label}</span>
                 {tab.id === "preview" && generatedImage && (
-                  <span className="bg-pink-100 dark:bg-pink-900/30 text-pink-800 dark:text-pink-300 text-xs px-2 py-0.5 rounded-full">
+                  <span className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-xs px-2 py-0.5 rounded-full">
                     1
                   </span>
                 )}
@@ -346,7 +346,7 @@ const ImageGenerator = () => {
                 onClose={() => setActiveTab("generate")}
               />
             ) : (
-              <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-12 text-center transition-colors duration-300">
+              <div className="glass-surface rounded-xl border border-slate-200/70 dark:border-slate-700/70 p-12 text-center transition-colors duration-300">
                 <div className="max-w-md mx-auto">
                   <div className="w-20 h-20 mx-auto mb-6 bg-gray-100 dark:bg-gray-700 rounded-xl flex items-center justify-center">
                     <svg
@@ -372,7 +372,7 @@ const ImageGenerator = () => {
                   </p>
                   <button
                     onClick={() => setActiveTab("generate")}
-                    className="bg-blue-600 dark:bg-blue-500 text-white py-3 px-6 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-all duration-200 font-medium"
+                    className="button-enterprise text-white py-3 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors duration-200 font-medium"
                   >
                     Generate New Image
                   </button>

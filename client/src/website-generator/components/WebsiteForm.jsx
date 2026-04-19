@@ -19,31 +19,31 @@ const WebsiteForm = ({ onSubmit, loading, userCredits }) => {
       value: "landing",
       label: "Landing Page",
       description: "Single page for product/service promotion",
-      icon: "🚀",
+      icon: "",
     },
     {
       value: "portfolio",
       label: "Portfolio",
       description: "Showcase work and projects",
-      icon: "🎨",
+      icon: "",
     },
     {
       value: "business",
       label: "Business",
       description: "Professional business website",
-      icon: "🏢",
+      icon: "",
     },
     {
       value: "ecommerce",
       label: "E-commerce",
       description: "Online store with product catalog",
-      icon: "🛒",
+      icon: "",
     },
     {
       value: "blog",
       label: "Blog",
       description: "Content-focused blog website",
-      icon: "📝",
+      icon: "",
     },
   ];
 

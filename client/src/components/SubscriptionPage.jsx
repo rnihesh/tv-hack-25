@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { subscriptionAPI } from "../utils/subscriptionApi";
 import { authAPI } from "../utils/api";
 import AppNavigation from "./AppNavigation";
+import { BarChart3, Box, CreditCard, History, Zap } from "lucide-react";
 
 const RAZORPAY_SCRIPT_SRC = "https://checkout.razorpay.com/v1/checkout.js";
 
@@ -182,42 +183,30 @@ const SubscriptionPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 enterprise-shell transition-colors duration-300">
       {/* Navigation */}
       <AppNavigation />
 
       {/* Page Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+      <div className="glass-surface border-x-0 border-t-0 rounded-none">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center space-x-4">
-              <div className="p-3 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl shadow-lg">
-                <svg
-                  className="w-6 h-6 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-                  />
-                </svg>
+              <div className="p-3 bg-gradient-to-br from-blue-500/20 to-indigo-500/20 dark:from-blue-400/25 dark:to-indigo-400/20 rounded-xl border border-slate-200/70 dark:border-slate-700/70">
+                <CreditCard className="w-6 h-6 text-blue-700 dark:text-blue-300" />
               </div>
               <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100">
                   Subscription & Credits
                 </h1>
-                <p className="text-gray-600 dark:text-gray-400 mt-1">
+                <p className="text-slate-600 dark:text-slate-400 mt-1">
                   Buy AI credits to power your business tools
                 </p>
               </div>
             </div>
-            <div className="flex items-center space-x-2 px-4 py-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-700">
-              <span className="text-amber-600 dark:text-amber-400">✨</span>
-              <span className="text-sm font-medium text-amber-700 dark:text-amber-300">
+            <div className="flex items-center space-x-2 px-4 py-2 gradient-panel rounded-lg">
+              <Zap className="w-4 h-4 text-blue-700 dark:text-blue-300" />
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
                 Current Credits:{" "}
                 <span className="text-lg font-bold">{currentCredits}</span>
               </span>
@@ -228,7 +217,7 @@ const SubscriptionPage = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Tab Navigation */}
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-1.5 mb-6 shadow-sm">
+        <div className="glass-surface rounded-xl p-1.5 mb-6">
           <div className="flex flex-wrap gap-1">
             {["packages", "history", "analytics"].map((tab) => (
               <button
@@ -239,13 +228,25 @@ const SubscriptionPage = () => {
                 }}
                 className={`flex-1 py-3 px-4 rounded-lg font-medium text-sm transition-all duration-200 whitespace-nowrap ${
                   activeTab === tab
-                    ? "bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-md"
-                    : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    ? "bg-blue-600 dark:bg-blue-500 text-white shadow-md"
+                    : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
                 }`}
               >
-                {tab === "packages" && "📦 Credit Packages"}
-                {tab === "history" && "📜 Payment History"}
-                {tab === "analytics" && "📊 Analytics"}
+                {tab === "packages" && (
+                  <span className="inline-flex items-center gap-2">
+                    <Box className="w-4 h-4" /> Credit Packages
+                  </span>
+                )}
+                {tab === "history" && (
+                  <span className="inline-flex items-center gap-2">
+                    <History className="w-4 h-4" /> Payment History
+                  </span>
+                )}
+                {tab === "analytics" && (
+                  <span className="inline-flex items-center gap-2">
+                    <BarChart3 className="w-4 h-4" /> Analytics
+                  </span>
+                )}
               </button>
             ))}
           </div>
@@ -257,30 +258,30 @@ const SubscriptionPage = () => {
             {packages.map((pkg) => (
               <div
                 key={pkg.id}
-                className={`relative bg-white dark:bg-gray-800 rounded-2xl shadow-lg dark:shadow-gray-900/20 p-6 sm:p-8 border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl ${
+                className={`relative bg-white/85 dark:bg-slate-900/70 rounded-2xl shadow-md p-6 sm:p-8 border border-slate-200 dark:border-slate-700 transition-all duration-300 hover:shadow-lg ${
                   pkg.isPopular
-                    ? "ring-2 ring-amber-500 dark:ring-amber-400"
+                    ? "ring-2 ring-blue-500/50 dark:ring-blue-400/50"
                     : ""
                 }`}
               >
                 {pkg.isPopular && (
                   <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                    <span className="bg-gradient-to-r from-amber-500 to-orange-600 text-white px-4 py-1 rounded-full text-sm font-medium shadow-lg">
+                    <span className="bg-blue-600 dark:bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-medium shadow-sm">
                       Most Popular
                     </span>
                   </div>
                 )}
 
                 <div className="text-center">
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
                     {pkg.name}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-300 mt-2">
+                  <p className="text-slate-600 dark:text-slate-300 mt-2">
                     {pkg.description}
                   </p>
 
                   <div className="mt-6">
-                    <span className="text-4xl font-bold text-gray-900 dark:text-white">
+                    <span className="text-4xl font-bold text-slate-900 dark:text-slate-100">
                       {formatCurrency(pkg.price)}
                     </span>
                   </div>
@@ -322,8 +323,8 @@ const SubscriptionPage = () => {
                     disabled={loading}
                     className={`mt-8 w-full py-3 px-6 rounded-lg font-medium transition-all duration-300 ${
                       pkg.isPopular
-                        ? "bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 text-white"
-                        : "bg-gray-800 hover:bg-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 text-white"
+                        ? "button-enterprise"
+                        : "bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white"
                     } disabled:opacity-50 disabled:cursor-not-allowed`}
                   >
                     {loading ? "Processing..." : "Purchase Now"}

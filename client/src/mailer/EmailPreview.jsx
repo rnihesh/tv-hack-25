@@ -64,7 +64,7 @@ const EmailPreview = ({ emailData, onBack, onNext, onEdit }) => {
   };
 
   return (
-    <div className="p-8">
+    <div className="p-8 bg-white/55 dark:bg-slate-900/35 backdrop-blur-sm rounded-xl">
       {/* Header */}
       <div className="text-center mb-8">
         <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full mb-4">
@@ -88,17 +88,17 @@ const EmailPreview = ({ emailData, onBack, onNext, onEdit }) => {
             />
           </svg>
         </div>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">
           Preview Your Email
         </h2>
-        <p className="text-gray-600 dark:text-gray-300">
+        <p className="text-slate-600 dark:text-slate-300">
           Review your email before selecting recipients
         </p>
       </div>
 
       {/* Email Preview Container */}
-      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 p-6 mb-8">
-        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 max-w-2xl mx-auto">
+      <div className="bg-slate-50/70 dark:bg-slate-800/50 rounded-lg border-2 border-dashed border-slate-300 dark:border-slate-600 p-6 mb-8">
+        <div className="bg-white/90 dark:bg-slate-900 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 max-w-2xl mx-auto">
           {/* Email Header */}
           <div className="border-b border-gray-200 dark:border-gray-700 p-6">
             <div className="flex items-center justify-between mb-4">
@@ -109,7 +109,7 @@ const EmailPreview = ({ emailData, onBack, onNext, onEdit }) => {
                     ?.toUpperCase()}
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900 dark:text-white">
+                  <p className="font-medium text-slate-900 dark:text-slate-100">
                     {
                       JSON.parse(localStorage.getItem("userData"))?.company
                         ?.companyName
@@ -128,14 +128,14 @@ const EmailPreview = ({ emailData, onBack, onNext, onEdit }) => {
               </div>
             </div>
 
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+            <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">
               {emailData.subject || "No Subject"}
             </h3>
           </div>
 
           {/* Email Body */}
           <div className="p-6">
-            <div className="prose prose-sm max-w-none text-gray-900 dark:text-gray-100">
+            <div className="prose prose-sm max-w-none text-slate-900 dark:text-slate-100">
               {formatEmailContent(
                 emailData.enhancedMessage || emailData.description
               )}
@@ -168,22 +168,22 @@ const EmailPreview = ({ emailData, onBack, onNext, onEdit }) => {
       </div>
 
       {/* Original Description (Expandable) */}
-      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+      <div className="gradient-panel rounded-lg p-4 mb-6">
         <button
           onClick={() => setIsExpanded(!isExpanded)}
           className="w-full flex items-center justify-between text-left transition-colors"
         >
-          <h3 className="font-medium text-blue-900 dark:text-blue-100">
+          <h3 className="font-medium text-slate-900 dark:text-slate-100">
             Original Description
           </h3>
           <span className="text-blue-600 dark:text-blue-400">
-            {isExpanded ? "▼" : "▶"}
+            {isExpanded ? "▼" : ""}
           </span>
         </button>
 
         {isExpanded && (
-          <div className="mt-3 pt-3 border-t border-blue-200 dark:border-blue-800">
-            <p className="text-blue-800 dark:text-blue-200 text-sm whitespace-pre-wrap">
+          <div className="mt-3 pt-3 border-t border-slate-300/60 dark:border-slate-600/60">
+            <p className="text-slate-700 dark:text-slate-300 text-sm whitespace-pre-wrap">
               {emailData.description || "No description provided"}
             </p>
           </div>
@@ -221,9 +221,9 @@ const EmailPreview = ({ emailData, onBack, onNext, onEdit }) => {
       </div>
 
       {/* Content Analysis */}
-      <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-8">
-        <h3 className="font-medium text-yellow-900 dark:text-yellow-100 mb-2">
-          📊 Content Analysis
+      <div className="gradient-panel rounded-lg p-4 mb-8">
+        <h3 className="font-medium text-slate-900 dark:text-slate-100 mb-2">
+          Content Analysis
         </h3>
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
@@ -260,25 +260,25 @@ const EmailPreview = ({ emailData, onBack, onNext, onEdit }) => {
       </div>
 
       {/* Action Buttons */}
-      <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-700">
+      <div className="flex items-center justify-between pt-6 border-t border-slate-200 dark:border-slate-700">
         <div className="flex space-x-3">
           <button
             onClick={onBack}
-            className="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-lg font-medium transition-colors"
+            className="bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 px-6 py-3 rounded-lg font-medium transition-colors"
           >
             ← Back to Edit
           </button>
 
           <button
             onClick={onEdit}
-            className="bg-yellow-500 dark:bg-yellow-600 hover:bg-yellow-600 dark:hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+            className="bg-slate-700 dark:bg-slate-600 hover:bg-slate-800 dark:hover:bg-slate-500 text-white px-6 py-3 rounded-lg font-medium transition-colors"
           >
-            ✏️ Make Changes
+            Make Changes
           </button>
         </div>
 
         <div className="flex items-center space-x-4">
-          <div className="text-sm text-gray-500 dark:text-gray-400">
+          <div className="text-sm text-slate-500 dark:text-slate-400">
             Step 2 of 4
           </div>
 

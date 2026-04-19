@@ -22,13 +22,13 @@ const WebsiteList = ({
 
   const getTemplateIcon = (templateType) => {
     const icons = {
-      landing: '🚀',
-      portfolio: '🎨',
-      business: '🏢',
-      ecommerce: '🛒',
-      blog: '📝'
+      landing: 'LP',
+      portfolio: 'PF',
+      business: 'BS',
+      ecommerce: 'EC',
+      blog: 'BL'
     };
-    return icons[templateType] || '🌐';
+    return icons[templateType] || 'WB';
   };
 
   const getStyleColor = (style) => {
@@ -157,7 +157,7 @@ const WebsiteList = ({
 
       {websites.length === 0 ? (
         <div className="text-center py-16">
-          <div className="text-6xl mb-4">🌐</div>
+          <div className="text-sm mb-4 inline-flex px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">WEB</div>
           <h3 className="text-xl font-semibold text-gray-900 mb-2">No websites yet</h3>
           <p className="text-gray-600 mb-6">Generate your first website using the AI generator</p>
           <button 
@@ -171,12 +171,12 @@ const WebsiteList = ({
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {websites.map((website) => (
-              <div key={website._id} className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+              <div key={website._id} className="glass-surface border border-slate-200/70 dark:border-slate-700/70 rounded-lg shadow-sm hover:shadow-md transition-shadow">
                 <div className="p-6">
                   {/* Card Header */}
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex items-center gap-3 flex-1">
-                      <span className="text-2xl">
+                      <span className="text-xs font-semibold px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200">
                         {getTemplateIcon(website.customizations?.templateType)}
                       </span>
                       <div className="min-w-0">
@@ -190,7 +190,7 @@ const WebsiteList = ({
                         className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                         title="View Website"
                       >
-                        👁️
+                        View
                       </button>
                       {/* Deploy button - only show if files are available */}
                       {(website.filesAvailable || website.deployment?.url) && (
@@ -200,7 +200,7 @@ const WebsiteList = ({
                           className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                           title={website.deployment?.url ? "Redeploy Website" : "Deploy Website"}
                         >
-                          {deployingWebsites.has(website._id) ? '⏳' : '🚀'}
+                          {deployingWebsites.has(website._id) ? 'Deploying' : 'Deploy'}
                         </button>
                       )}
                       <button
@@ -208,7 +208,7 @@ const WebsiteList = ({
                         className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                         title="Delete Website"
                       >
-                        🗑️
+                        Delete
                       </button>
                     </div>
                   </div>
@@ -228,12 +228,12 @@ const WebsiteList = ({
                       )}
                       {website.aiGenerated && (
                         <span className="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">
-                          🤖 AI Generated
+                           AI Generated
                         </span>
                       )}
                       {website.deployment?.url && (
                         <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
-                          🌐 Deployed
+                           Deployed
                         </span>
                       )}
                     </div>
@@ -247,7 +247,7 @@ const WebsiteList = ({
                           rel="noopener noreferrer"
                           className="text-sm text-blue-600 hover:text-blue-800 truncate block"
                         >
-                          🔗 {website.deployment.url}
+                          URL: {website.deployment.url}
                         </a>
                       </div>
                     )}

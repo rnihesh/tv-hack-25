@@ -4,6 +4,7 @@ import {
   Routes,
   Route,
   Navigate,
+  useLocation,
 } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import AuthWrapper from "./components/auth/AuthWrapper";
@@ -12,7 +13,6 @@ import WebsiteGenerator from "./website-generator/WebsiteGenerator";
 import ImageGenerator from "./aiImageGenerator/ImageGenerator";
 import ChatbotPage from "./chatbot/ChatbotPage";
 import ChatInterface from "./chatbot/ChatInterface";
-import ThemeToggle from "./utils/ThemeToggle";
 import CommunityChat from "./community/CommunityChat";
 import MailingDashboard from "./mailer/MailingDashboard";
 import SubscriptionPage from "./components/SubscriptionPage";
@@ -103,88 +103,95 @@ function PublicRoute({ children }) {
 }
 
 function AppContent() {
+  const { isAuthenticated } = useAuth();
+  const location = useLocation();
+  const showChatWidget = isAuthenticated && location.pathname !== "/auth";
+
   return (
-    <Routes>
-      {/* Public Routes */}
-      <Route
-        path="/auth"
-        element={
-          <PublicRoute>
-            <AuthWrapper />
-          </PublicRoute>
-        }
-      />
+    <>
+      <Routes>
+        {/* Public Routes */}
+        <Route
+          path="/auth"
+          element={
+            <PublicRoute>
+              <AuthWrapper />
+            </PublicRoute>
+          }
+        />
 
-      {/* Protected Routes */}
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        }
-      />
+        {/* Protected Routes */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
 
-      <Route
-        path="/website-generator"
-        element={
-          <ProtectedRoute>
-            <WebsiteGenerator />
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path="/website-generator"
+          element={
+            <ProtectedRoute>
+              <WebsiteGenerator />
+            </ProtectedRoute>
+          }
+        />
 
-      <Route
-        path="/image-generator"
-        element={
-          <ProtectedRoute>
-            <ImageGenerator />
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path="/image-generator"
+          element={
+            <ProtectedRoute>
+              <ImageGenerator />
+            </ProtectedRoute>
+          }
+        />
 
-      <Route
-        path="/chatbot"
-        element={
-          <ProtectedRoute>
-            <ChatbotPage />
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path="/chatbot"
+          element={
+            <ProtectedRoute>
+              <ChatbotPage />
+            </ProtectedRoute>
+          }
+        />
 
-      <Route
-        path="/mailer"
-        element={
-          <ProtectedRoute>
-            <MailingDashboard />
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path="/mailer"
+          element={
+            <ProtectedRoute>
+              <MailingDashboard />
+            </ProtectedRoute>
+          }
+        />
 
-      <Route
-        path="/community"
-        element={
-          <ProtectedRoute>
-            <CommunityChat />
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path="/community"
+          element={
+            <ProtectedRoute>
+              <CommunityChat />
+            </ProtectedRoute>
+          }
+        />
 
-      <Route
-        path="/subscription"
-        element={
-          <ProtectedRoute>
-            <SubscriptionPage />
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path="/subscription"
+          element={
+            <ProtectedRoute>
+              <SubscriptionPage />
+            </ProtectedRoute>
+          }
+        />
 
-      {/* Default redirect */}
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        {/* Default redirect */}
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-      {/* Catch-all redirect */}
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
-    </Routes>
+        {/* Catch-all redirect */}
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+      {showChatWidget && <ChatInterface />}
+    </>
   );
 }
 
@@ -193,8 +200,6 @@ function App() {
     <AuthProvider>
       <Router>
         <AppContent />
-        {/* <ThemeToggle /> */}
-        <ChatInterface />
       </Router>
     </AuthProvider>
   );

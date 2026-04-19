@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { emailAPI } from "../utils/api";
+import { Sparkles } from "lucide-react";
 
 const EmailComposer = ({
   emailData,
@@ -95,7 +96,7 @@ const EmailComposer = ({
   };
 
   return (
-    <div className="p-8">
+    <div className="p-8 bg-white/55 dark:bg-slate-900/35 backdrop-blur-sm rounded-xl">
       {/* Header */}
       <div className="text-center mb-8">
         <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full mb-4">
@@ -113,10 +114,10 @@ const EmailComposer = ({
             />
           </svg>
         </div>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">
           Compose Your Email
         </h2>
-        <p className="text-gray-600 dark:text-gray-300">
+        <p className="text-slate-600 dark:text-slate-300">
           Describe your message and let AI create a professional email for you
         </p>
       </div>
@@ -165,7 +166,7 @@ const EmailComposer = ({
         <div>
           <label
             htmlFor="description"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
           >
             What would you like to send to your customers? *
           </label>
@@ -175,10 +176,10 @@ const EmailComposer = ({
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Describe what you want to communicate to your customers. For example: 'I want to announce our new product launch with a 20% discount for existing customers. Include details about the product features and how they can claim the discount.'"
-            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors ${
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 transition-colors ${
               errors.description
                 ? "border-red-300 dark:border-red-600"
-                : "border-gray-300 dark:border-gray-600"
+                : "border-slate-300 dark:border-slate-600"
             }`}
           />
           {errors.description && (
@@ -186,18 +187,19 @@ const EmailComposer = ({
               {errors.description}
             </p>
           )}
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
             Be as detailed as possible. Our AI will create a professional,
             engaging email based on your description.
           </p>
         </div>
 
         {/* Tips Section */}
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-          <h3 className="font-medium text-blue-900 dark:text-blue-100 mb-2">
-            💡 Tips for better results:
+        <div className="gradient-panel rounded-lg p-4">
+          <h3 className="font-medium text-slate-900 dark:text-slate-100 mb-2 flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+            Tips for better results:
           </h3>
-          <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+          <ul className="text-sm text-slate-700 dark:text-slate-300 space-y-1">
             <li>
               • Include the purpose of your email (promotion, announcement,
               newsletter, etc.)
@@ -213,12 +215,12 @@ const EmailComposer = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between pt-6 border-t border-slate-200 dark:border-slate-700">
           <div className="flex space-x-3">
             <button
               onClick={handleEnhanceMessage}
               disabled={isLoading}
-              className="bg-blue-600 dark:bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-700 disabled:bg-blue-400 dark:disabled:bg-blue-500 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2"
+              className="button-enterprise disabled:bg-slate-400 dark:disabled:bg-slate-500 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2"
             >
               {isLoading ? (
                 <>
@@ -246,7 +248,7 @@ const EmailComposer = ({
                 </>
               ) : (
                 <>
-                  <span>🎨</span>
+                  <Sparkles className="w-4 h-4" />
                   <span>Enhance with AI</span>
                 </>
               )}
@@ -255,13 +257,13 @@ const EmailComposer = ({
             <button
               onClick={handlePreviewWithoutEnhancing}
               disabled={isLoading}
-              className="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:bg-gray-50 dark:disabled:bg-gray-800 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-lg font-medium transition-colors"
+              className="bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:bg-slate-50 dark:disabled:bg-slate-800 text-slate-700 dark:text-slate-300 px-6 py-3 rounded-lg font-medium transition-colors"
             >
               Skip Enhancement
             </button>
           </div>
 
-          <div className="text-sm text-gray-500 dark:text-gray-400">
+          <div className="text-sm text-slate-500 dark:text-slate-400">
             Step 1 of 4
           </div>
         </div>

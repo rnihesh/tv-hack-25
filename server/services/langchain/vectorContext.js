@@ -1,10 +1,10 @@
 const { OllamaEmbeddings } = require("@langchain/community/embeddings/ollama");
-const { GoogleGenerativeAIEmbeddings } = require("@langchain/google-genai");
 const { Document } = require("@langchain/core/documents");
 const { VectorStore } = require("../../models/VectorStore");
 const config = require("../../config/env-config");
 const { logger, aiLogger } = require("../../utils/logger");
 const { memoryVectorStore } = require("./memoryVectorStore");
+const { GoogleEmbeddingsService } = require("./googleEmbeddings");
 
 class VectorContextService {
   constructor() {
@@ -51,7 +51,7 @@ class VectorContextService {
       // Fallback to Google if Ollama failed or not configured
       if (!embeddingsInitialized && config.geminiApiKey) {
         try {
-          this.embeddings = new GoogleGenerativeAIEmbeddings({
+          this.embeddings = new GoogleEmbeddingsService({
             apiKey: config.geminiApiKey,
             modelName: config.geminiEmbeddingModel,
           });

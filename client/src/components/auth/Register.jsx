@@ -5,70 +5,70 @@ const businessTypes = [
   {
     value: "restaurant",
     label: "Restaurant",
-    icon: "🍽️",
+    icon: "",
     desc: "Food & Dining",
   },
   {
     value: "retail",
     label: "Retail Store",
-    icon: "🛍️",
+    icon: "",
     desc: "Shopping & Commerce",
   },
   {
     value: "service",
     label: "Service Business",
-    icon: "🔧",
+    icon: "",
     desc: "Professional Services",
   },
   {
     value: "consulting",
     label: "Consulting",
-    icon: "💼",
+    icon: "",
     desc: "Business Advisory",
   },
   {
     value: "healthcare",
     label: "Healthcare",
-    icon: "🏥",
+    icon: "",
     desc: "Medical & Wellness",
   },
   {
     value: "education",
     label: "Education",
-    icon: "🎓",
+    icon: "",
     desc: "Learning & Training",
   },
   {
     value: "technology",
     label: "Technology",
-    icon: "💻",
+    icon: "",
     desc: "Tech & Software",
   },
   {
     value: "manufacturing",
     label: "Manufacturing",
-    icon: "🏭",
+    icon: "",
     desc: "Production & Industry",
   },
   {
     value: "real_estate",
     label: "Real Estate",
-    icon: "🏠",
+    icon: "",
     desc: "Property & Investment",
   },
   {
     value: "finance",
     label: "Finance",
-    icon: "💰",
+    icon: "",
     desc: "Banking & Investment",
   },
   {
     value: "marketing",
     label: "Marketing",
-    icon: "📢",
+    icon: "",
     desc: "Advertising & Promotion",
   },
-  { value: "other", label: "Other", icon: "📋", desc: "Other Industry" },
+  { value: "other", label: "Other", icon: "OT", desc: "Other Industry" },
 ];
 
 const companySizes = [
@@ -130,37 +130,37 @@ const communicationTones = [
     value: "professional",
     label: "Professional",
     description: "Formal and business-like",
-    icon: "💼",
+    icon: "",
   },
   {
     value: "friendly",
     label: "Friendly",
     description: "Warm and approachable",
-    icon: "😊",
+    icon: "",
   },
   {
     value: "casual",
     label: "Casual",
     description: "Relaxed and informal",
-    icon: "👋",
+    icon: "",
   },
   {
     value: "conversational",
     label: "Conversational",
     description: "Natural and engaging",
-    icon: "💬",
+    icon: "",
   },
   {
     value: "formal",
     label: "Formal",
     description: "Structured and official",
-    icon: "🎩",
+    icon: "",
   },
   {
     value: "enthusiastic",
     label: "Enthusiastic",
     description: "Energetic and excited",
-    icon: "🚀",
+    icon: "",
   },
 ];
 
@@ -168,37 +168,37 @@ const marketingGoals = [
   {
     value: "brand_awareness",
     label: "Brand Awareness",
-    icon: "📢",
+    icon: "",
     desc: "Get known in your market",
   },
   {
     value: "lead_generation",
     label: "Lead Generation",
-    icon: "🎯",
+    icon: "",
     desc: "Attract potential customers",
   },
   {
     value: "customer_retention",
     label: "Customer Retention",
-    icon: "💝",
+    icon: "",
     desc: "Keep existing customers happy",
   },
   {
     value: "sales_conversion",
     label: "Sales Conversion",
-    icon: "💰",
+    icon: "",
     desc: "Turn leads into sales",
   },
   {
     value: "engagement",
     label: "Engagement",
-    icon: "👥",
+    icon: "",
     desc: "Build community around your brand",
   },
   {
     value: "reach",
     label: "Reach",
-    icon: "🌐",
+    icon: "",
     desc: "Expand your market presence",
   },
 ];
@@ -236,6 +236,14 @@ const Register = ({ onSwitchToLogin }) => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
+
+  const getShortLabel = (text = "") =>
+    text
+      .split(" ")
+      .map((part) => part[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -373,8 +381,8 @@ const Register = ({ onSwitchToLogin }) => {
   const renderStep1 = () => (
     <div className="space-y-6 animate-fade-in">
       <div className="text-center mb-8">
-        <div className="w-16 h-16 bg-blue-600 dark:bg-blue-500 rounded-xl flex items-center justify-center mx-auto mb-4">
-          <span className="text-2xl">🚀</span>
+        <div className="w-16 h-16 bg-gradient-to-br from-blue-500/85 to-indigo-500/85 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+          <span className="text-lg font-bold text-white">1</span>
         </div>
         <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
           Create Your Account
@@ -501,8 +509,8 @@ const Register = ({ onSwitchToLogin }) => {
   const renderStep2 = () => (
     <div className="space-y-8 animate-fade-in">
       <div className="text-center mb-8">
-        <div className="w-16 h-16 bg-blue-600 dark:bg-blue-500 rounded-xl flex items-center justify-center mx-auto mb-4">
-          <span className="text-2xl">🏢</span>
+        <div className="w-16 h-16 bg-gradient-to-br from-blue-500/85 to-indigo-500/85 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+          <span className="text-lg font-bold text-white">2</span>
         </div>
         <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
           About Your Business
@@ -531,7 +539,7 @@ const Register = ({ onSwitchToLogin }) => {
                     : "border-gray-300 dark:border-gray-600 hover:border-blue-300 bg-white dark:bg-gray-800"
                 }`}
               >
-                <div className="text-2xl mb-2">{type.icon}</div>
+                <div className="text-xs font-semibold mb-2 inline-flex px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200">{type.icon || getShortLabel(type.label)}</div>
                 <div className="font-semibold text-gray-900 dark:text-white text-sm">
                   {type.label}
                 </div>
@@ -618,8 +626,8 @@ const Register = ({ onSwitchToLogin }) => {
   const renderStep3 = () => (
     <div className="space-y-8 animate-fade-in">
       <div className="text-center mb-8">
-        <div className="w-16 h-16 bg-green-600 dark:bg-green-500 rounded-xl flex items-center justify-center mx-auto mb-4">
-          <span className="text-2xl">🎯</span>
+        <div className="w-16 h-16 bg-gradient-to-br from-blue-500/85 to-indigo-500/85 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+          <span className="text-lg font-bold text-white">3</span>
         </div>
         <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
           Target Audience & Goals
@@ -712,7 +720,7 @@ const Register = ({ onSwitchToLogin }) => {
                     : "border-gray-300 dark:border-gray-600 hover:border-green-300 bg-white dark:bg-gray-800"
                 }`}
               >
-                <div className="text-2xl mb-2">{goal.icon}</div>
+                <div className="text-xs font-semibold mb-2 inline-flex px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200">{goal.icon || getShortLabel(goal.label)}</div>
                 <div className="font-semibold text-gray-900 dark:text-white text-sm">
                   {goal.label}
                 </div>
@@ -730,8 +738,8 @@ const Register = ({ onSwitchToLogin }) => {
   const renderStep4 = () => (
     <div className="space-y-8 animate-fade-in">
       <div className="text-center mb-8">
-        <div className="w-16 h-16 bg-purple-600 dark:bg-purple-500 rounded-xl flex items-center justify-center mx-auto mb-4">
-          <span className="text-2xl">🎨</span>
+        <div className="w-16 h-16 bg-gradient-to-br from-blue-500/85 to-indigo-500/85 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+          <span className="text-lg font-bold text-white">4</span>
         </div>
         <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
           Brand Preferences
@@ -806,7 +814,7 @@ const Register = ({ onSwitchToLogin }) => {
                     : "border-gray-300 dark:border-gray-600 hover:border-blue-300 bg-white dark:bg-gray-800"
                 }`}
               >
-                <div className="text-2xl mb-2">{tone.icon}</div>
+                <div className="text-xs font-semibold mb-2 inline-flex px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200">{tone.icon || getShortLabel(tone.label)}</div>
                 <div className="font-semibold text-gray-900 dark:text-white text-sm">
                   {tone.label}
                 </div>
@@ -827,22 +835,18 @@ const Register = ({ onSwitchToLogin }) => {
         {
           num: 1,
           label: "Account",
-          icon: "🚀",
         },
         {
           num: 2,
           label: "Business",
-          icon: "🏢",
         },
         {
           num: 3,
           label: "Goals",
-          icon: "🎯",
         },
         {
           num: 4,
           label: "Brand",
-          icon: "🎨",
         },
       ].map((stepInfo, index) => (
         <div key={stepInfo.num} className="flex items-center">
@@ -854,7 +858,7 @@ const Register = ({ onSwitchToLogin }) => {
                   : "bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
               }`}
             >
-              {step > stepInfo.num ? "✓" : stepInfo.icon}
+              {step > stepInfo.num ? "✓" : stepInfo.num}
             </div>
             <div
               className={`text-xs mt-2 font-medium transition-colors duration-300 ${
@@ -881,11 +885,11 @@ const Register = ({ onSwitchToLogin }) => {
   );
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
+    <div className="min-h-screen enterprise-shell py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
       <div className="max-w-2xl w-full mx-auto">
         {renderStepIndicator()}
 
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-8 transition-all duration-300">
+        <div className="glass-surface rounded-xl shadow-lg border border-slate-200/70 dark:border-slate-700/70 p-8 transition-all duration-300">
           <form
             onSubmit={step === 4 ? handleSubmit : (e) => e.preventDefault()}
           >
@@ -928,7 +932,7 @@ const Register = ({ onSwitchToLogin }) => {
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded-lg font-medium transition-all duration-200"
+                  className="flex items-center px-6 py-3 button-enterprise text-white rounded-lg font-medium transition-colors duration-200"
                 >
                   Next Step
                   <svg
@@ -947,7 +951,7 @@ const Register = ({ onSwitchToLogin }) => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex items-center px-8 py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center px-8 py-3 button-enterprise text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? (
                     <>
@@ -974,7 +978,7 @@ const Register = ({ onSwitchToLogin }) => {
                       Creating Account...
                     </>
                   ) : (
-                    <>🎉 Create Account & Get 10 Free Credits!</>
+                    <>Create Account & Get 10 Free Credits!</>
                   )}
                 </button>
               )}

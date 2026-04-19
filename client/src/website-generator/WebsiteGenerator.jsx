@@ -291,22 +291,22 @@ const WebsiteGenerator = () => {
   // Show loading spinner while auth is checking
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center transition-colors duration-300">
+      <div className="min-h-screen enterprise-shell flex items-center justify-center transition-colors duration-300">
         <LoadingSpinner />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <div className="min-h-screen enterprise-shell transition-colors duration-300">
       <AppNavigation />
 
       {/* Page Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+      <div className="glass-surface border-b border-slate-200/70 dark:border-slate-700/70 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center space-x-4">
-              <div className="p-3 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl shadow-lg">
+              <div className="p-3 bg-gradient-to-br from-blue-500/85 to-indigo-500/85 rounded-xl shadow-md">
                 <svg
                   className="w-6 h-6 text-white"
                   fill="none"
@@ -330,9 +330,9 @@ const WebsiteGenerator = () => {
                 </p>
               </div>
             </div>
-            <div className="flex items-center space-x-2 px-4 py-2 bg-violet-50 dark:bg-violet-900/20 rounded-lg border border-violet-200 dark:border-violet-700">
+            <div className="flex items-center space-x-2 px-4 py-2 bg-blue-50/80 dark:bg-blue-900/20 rounded-lg border border-blue-200/70 dark:border-blue-700/50">
               <svg
-                className="w-4 h-4 text-violet-600 dark:text-violet-400"
+                className="w-4 h-4 text-blue-600 dark:text-blue-400"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -344,7 +344,7 @@ const WebsiteGenerator = () => {
                   d="M13 10V3L4 14h7v7l9-11h-7z"
                 />
               </svg>
-              <span className="text-sm font-medium text-violet-700 dark:text-violet-300">
+              <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
                 5 credits per website
               </span>
             </div>
@@ -354,45 +354,45 @@ const WebsiteGenerator = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Tab Navigation */}
-        <nav className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-1.5 mb-6 shadow-sm">
+        <nav className="glass-surface border border-slate-200/70 dark:border-slate-700/70 rounded-xl p-1.5 mb-6 shadow-sm">
           <div className="flex flex-wrap gap-1">
             <button
               className={`flex-1 py-3 px-4 sm:px-6 rounded-lg font-medium text-sm transition-all duration-200 whitespace-nowrap ${
                 activeTab === "generate"
-                  ? "bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-md"
-                  : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    ? "button-enterprise text-white shadow-sm"
+                    : "text-slate-600 dark:text-slate-300 hover:bg-slate-100/70 dark:hover:bg-slate-800/80"
               }`}
               onClick={() => setActiveTab("generate")}
             >
-              ✨ Generate
+                  Generate
             </button>
             <button
               className={`flex-1 py-3 px-4 sm:px-6 rounded-lg font-medium text-sm transition-all duration-200 whitespace-nowrap ${
                 activeTab === "manage"
-                  ? "bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-md"
-                  : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    ? "button-enterprise text-white shadow-sm"
+                    : "text-slate-600 dark:text-slate-300 hover:bg-slate-100/70 dark:hover:bg-slate-800/80"
               }`}
               onClick={() => setActiveTab("manage")}
             >
-              📁 My Websites
+                  My Websites
             </button>
             {selectedWebsite && (
               <button
                 className={`flex-1 py-3 px-4 sm:px-6 rounded-lg font-medium text-sm transition-all duration-200 whitespace-nowrap ${
                   activeTab === "preview"
-                    ? "bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-md"
-                    : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    ? "button-enterprise text-white shadow-sm"
+                    : "text-slate-600 dark:text-slate-300 hover:bg-slate-100/70 dark:hover:bg-slate-800/80"
                 }`}
                 onClick={() => setActiveTab("preview")}
               >
-                👁️ Preview
+                Preview
               </button>
             )}
           </div>
         </nav>
 
         {/* Main Content */}
-        <main className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 sm:p-8 relative shadow-sm">
+        <main className="glass-surface border border-slate-200/70 dark:border-slate-700/70 rounded-xl p-6 sm:p-8 relative shadow-sm">
           {loading && <LoadingSpinner />}
 
           {/* Generate Website Tab */}
@@ -436,7 +436,7 @@ const WebsiteGenerator = () => {
                       setActiveTab("generate");
                       setCurrentStep("create");
                     }}
-                    className="bg-gradient-to-r from-green-500 to-blue-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center gap-2"
+                    className="button-enterprise text-white px-6 py-3 rounded-xl font-semibold transition-colors duration-200 flex items-center gap-2"
                   >
                     <svg
                       className="w-5 h-5"
@@ -459,7 +459,7 @@ const WebsiteGenerator = () => {
               {/* Websites Grid */}
               {loading ? (
                 <div className="text-center py-16">
-                  <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 animate-spin">
+                  <div className="w-16 h-16 bg-slate-200 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-6 animate-spin">
                     <svg
                       className="w-8 h-8 text-white"
                       fill="none"
@@ -510,9 +510,9 @@ const WebsiteGenerator = () => {
                       setActiveTab("generate");
                       setCurrentStep("create");
                     }}
-                    className="bg-gradient-to-r from-green-500 to-blue-600 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
+                    className="button-enterprise text-white px-8 py-3 rounded-xl font-semibold transition-colors duration-200"
                   >
-                    ✨ Create Your First Website
+                    Create Your First Website
                   </button>
                 </div>
               ) : (
@@ -547,7 +547,7 @@ const WebsiteGenerator = () => {
                               : "bg-yellow-100 text-yellow-800"
                           }`}
                         >
-                          {website.isPublished ? "🌐 Published" : "📝 Draft"}
+                          {website.isPublished ? "Published" : "Draft"}
                         </span>
                       </div>
 
@@ -597,19 +597,19 @@ const WebsiteGenerator = () => {
                           }}
                           className="flex-1 bg-blue-600 text-white px-3 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm"
                         >
-                          👁️ Preview
+                          Preview
                         </button>
                         <button
                           onClick={() => handleEditWebsite(website)}
                           className="flex-1 bg-gray-600 text-white px-3 py-2 rounded-lg font-medium hover:bg-gray-700 transition-colors text-sm"
                         >
-                          ✏️ Edit
+                          Edit
                         </button>
                         <button
                           onClick={() => handleDeleteWebsite(website._id)}
                           className="bg-red-600 text-white px-3 py-2 rounded-lg font-medium hover:bg-red-700 transition-colors text-sm"
                         >
-                          🗑️
+                          Delete
                         </button>
                       </div>
 
@@ -646,7 +646,7 @@ const WebsiteGenerator = () => {
 
               {/* Summary Statistics */}
               {websites.length > 0 && (
-                <div className="bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-700 dark:to-gray-600 rounded-xl p-6 mt-8">
+                <div className="gradient-panel rounded-xl p-6 mt-8 border border-slate-200/60 dark:border-slate-700/60">
                   <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
                     Website Statistics
                   </h3>
@@ -702,12 +702,12 @@ const WebsiteGenerator = () => {
               <div className="grid md:grid-cols-2 gap-8">
                 {/* Create Website Card */}
                 <div
-                  className={`group bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-xl hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 border border-gray-100 dark:border-gray-700 ${slideUp}`}
+                  className={`glass-surface rounded-2xl p-8 shadow-lg transition-all duration-300 border border-slate-200/70 dark:border-slate-700/70 ${slideUp}`}
                 >
                   <div className="text-center">
-                    <div className="w-20 h-20 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <div className="w-20 h-20 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 border border-blue-200/70 dark:border-blue-700/50 rounded-full flex items-center justify-center mx-auto mb-6">
                       <svg
-                        className="w-10 h-10 text-white"
+                        className="w-10 h-10 text-blue-700 dark:text-blue-300"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -729,22 +729,22 @@ const WebsiteGenerator = () => {
                     </p>
                     <button
                       onClick={() => setCurrentStep("create")}
-                      className="bg-gradient-to-r from-green-500 to-blue-600 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 w-full"
+                      className="button-enterprise text-white px-8 py-4 rounded-xl font-semibold text-lg transition-colors duration-200 w-full"
                     >
-                      ✨ Start Creating
+                      Start Creating
                     </button>
                   </div>
                 </div>
 
                 {/* Deploy Website Card */}
                 <div
-                  className={`group bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-xl hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 border border-gray-100 dark:border-gray-700 ${slideUp}`}
+                  className={`glass-surface rounded-2xl p-8 shadow-lg transition-all duration-300 border border-slate-200/70 dark:border-slate-700/70 ${slideUp}`}
                   style={{ animationDelay: "0.2s" }}
                 >
                   <div className="text-center">
-                    <div className="w-20 h-20 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <div className="w-20 h-20 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 border border-blue-200/70 dark:border-blue-700/50 rounded-full flex items-center justify-center mx-auto mb-6">
                       <svg
-                        className="w-10 h-10 text-white"
+                        className="w-10 h-10 text-blue-700 dark:text-blue-300"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -766,9 +766,9 @@ const WebsiteGenerator = () => {
                     </p>
                     <button
                       onClick={() => setCurrentStep("deploy")}
-                      className="bg-gradient-to-r from-purple-500 to-pink-600 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 w-full"
+                      className="button-enterprise text-white px-8 py-4 rounded-xl font-semibold text-lg transition-colors duration-200 w-full"
                     >
-                      🚀 Deploy Now
+                      Deploy Now
                     </button>
                   </div>
                 </div>
@@ -794,7 +794,7 @@ const WebsiteGenerator = () => {
                           {website.templateName}
                         </div>
                         <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                          {website.isDeployed ? "🌐 Deployed" : "📝 Draft"}
+                          {website.isDeployed ? "Deployed" : "Draft"}
                         </div>
                       </div>
                     ))}
@@ -805,7 +805,7 @@ const WebsiteGenerator = () => {
               {/* User Statistics Dashboard */}
               {isAuthenticated && displayUser && (
                 <div
-                  className={`bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-8 shadow-xl border border-gray-200 dark:border-gray-600 ${slideUp}`}
+                  className={`gradient-panel rounded-2xl p-8 shadow-lg border border-slate-200/70 dark:border-slate-700/70 ${slideUp}`}
                   style={{ animationDelay: "0.6s" }}
                 >
                   <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center">
@@ -884,7 +884,7 @@ const WebsiteGenerator = () => {
             <div
               className={`bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 relative overflow-hidden ${fadeIn}`}
             >
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-400 to-blue-500"></div>
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400/70 to-indigo-400/70"></div>
               <div className="p-8">
                 <div className="flex items-center justify-between mb-8">
                   <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100">
@@ -974,7 +974,7 @@ const WebsiteGenerator = () => {
             <div
               className={`bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 relative overflow-hidden ${fadeIn}`}
             >
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-400 to-pink-500"></div>
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400/70 to-indigo-400/70"></div>
               <div className="p-8">
                 <div className="flex items-center justify-between mb-8">
                   <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100">
@@ -1025,7 +1025,7 @@ const WebsiteGenerator = () => {
                     </p>
                     <button
                       onClick={() => setCurrentStep("create")}
-                      className="bg-gradient-to-r from-green-500 to-blue-600 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
+                      className="button-enterprise text-white px-8 py-3 rounded-xl font-semibold transition-colors duration-200"
                     >
                       Create Website
                     </button>
@@ -1091,7 +1091,7 @@ const WebsiteGenerator = () => {
             <div
               className={`bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 relative overflow-hidden ${fadeIn}`}
             >
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-purple-500"></div>
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400/70 to-indigo-400/70"></div>
               <div className="p-8">
                 <div className="flex items-center justify-between mb-8">
                   <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100">
@@ -1121,7 +1121,7 @@ const WebsiteGenerator = () => {
 
                 {/* Deploy Section */}
                 {!selectedWebsite.isDeployed ? (
-                  <div className="mt-8 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/30 dark:to-blue-900/30 rounded-xl p-8 border border-purple-200 dark:border-purple-700">
+                  <div className="mt-8 gradient-panel rounded-xl p-8 border border-slate-200/70 dark:border-slate-700/70">
                     <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center">
                       Ready to Deploy?
                     </h3>
@@ -1148,7 +1148,7 @@ const WebsiteGenerator = () => {
                         className={`px-8 py-4 rounded-xl font-semibold text-lg shadow-lg transition-all transform ${
                           deploying
                             ? "bg-gray-400 cursor-not-allowed"
-                            : "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 hover:scale-105 hover:shadow-xl"
+                            : "button-enterprise"
                         } text-white`}
                         onClick={() =>
                           handleDeployWebsite(selectedWebsite._id, siteName)
@@ -1180,7 +1180,7 @@ const WebsiteGenerator = () => {
                             Deploying... {deployTimer}s
                           </span>
                         ) : (
-                          "🚀 Deploy Website"
+                          "Deploy Website"
                         )}
                       </button>
 
@@ -1195,7 +1195,7 @@ const WebsiteGenerator = () => {
                           {deployResult.success ? (
                             <div>
                               <p className="font-semibold mb-2">
-                                🎉 Deployment Successful!
+                                 Deployment Successful!
                               </p>
                               <a
                                 href={deployResult.url}
@@ -1241,9 +1241,9 @@ const WebsiteGenerator = () => {
                       href={selectedWebsite.deploymentUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="bg-green-600 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:bg-green-700 hover:shadow-xl transition-all inline-block"
+                      className="button-enterprise text-white px-8 py-3 rounded-xl font-semibold transition-colors duration-200 inline-block"
                     >
-                      🌐 View Live Website
+                      View Live Website
                     </a>
                   </div>
                 ) : null}
