@@ -15,7 +15,7 @@ const {
   ChatbotChain,
 } = require("../services/langchain/contextualChains");
 const Company = require("../models/Company");
-const { businessLogger } = require("../utils/logger");
+const { businessLogger } = require("./logger");
 
 class VectorContextTester {
   constructor() {

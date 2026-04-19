@@ -175,9 +175,15 @@ export const authAPI = {
       }
       return response.data;
     } catch (error) {
+      const errorData = error.response?.data;
+      const validationMessage = errorData?.errors?.[0]?.msg;
       return {
         success: false,
-        message: error.response?.data?.message || "Registration failed",
+        message:
+          errorData?.message === "Validation failed" && validationMessage
+            ? validationMessage
+            : errorData?.message || "Registration failed",
+        errors: errorData?.errors || [],
       };
     }
   },

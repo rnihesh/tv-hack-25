@@ -56,7 +56,7 @@ class FeedbackVectorStore {
         try {
           this.embeddings = new GoogleGenerativeAIEmbeddings({
             apiKey: config.geminiApiKey,
-            model: "text-embedding-004",
+            modelName: config.geminiEmbeddingModel,
           });
 
           // Skip test embeddings to save API calls

@@ -29,7 +29,8 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response.data,
   (error) => {
-    if (error.response?.status === 401) {
+    const isAuthEndpoint = /\/auth\//.test(error.config?.url || "");
+    if (error.response?.status === 401 && isAuthEndpoint) {
       localStorage.removeItem("authToken");
       window.location.href = "/login";
     }

@@ -3,6 +3,40 @@ import { subscriptionAPI } from "../utils/subscriptionApi";
 import { authAPI } from "../utils/api";
 import AppNavigation from "./AppNavigation";
 
+const RAZORPAY_SCRIPT_SRC = "https://checkout.razorpay.com/v1/checkout.js";
+
+const loadRazorpayScript = () => {
+  return new Promise((resolve, reject) => {
+    if (window.Razorpay) {
+      resolve(true);
+      return;
+    }
+
+    const existingScript = document.querySelector(
+      `script[src="${RAZORPAY_SCRIPT_SRC}"]`
+    );
+
+    if (existingScript) {
+      existingScript.addEventListener("load", () => resolve(true), {
+        once: true,
+      });
+      existingScript.addEventListener(
+        "error",
+        () => reject(new Error("Failed to load payment gateway")),
+        { once: true }
+      );
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = RAZORPAY_SCRIPT_SRC;
+    script.async = true;
+    script.onload = () => resolve(true);
+    script.onerror = () => reject(new Error("Failed to load payment gateway"));
+    document.body.appendChild(script);
+  });
+};
+
 const SubscriptionPage = () => {
   const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -58,6 +92,8 @@ const SubscriptionPage = () => {
   const handlePurchase = async (packageId) => {
     try {
       setLoading(true);
+
+      await loadRazorpayScript();
 
       // Create Razorpay order
       const orderResponse = await subscriptionAPI.createOrder(packageId);

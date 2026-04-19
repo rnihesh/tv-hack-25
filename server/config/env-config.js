@@ -30,6 +30,12 @@ module.exports = {
 
   // AI Model Configuration
   geminiApiKey: process.env.GEMINI_API_KEY,
+  geminiEmbeddingModel:
+    process.env.GEMINI_EMBEDDING_MODEL || "text-embedding-004",
+  imagenModels: (process.env.IMAGEN_MODELS || process.env.IMAGEN_MODEL || "")
+    .split(",")
+    .map((model) => model.trim())
+    .filter(Boolean),
   ollamaUrl: process.env.OLLAMA_URL || "http://localhost:11434",
 
   // Cloudinary Configuration

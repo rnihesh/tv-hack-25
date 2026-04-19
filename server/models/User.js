@@ -33,6 +33,8 @@ const CompanySchema = new mongoose.Schema(
         "consulting",
         "manufacturing",
         "real_estate",
+        "finance",
+        "marketing",
         "other",
       ],
     },

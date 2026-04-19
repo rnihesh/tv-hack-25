@@ -83,7 +83,12 @@ const ImageGenerator = () => {
       if (response.success) {
         setGeneratedImage(response.data);
         setActiveTab("preview");
-        showToast("Image generated successfully!", "success");
+        showToast(
+          response.data?.fallback
+            ? response.message || "Fallback poster generated."
+            : response.message || "Image generated successfully!",
+          response.data?.fallback ? "warning" : "success"
+        );
 
         // Always refresh history after successful generation
         // Reset images first to trigger a fresh load

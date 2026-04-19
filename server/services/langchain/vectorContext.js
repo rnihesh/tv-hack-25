@@ -53,7 +53,7 @@ class VectorContextService {
         try {
           this.embeddings = new GoogleGenerativeAIEmbeddings({
             apiKey: config.geminiApiKey,
-            model: "text-embedding-004", // Updated to latest model
+            modelName: config.geminiEmbeddingModel,
           });
 
           // Skip test embedding to save API calls
